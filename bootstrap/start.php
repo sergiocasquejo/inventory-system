@@ -26,7 +26,9 @@ $app = new Illuminate\Foundation\Application;
 
 $env = $app->detectEnvironment(array(
 
-	'local' => array('homestead'),
+	'local' => array('*.local','programmer-desktop', 'philwebservicesdataentry3-desktop'),
+	'development' => array('*.com.au'),
+	'production' => array('*.com'),
 
 ));
 
