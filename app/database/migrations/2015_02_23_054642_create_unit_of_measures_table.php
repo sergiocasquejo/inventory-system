@@ -14,7 +14,8 @@ class CreateUnitOfMeasuresTable extends Migration {
 	{
 		// Creates the users table
         Schema::create('unit_of_measures', function ($table) {
-            $table->increments('uom_id');
+        	$table->engine ='InnoDB';
+            $table->increments('uom_id')->unsigned();
             $table->string('name', 120)->unique();
             $table->string('label', 120)->unique();
         });

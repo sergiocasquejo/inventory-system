@@ -10,7 +10,8 @@
 | and give it the Closure to execute when that URI is requested.
 |
 */
-
+require_once 'routes/auth.php';
+require_once 'routes/errors.php';
 require_once 'routes/admin.php';
 
 Route::get('/', function()

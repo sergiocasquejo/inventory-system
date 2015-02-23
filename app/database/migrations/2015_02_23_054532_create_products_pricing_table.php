@@ -14,13 +14,17 @@ class CreateProductsPricingTable extends Migration {
 	{
 		// Creates the users table
         Schema::create('product_pricing', function ($table) {
+        	$table->engine ='InnoDB';
             $table->increments('price_id');
-            $table->bigInteger('product_id');
-            $table->integer('branch_id');
+            $table->bigInteger('product_id')->unsigned();
+            $table->integer('branch_id')->unsigned();
             $table->decimal('price', 10, 2);
             $table->float('per_unit');
             $table->string('uom', 120);
             $table->tinyInteger('status')->default(0);
+            $table->integer('encoded_by')->unsigned();
+            $table->timestamps();
+            $table->softDeletes();
             $table->foreign('product_id')
      			->references('id')->on('products')
      			->onDelete('cascade');

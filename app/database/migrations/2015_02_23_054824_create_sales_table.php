@@ -14,14 +14,16 @@ class CreateSalesTable extends Migration {
 	{
 		// Creates the users table
         Schema::create('sales', function ($table) {
-            $table->bigIncrements('sale_id');
-            $table->integer('branch_id');
-            $table->bigInteger('product_id');
+            $table->engine ='InnoDB';
+            $table->bigIncrements('sale_id')->unsigned();
+            $table->integer('branch_id')->unsigned();
+            $table->bigInteger('product_id')->unsigned();
             $table->float('quantity');
             $table->string('uom', 120);
             $table->decimal('total_amount', 10, 2);
-            $table->integer('encoded_by');
+            $table->integer('encoded_by')->unsigned();
             $table->timestamps();
+            $table->softDeletes();
             $table->foreign('encoded_by')
      			->references('id')->on('users')
      			->onDelete('cascade');

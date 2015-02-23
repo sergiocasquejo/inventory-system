@@ -14,13 +14,15 @@ class CreateProductsTable extends Migration {
 	{
 		// Creates the users table
         Schema::create('products', function ($table) {
-            $table->increments('id');
+        	$table->engine ='InnoDB';
+            $table->bigIncrements('id')->unsigned();
             $table->string('name', 255)->unique();
             $table->text('description');
             $table->text('comments');
             $table->tinyInteger('status')->default(0);
-            $table->integer('encoded_by');
+            $table->integer('encoded_by')->unsigned();
             $table->timestamps();
+            $table->softDeletes();
         });
 	}
 

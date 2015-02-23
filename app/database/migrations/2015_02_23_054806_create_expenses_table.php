@@ -14,17 +14,19 @@ class CreateExpensesTable extends Migration {
 	{
 		// Creates the users table
         Schema::create('expenses', function ($table) {
-            $table->bigIncrements('expense_id');
-            $table->integer('branch_id');
+            $table->engine ='InnoDB';
+            $table->bigIncrements('expense_id')->unsigned();
+            $table->integer('branch_id')->unsigned();
             $table->string('name', 255);
             $table->decimal('total_amount', 10, 2);
             $table->float('quantity');
             $table->string('uom', 120);
             $table->text('comments');
             $table->tinyInteger('status')->default(0);
-            $table->integer('encoded_by');
+            $table->integer('encoded_by')->unsigned();
             $table->date('date_of_expense');
             $table->timestamps();
+            $table->softDeletes();
             $table->foreign('encoded_by')
      			->references('id')->on('users')
      			->onDelete('cascade');

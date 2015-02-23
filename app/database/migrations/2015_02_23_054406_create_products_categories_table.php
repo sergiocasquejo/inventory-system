@@ -14,7 +14,8 @@ class CreateProductsCategoriesTable extends Migration {
 	{
 		// Creates the users table
         Schema::create('products_categories', function ($table) {
-            $table->increments('category_id');
+        	$table->engine ='InnoDB';
+            $table->increments('category_id')->unsigned();
             $table->string('name', 255)->unique();
             $table->string('slug', 255);
             $table->text('description');

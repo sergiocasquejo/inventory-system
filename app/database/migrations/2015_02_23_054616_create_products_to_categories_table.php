@@ -14,15 +14,16 @@ class CreateProductsToCategoriesTable extends Migration {
 	{
 		// Creates the users table
         Schema::create('products_to_categories', function ($table) {
-            $table->increments('product_to_category_id');
-            $table->bigInteger('product_id');
-            $table->integer('category_id');
+        	$table->engine ='InnoDB';
+            $table->increments('product_to_category_id')->unsigned();
+            $table->bigInteger('product_id')->unsigned();
+            $table->integer('category_id')->unsigned();
             $table->foreign('product_id')
      			->references('id')->on('products')
      			->onDelete('cascade');
 
      		$table->foreign('category_id')
-     			->references('id')->on('categories')
+     			->references('category_id')->on('products_categories')
      			->onDelete('cascade');
         });
 	}

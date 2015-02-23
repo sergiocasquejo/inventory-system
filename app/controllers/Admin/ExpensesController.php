@@ -9,7 +9,11 @@ class ExpensesController extends \BaseController {
 	 */
 	public function index()
 	{
-		//
+
+		$expenses = \Expense::withTrashed();
+
+
+		return \View::make('admin.expense.index')->with('expenses', $expenses);
 	}
 
 
@@ -20,7 +24,7 @@ class ExpensesController extends \BaseController {
 	 */
 	public function create()
 	{
-		//
+		return \View::make('admin.expense.create');
 	}
 
 

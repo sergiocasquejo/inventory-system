@@ -1,4 +1,5 @@
-<?php namespace Admin
+<?php namespace Admin;
+use View;
 
 class DashboardController extends \BaseController {
 	/**

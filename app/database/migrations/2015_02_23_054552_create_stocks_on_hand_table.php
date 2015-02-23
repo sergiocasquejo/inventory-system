@@ -14,12 +14,16 @@ class CreateStocksOnHandTable extends Migration {
 	{
 		// Creates the users table
         Schema::create('stocks_on_hand', function ($table) {
-            $table->increments('stock_on_hand');
-            $table->bigInteger('product_id');
-            $table->integer('branch_id');
+        	$table->engine ='InnoDB';
+            $table->increments('stock_on_hand')->unsigned();
+            $table->bigInteger('product_id')->unsigned();
+            $table->integer('branch_id')->unsigned();
             $table->float('total_stocks');
             $table->string('uom', 120);
             $table->tinyInteger('status')->default(0);
+            $table->integer('encoded_by')->unsigned();
+            $table->timestamps();
+            $table->softDeletes();
             $table->foreign('product_id')
      			->references('id')->on('products')
      			->onDelete('cascade');

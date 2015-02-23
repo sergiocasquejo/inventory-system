@@ -5,7 +5,8 @@
 	"license": "MIT",
 	"require": {
 		"laravel/framework": "4.2.*",
-		"zizaco/confide": "~4.3@dev"
+		"zizaco/confide": "~4.3@dev",
+		"stolz/assets": "0.0.9"
 	},
 	"autoload": {
 		"classmap": [
