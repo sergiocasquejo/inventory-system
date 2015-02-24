@@ -5,7 +5,7 @@ class StockOnHand extends Eloquent {
 	protected $primaryKey = 'stock_on_hand_id';
 
 	public static $rules = [
-		'branch_id'		=> 'required|exists:branches,id'
+		'branch_id'		=> 'required|exists:branches,id',
     	'product_id' => 'required|exists:products,id',
     	'total_stocks'	=> 'required|numeric',
     	'uom'	           => 'required',

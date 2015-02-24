@@ -9,7 +9,7 @@ class Branch extends Eloquent {
 	protected $dates = ['deleted_at'];
 	
 	public static $rules = [
-    	'name' 		=> 'required|min:5|unique:expenses',
+    	'name' 		=> 'required|min:5|unique:branches,name',
     	'address'	=> 'required',
     	'city' 		=> 'required',
     	'state'		=> 'required',

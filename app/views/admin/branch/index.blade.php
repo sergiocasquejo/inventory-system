@@ -9,21 +9,22 @@
             <form action="{{ route('admin_branches.index') }}"  class="form-horizontal tasi-form" method="GET">
               <input type="hidden" name="_token" value="{{ csrf_token() }}" />
               <header class="panel-heading">
-                  Branches
+                  Branches <a class="btn btn-info btn-xs" href="{{ route('admin_branches.create') }}">Add New</a> <a class="btn btn-warning btn-xs" href="{{ route('admin_branches.index') }}" title="Reset"><i class=" icon-refresh"></i></a>
               </header>
               <div class="dataTables_wrapper form-inline">
                 <div class="row">
                   <div class="col-sm-6">
                     <div id="sample_1_length" class="dataTables_length">
                       <label>
-                        {{ Form::select('records_per_page', \Config::get('agrivate.records_per_page'), Input::old('records_per_page', 10), ['class' => 'form-control', 'size' => '1']) }} 
+                        {{ Form::select('records_per_page', \Config::get('agrivate.records_per_page'), Input::get('records_per_page', 10), ['class' => 'form-control', 'size' => '1', 'onchange' => 'this.form.submit();']) }} 
                         records per page
                       </label>
                     </div>
                   </div>
                   <div class="col-sm-6">
-                    <div class="dataTables_filter" id="sample_1_filter">
-                      <label>Search: <input type="text" name="s" class="form-control"></label>
+                    
+                    <div class="dataTables_filter">
+                        <label class="pull-left">Search: <input type="text" name="s" class="form-control"> </label>
                     </div>
                   </div>
                 </div>
@@ -82,7 +83,7 @@
                   </div>
                   <div class="col-sm-6">
                     <div class="dataTables_filter pagination-sm">
-                      <label>{{ $branches->links() }}</label>
+                      <label>{{ $branches->appends($appends)->links() }}</label>
                     </div>
                   </div>
                 </div>

@@ -21,10 +21,6 @@ class CreateProductsPricingTable extends Migration {
             $table->decimal('price', 10, 2);
             $table->float('per_unit');
             $table->string('uom', 120);
-            $table->tinyInteger('status')->default(0);
-            $table->integer('encoded_by')->unsigned();
-            $table->timestamps();
-            $table->softDeletes();
             $table->foreign('product_id')
      			->references('id')->on('products')
      			->onDelete('cascade');

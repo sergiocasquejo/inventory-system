@@ -10,15 +10,19 @@ class BranchesController extends \BaseController {
 	public function index()
 	{
 		$input = \Input::all();
+
+
 		$branches = \Branch::withTrashed()->search($input)->orderBy('id', 'desc')->paginate(intval(array_get($input, 'records_per_page', 10)));
 		
 		$totalRows = \Branch::withTrashed()->count();
 
+		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
 		$countries = \Config::get('agrivate.countries');
 		return \View::make('admin.branch.index')
 			->with('branches', $branches)
 			->with('countries', $countries)
+			->with('appends', $appends)
 			->with('totalRows', $totalRows);
 	}
 
@@ -100,9 +104,13 @@ class BranchesController extends \BaseController {
 	 */
 	public function update($id)
 	{
+
+
 		$input = \Input::all();
 
 		$rules = \Branch::$rules;
+
+		$rules['name'] = $rules['name'].','.$id.',id';
 
 		$validator = \Validator::make($input, $rules);
 

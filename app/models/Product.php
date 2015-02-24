@@ -9,8 +9,8 @@ class Product extends Eloquent {
 	protected $dates = ['deleted_at'];
 
 	public static $rules = [
-    	'name'	           => 'required:min:5',
-    	'uom'	           => 'required',
+    	'name'	           => 'required|min:5|unique:products,name',
+    	'description'	   => 'required',
     	'encoded_by' 	   => 'required|exists:users,id',
     	'status'	       => 'required|in:0,1'
     ];
@@ -25,6 +25,10 @@ class Product extends Eloquent {
 	public function prices() {
     	return $this->hasMany('ProductPricing');
     }
+    
+    public function user() {
+    	return $this->belongsTo('User', 'encoded_by');
+    }
 
     public function stocks() {
     	return $this->hasMany('StockOnHand');
@@ -34,16 +38,25 @@ class Product extends Eloquent {
      * SCOPE QUERY
      *==================================================*/
 
-	public function scopeActive($query) {
-		return $query->where('status', 1);
-	}
+    public function scopeActive($query) {
+        return $query->where('status', 1);
+    }
 
-	public function scopeInActive($query) {
-		return $query->where('status', 0);
-	}
+    public function scopeInActive($query) {
+        return $query->where('status', 0);
+    }
+
+    public function scopeSearch($query, $input) {
+    	
+    	if (isset($input['s'])) {
+    		$query->whereRaw('name LIKE "%'. array_get($input, 's', '') .'%"');
+    	}
+
+    	return $query;
+    }
 
 
-	public function doSave(Expense $instance, $input) {
+	public function doSave(Product $instance, $input) {
 		$instance->name = array_get($input, 'name');
 		$instance->description = array_get($input, 'description');
 		$instance->comments = array_get($input, 'comments');

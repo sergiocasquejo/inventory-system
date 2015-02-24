@@ -34,4 +34,8 @@ class User extends Eloquent implements ConfideUserInterface {
         return $this->hasMany('ProductPricing');
     }
 
+    public function products() {
+        return $this->hasMany('Product');
+    }
+
 }

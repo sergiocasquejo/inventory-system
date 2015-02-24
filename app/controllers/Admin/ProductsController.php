@@ -10,10 +10,27 @@ class ProductsController extends \BaseController {
 	public function index()
 	{
 
+		$input = \Input::all();
+
+
+		$products = \Product::withTrashed()->search($input)->orderBy('id', 'desc')->paginate(intval(array_get($input, 'records_per_page', 10)));
+		
+		$totalRows = \Product::withTrashed()->count();
+
+		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
+
+		$countries = \Config::get('agrivate.countries');
+		return \View::make('admin.product.index')
+			->with('products', $products)
+			->with('branches', \Branch::all()->lists('name', 'id'))
+			->with('appends', $appends)
+			->with('totalRows', $totalRows);
+
+
 		$products = \Product::withTrashed();
 
 
-		return \View::make('admin.product.index')->with('products', $products);
+		;
 	}
 
 
@@ -37,6 +54,8 @@ class ProductsController extends \BaseController {
 	{
 		$input = \Input::all();
 
+		$input['encoded_by'] = \Confide::user()->id;
+
 		$rules = \Product::$rules;
 
 		$validator = \Validator::make($input, $rules);
@@ -47,8 +66,9 @@ class ProductsController extends \BaseController {
 			try {
 				$product = new \Product;
 
+
 				if ($product->doSave($product, $input)) {
-					return \Redirect::route('admin_branches.index')->with('success', \Lang::get('agrivate.created'));
+					return \Redirect::route('admin_products.index')->with('success', \Lang::get('agrivate.created'));
 				}
 
 				return \Redirect::back()->withErrors($product->errors())->withInput();
@@ -71,7 +91,7 @@ class ProductsController extends \BaseController {
 
 		$product = \Product::find($id);
 		
-		return \View::make('admin.product.edit')->with('product', $product);
+		return \View::make('admin.product.edit')->with('product', $product)->with('branches', array_add(\Branch::all()->lists('name', 'id'), '', 'Select Branch'));
 	}
 
 
@@ -85,23 +105,38 @@ class ProductsController extends \BaseController {
 	{
 		$input = \Input::all();
 
-		$rules = \Product::$rules;
 
-		$validator = \Validator::make($input, $rules);
+		if (array_get($input, 'action') == 'add_stock') {
+			$product = \Product::find($id);
 
-		if ($validator->fails()) {
-			return \Redirect::back()->withErrors($validator->errors())->withInput();
+			$repo = new \StockOnHand;
+
+			
+
 		} else {
-			try {
-				$product = \Product::findOrFail($id);
-				
-				if ($product->doSave($product, $input)) {
-					return \Redirect::route('admin_branches.index')->with('success', \Lang::get('agrivate.updated'));
-				}
 
-				return \Redirect::back()->withErrors($product->errors())->withInput();
-			} catch(\Exception $e) {
-				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
+
+			$rules = array_except(\Product::$rules, 'encoded_by');
+
+			$rules['name'] = $rules['name'].','.$id.',id';
+
+			$validator = \Validator::make($input, $rules);
+
+			if ($validator->fails()) {
+				return \Redirect::back()->withErrors($validator->errors())->withInput();
+			} else {
+				try {
+					$product = \Product::findOrFail($id);
+					
+					$input['encoded_by'] = $product->encoded_by;
+					if ($product->doSave($product, $input)) {
+						return \Redirect::route('admin_products.index')->with('success', \Lang::get('agrivate.updated'));
+					}
+
+					return \Redirect::back()->withErrors($product->errors())->withInput();
+				} catch(\Exception $e) {
+					return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
+				}
 			}
 		}
 	}
@@ -124,7 +159,7 @@ class ProductsController extends \BaseController {
             $product->delete();
         }
 
-        return \Redirect::route('admin_branches.index')->with('success', $message);
+        return \Redirect::route('admin_products.index')->with('success', $message);
 	}
 
 

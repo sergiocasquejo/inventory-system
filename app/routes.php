@@ -19,5 +19,5 @@ Route::get('/', function()
 	if (Auth::check())
 		return Redirect::route('admin_login');
 	else
-		return Redirect::to('users/login');
+		return Redirect::to('admin/login');
 });

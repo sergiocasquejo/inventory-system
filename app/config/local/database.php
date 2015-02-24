@@ -23,7 +23,7 @@ return array(
 		'mysql' => array(
 			'driver'    => 'mysql',
 			'host'      => 'localhost',
-			'database'  => 'sales',
+			'database'  => 'kmagrivate_db',
 			'username'  => 'root',
 			'password'  => '',
 			'charset'   => 'utf8',

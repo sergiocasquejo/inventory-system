@@ -1,7 +1,9 @@
 <?php
 
 return [
+	'statuses' => ['1' => 'Active', '0' => 'Inactive'], 
 	'records_per_page' => [
+		5 	=> 5,
 		10 => 10,
 		25 => 25,
 		50 => 100,
@@ -10,10 +12,12 @@ return [
 	'unit_of_measure' => [
 			'kg' 		=> 'Kilogram',
 			'pcs' 		=> 'Pieces',
-			'sack' 		=> 'Sack',
+			'sack' 		=> 'Sacks',
 			'gram' 		=> 'Gram',
-			'bottle' 	=> 'Bottle'
+			'bottle' 	=> 'Bottle', 
+			'ml'		=> 'Milliliter'
 		],
+
 	// Default country code
 	'default_country_code' => 'PH',
 	// List of countries

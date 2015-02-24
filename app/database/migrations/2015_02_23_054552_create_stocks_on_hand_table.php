@@ -20,10 +20,6 @@ class CreateStocksOnHandTable extends Migration {
             $table->integer('branch_id')->unsigned();
             $table->float('total_stocks');
             $table->string('uom', 120);
-            $table->tinyInteger('status')->default(0);
-            $table->integer('encoded_by')->unsigned();
-            $table->timestamps();
-            $table->softDeletes();
             $table->foreign('product_id')
      			->references('id')->on('products')
      			->onDelete('cascade');

@@ -55,12 +55,12 @@ return array(
 		'mysql' => array(
 			'driver'    => 'mysql',
 			'host'      => 'localhost',
-			'database'  => 'forge',
-			'username'  => 'forge',
-			'password'  => '',
+			'database'  => 'ianquija_agrivate',
+			'username'  => 'ianquija_agri',
+			'password'  => 'yB#yp3xC!A2K',
 			'charset'   => 'utf8',
 			'collation' => 'utf8_unicode_ci',
-			'prefix'    => '',
+			'prefix'    => 'sales_',
 		),
 
 		'pgsql' => array(

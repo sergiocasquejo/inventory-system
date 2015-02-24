@@ -12,6 +12,18 @@
             <li class="sub-menu">
                 <a href="javascript:;" class="">
                     <i class="icon-bar-chart"></i>
+                    <span>Products</span>
+                    <span class="arrow"></span>
+                </a>
+                <ul class="sub">
+                    <li><a class="" href="{{ route('admin_products.index') }}">All</a></li>
+                    <li><a class="" href="{{ route('admin_products.create') }}">Add New</a></li>
+                </ul>
+            </li>
+
+            <li class="sub-menu">
+                <a href="javascript:;" class="">
+                    <i class="icon-bar-chart"></i>
                     <span>Sales</span>
                     <span class="arrow"></span>
                 </a>

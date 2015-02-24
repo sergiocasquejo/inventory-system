@@ -32,7 +32,7 @@
         <form role="form" method="POST" action="{{{ URL::to('/users/login') }}}" accept-charset="UTF-8" class="form-signin">
         <h2 class="form-signin-heading">sign in now</h2>
         <div class="login-wrap">
-            <input class="form-control" tabindex="1" placeholder="{{{ Lang::get('confide::confide.e_mail') }}}" type="text" name="email" id="email" value="{{{ Input::old('email') }}}">
+            <input class="form-control" tabindex="1" placeholder="Email/Username" type="text" name="email" id="email" value="{{{ Input::old('email') }}}">
 
             <input class="form-control" tabindex="2" placeholder="{{{ Lang::get('confide::confide.password') }}}" type="password" name="password" id="password">
             <label class="checkbox">
