@@ -16,7 +16,7 @@ require_once 'routes/admin.php';
 
 Route::get('/', function()
 {
-	return View::make('hello');
+	return Redirect::route('users/login');
 });
 //
 

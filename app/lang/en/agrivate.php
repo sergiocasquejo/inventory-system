@@ -8,5 +8,10 @@ return [
 	'trashed' => 'Successfully trashed.',
 
 	// Table localizations
-	'empty'	=> 'Empty %s'
+	'empty'	=> 'Empty %s',
+
+	// Errors
+	'errors' => [
+		'permission' => 'You dont have permission to access the page!'
+	]
 ];

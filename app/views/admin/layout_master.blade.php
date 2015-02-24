@@ -37,7 +37,8 @@
       <!--main content start-->
       <section id="main-content">
           <section class="wrapper">
-              @yield('content')
+            @include('admin/_partials/messages')
+            @yield('content')
           </section>
       </section>
       <!--main content end-->
