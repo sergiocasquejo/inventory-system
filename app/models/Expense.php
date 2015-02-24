@@ -17,6 +17,9 @@ class Expense extends Eloquent {
     	'status'	       => 'required|in:0,1'
     ];
 
+    /**=================================================
+     * QUERY RELATIONSHIPS
+     *==================================================*/
 
 	public function user() {
 		return $this->belongsTo('User', 'encoded_by');
@@ -27,6 +30,17 @@ class Expense extends Eloquent {
         return $this->belongsTo('Branch', 'branch_id');
     }
 
+    /**=================================================
+     * SCOPE QUERY
+     *==================================================*/
+
+    public function scopeActive($query) {
+        return $query->where('status', 1);
+    }
+
+    public function scopeInActive($query) {
+        return $query->where('status', 0);
+    }
 
 	public function doSave(Expense $instance, $input) {
 		$instance->branch_id = array_get($input, 'branch_id');
@@ -39,20 +53,8 @@ class Expense extends Eloquent {
         $instance->encoded_by = array_get($input, 'encoded_by');
         $instance->date_of_expense = array_get($input, 'date_of_expense');
 		
-		$this->save($instance);
+		$instance->save();
 		return $instance;
 	}
-
-	 /**
-     * Simply saves the given instance
-     *
-     * @param  Expense $instance
-     *
-     * @return  boolean Success
-     */
-    public function save(Expense $instance)
-    {
-        return $instance->save();
-    }
 
 }

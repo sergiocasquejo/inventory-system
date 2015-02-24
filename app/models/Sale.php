@@ -11,7 +11,7 @@ class Sale extends Eloquent {
 	protected $dates = ['deleted_at'];
 
 	public static $rules = [
-		'branch_id'		=> 'required|exists:branches,id'
+		'branch_id'		=> 'required|exists:branches,id',
     	'product_id' => 'required|exists:products,id',
     	'quantity'	=> 'required|numeric',
     	'total_amount'	=> 'required|numeric',
@@ -20,7 +20,9 @@ class Sale extends Eloquent {
     	'status'	       => 'required|in:0,1'
     ];
 
-
+    /**=================================================
+     * QUERY RELATIONSHIPS
+     *==================================================*/
 	public function branch() {
 		return $this->belongsTo('Branch', 'branch_id');
 	}
@@ -35,6 +37,24 @@ class Sale extends Eloquent {
 		return $this->belongsTo('user', 'encoded_by');
 	}
 
+	/**=================================================
+     * SCOPE QUERY
+     *==================================================*/
+
+	public function scopeActive($query) {
+		return $query->where('status', 1);
+	}
+
+	public function scopeInActive($query) {
+		return $query->where('status', 0);
+	}
+
+	/**
+     * Simply saves the given instance
+     *
+     * @param  Sale $instance
+     * @return Object $instance
+     */
 
 
 	public function doSave(Expense $instance, $input) {
@@ -46,19 +66,8 @@ class Sale extends Eloquent {
 		$instance->encoded_by = array_get($input, 'encoded_by');
 		$instance->status = array_get($input, 'status');
 		
-		$this->save($instance);
+		$instance->save();
 		return $instance;
 	}
 
-	 /**
-     * Simply saves the given instance
-     *
-     * @param  Expense $instance
-     *
-     * @return  boolean Success
-     */
-    public function save(Expense $instance)
-    {
-        return $instance->save();
-    }
 }

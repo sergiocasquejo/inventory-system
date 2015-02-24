@@ -15,7 +15,9 @@ class Product extends Eloquent {
     	'status'	       => 'required|in:0,1'
     ];
 
-
+    /**=================================================
+     * QUERY RELATIONSHIPS
+     *==================================================*/
 	public function sales() {
 		return $this->hasMany('Sale');
 	}
@@ -28,6 +30,18 @@ class Product extends Eloquent {
     	return $this->hasMany('StockOnHand');
     }
 
+    /**=================================================
+     * SCOPE QUERY
+     *==================================================*/
+
+	public function scopeActive($query) {
+		return $query->where('status', 1);
+	}
+
+	public function scopeInActive($query) {
+		return $query->where('status', 0);
+	}
+
 
 	public function doSave(Expense $instance, $input) {
 		$instance->name = array_get($input, 'name');
@@ -36,20 +50,8 @@ class Product extends Eloquent {
 		$instance->status = array_get($input, 'status');
 		$instance->encoded_by = array_get($input, 'encoded_by');
 		
-		$this->save($instance);
+		$instance->save();
 		return $instance;
 	}
-
-	 /**
-     * Simply saves the given instance
-     *
-     * @param  Expense $instance
-     *
-     * @return  boolean Success
-     */
-    public function save(Expense $instance)
-    {
-        return $instance->save();
-    }
 
 }

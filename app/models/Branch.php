@@ -19,7 +19,9 @@ class Branch extends Eloquent {
     ];
 
 
-
+    /**=================================================
+     * QUERY RELATIONSHIPS
+     *==================================================*/
 	public function users() {
 		return $this->hasMany('User');
 	}
@@ -42,6 +44,18 @@ class Branch extends Eloquent {
         return $this->hasMany('StockOnHand');
     }
 
+    /**=================================================
+     * SCOPE QUERY
+     *==================================================*/
+
+    public function scopeActive($query) {
+        return $query->where('status', 1);
+    }
+
+    public function scopeInActive($query) {
+        return $query->where('status', 0);
+    }
+
 	public function doSave(Branch $instance, $input) {
 		$instance->name = array_get($input, 'name');
 		$instance->address = array_get($input, 'address');
@@ -51,20 +65,9 @@ class Branch extends Eloquent {
 		$instance->country = array_get($input, 'country');
 		$instance->status = array_get($input, 'status');
 		
-		$this->save($instance);
+		$instance->save();
 		return $instance;
 	}
 
-	 /**
-     * Simply saves the given instance
-     *
-     * @param  Branch $instance
-     *
-     * @return  boolean Success
-     */
-    public function save(Branch $instance)
-    {
-        return $instance->save();
-    }
 
 }

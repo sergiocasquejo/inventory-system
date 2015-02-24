@@ -4,7 +4,7 @@
         <!-- sidebar menu start-->
         <ul class="sidebar-menu">
             <li class="active">
-                <a class="" href="index.html">
+                <a class="" href="{{ route('admin_dashboard.index') }}">
                     <i class="icon-dashboard"></i>
                     <span>Dashboard</span>
                 </a>
@@ -16,8 +16,8 @@
                     <span class="arrow"></span>
                 </a>
                 <ul class="sub">
-                    <li><a class="" href="general.html">All</a></li>
-                    <li><a class="" href="buttons.html">Add New</a></li>
+                    <li><a class="" href="{{ route('admin_sales.index') }}">All</a></li>
+                    <li><a class="" href="{{ route('admin_sales.create') }}">Add New</a></li>
                 </ul>
             </li>
 
@@ -40,8 +40,8 @@
                     <span class="arrow"></span>
                 </a>
                 <ul class="sub">
-                    <li><a class="" href="general.html">All</a></li>
-                    <li><a class="" href="buttons.html">Add New</a></li>
+                    <li><a class="" href="{{ route('admin_users.index') }}">All</a></li>
+                    <li><a class="" href="{{ route('admin_users.create') }}">Add New</a></li>
                 </ul>
             </li>
 

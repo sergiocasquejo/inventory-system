@@ -31,20 +31,10 @@ class StockOnHand extends Eloquent {
 		$instance->status = array_get($input, 'status');
 		$instance->encoded_by = array_get($input, 'encoded_by');
 		
-		$this->save($instance);
+		$instance->save();
 		return $instance;
 	}
 
-	 /**
-     * Simply saves the given instance
-     *
-     * @param  Expense $instance
-     *
-     * @return  boolean Success
-     */
-    public function save(Expense $instance)
-    {
-        return $instance->save();
-    }
+
 
 }
