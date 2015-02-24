@@ -42,7 +42,7 @@ class ProductsController extends \BaseController {
 		$validator = \Validator::make($input, $rules);
 
 		if ($validator->fails()) {
-			return \Redirect::back()->withErrors($validator->errors());
+			return \Redirect::back()->withErrors($validator->errors())->withInput();
 		} else {
 			try {
 				$product = new \Product;
@@ -51,9 +51,9 @@ class ProductsController extends \BaseController {
 					return \Redirect::route('admin_branches.index')->with('success', \Lang::get('agrivate.created'));
 				}
 
-				return \Redirect::back()->withErrors($product->errors());
+				return \Redirect::back()->withErrors($product->errors())->withInput();
 			} catch(\Exception $e) {
-				return \Redirect::back()->withErrors((array)$e->getMessage());
+				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
 			}
 		}
 	}
@@ -90,7 +90,7 @@ class ProductsController extends \BaseController {
 		$validator = \Validator::make($input, $rules);
 
 		if ($validator->fails()) {
-			return \Redirect::back()->withErrors($validator->errors());
+			return \Redirect::back()->withErrors($validator->errors())->withInput();
 		} else {
 			try {
 				$product = \Product::findOrFail($id);
@@ -99,9 +99,9 @@ class ProductsController extends \BaseController {
 					return \Redirect::route('admin_branches.index')->with('success', \Lang::get('agrivate.updated'));
 				}
 
-				return \Redirect::back()->withErrors($product->errors());
+				return \Redirect::back()->withErrors($product->errors())->withInput();
 			} catch(\Exception $e) {
-				return \Redirect::back()->withErrors((array)$e->getMessage());
+				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
 			}
 		}
 	}

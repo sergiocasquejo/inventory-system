@@ -1,6 +1,11 @@
 <?php
 
 return [
+	'records_per_page' => [
+		10 => 10,
+		25 => 25,
+		50 => 100,
+	],
 	// Unit of measures
 	'unit_of_measure' => [
 			'kg' 		=> 'Kilogram',

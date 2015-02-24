@@ -7,8 +7,9 @@
 		 Edit Branch
 		</header>
 		<div class="panel-body">
-		  	<form action="{{ route('admin_branches.update', $branch->id) }}"  class="form-horizontal tasi-form" method="PUT">
+		  	<form action="{{ route('admin_branches.update', $branch->id) }}"  class="form-horizontal tasi-form" method="POST">
 		  		<input type="hidden" name="_token" value="{{ csrf_token() }}" />
+		  		<input name="_method" type="hidden" value="PUT">
 		       <div class="form-group">
 		          <label class="col-sm-2 control-label">Name</label>
 		          <div class="col-sm-10">
@@ -47,7 +48,7 @@
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Country</label>
 				  <div class="col-sm-10">
-				      {{ Form::select('country', $countries, Input::old('country', $branch->post_code), ['class' => 'form-control m-bot15']) }}
+				      {{ Form::select('country', $countries, Input::old('country', $branch->country), ['class' => 'form-control m-bot15']) }}
 				  </div>
 				</div>
 

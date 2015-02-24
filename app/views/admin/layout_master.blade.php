@@ -20,7 +20,11 @@
     <!-- Custom styles for this template -->
     <link href="{{ asset('/assets/backend/css/style.css') }}" rel="stylesheet">
     <link href="{{ asset('/assets/backend/css/style-responsive.css') }}" rel="stylesheet" />
-
+    <script type="text/javascript">
+    //<![CDATA[
+      var CSRF_TOKEN = '<?php echo csrf_token(); ?>';
+    //]]>
+    </script>
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 tooltipss and media queries -->
     <!--[if lt IE 9]>
       <script src="{{ asset('/assets/backend/js/html5shiv.js') }}"></script>
@@ -61,7 +65,8 @@
   <!--script for this page-->
   <script src="{{ asset('/assets/backend/js/sparkline-chart.js') }}"></script>
   <script src="{{ asset('/assets/backend/js/easy-pie-chart.js') }}"></script>
-
+  <script src="{{ asset('/assets/backend/js/obstrusive.js') }}"></script>
+  
   <script>
       //owl carousel
       $(document).ready(function() {

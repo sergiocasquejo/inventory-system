@@ -42,7 +42,7 @@ class ExpensesController extends \BaseController {
 		$validator = \Validator::make($input, $rules);
 
 		if ($validator->fails()) {
-			return \Redirect::back()->withErrors($validator->errors());
+			return \Redirect::back()->withErrors($validator->errors())->withInput();
 		} else {
 			try {
 				$expense = new \Expense;
@@ -51,9 +51,9 @@ class ExpensesController extends \BaseController {
 					return \Redirect::route('admin_branches.index')->with('success', \Lang::get('agrivate.created'));
 				}
 
-				return \Redirect::back()->withErrors($expense->errors());
+				return \Redirect::back()->withErrors($expense->errors())->withInput();
 			} catch(\Exception $e) {
-				return \Redirect::back()->withErrors((array)$e->getMessage());
+				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
 			}
 		}
 	}
@@ -90,7 +90,7 @@ class ExpensesController extends \BaseController {
 		$validator = \Validator::make($input, $rules);
 
 		if ($validator->fails()) {
-			return \Redirect::back()->withErrors($validator->errors());
+			return \Redirect::back()->withErrors($validator->errors())->withInput();
 		} else {
 			try {
 				$expense = \Expense::findOrFail($id);
@@ -99,9 +99,9 @@ class ExpensesController extends \BaseController {
 					return \Redirect::route('admin_branches.index')->with('success', \Lang::get('agrivate.updated'));
 				}
 
-				return \Redirect::back()->withErrors($expense->errors());
+				return \Redirect::back()->withErrors($expense->errors())->withInput();
 			} catch(\Exception $e) {
-				return \Redirect::back()->withErrors((array)$e->getMessage());
+				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
 			}
 		}
 	}

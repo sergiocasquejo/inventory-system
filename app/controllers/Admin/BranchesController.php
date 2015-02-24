@@ -9,10 +9,17 @@ class BranchesController extends \BaseController {
 	 */
 	public function index()
 	{
-		$branches = \Branch::withTrashed();
+		$input = \Input::all();
+		$branches = \Branch::withTrashed()->search($input)->orderBy('id', 'desc')->paginate(intval(array_get($input, 'records_per_page', 10)));
+		
+		$totalRows = \Branch::withTrashed()->count();
 
 
-		return \View::make('admin.branch.index')->with('branches', $branches);
+		$countries = \Config::get('agrivate.countries');
+		return \View::make('admin.branch.index')
+			->with('branches', $branches)
+			->with('countries', $countries)
+			->with('totalRows', $totalRows);
 	}
 
 
@@ -45,7 +52,7 @@ class BranchesController extends \BaseController {
 		$validator = \Validator::make($input, $rules);
 
 		if ($validator->fails()) {
-			return \Redirect::back()->withErrors($validator->errors());
+			return \Redirect::back()->withErrors($validator->errors())->withInput();
 		} else {
 			try {
 				$branch = new \Branch;
@@ -54,9 +61,9 @@ class BranchesController extends \BaseController {
 					return \Redirect::route('admin_branches.index')->with('success', \Lang::get('agrivate.created'));
 				}
 
-				return \Redirect::back()->withErrors($branch->errors());
+				return \Redirect::back()->withErrors($branch->errors())->withInput();
 			} catch(\Exception $e) {
-				return \Redirect::back()->withErrors((array)$e->getMessage());
+				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
 			}
 		}
 	}
@@ -72,10 +79,17 @@ class BranchesController extends \BaseController {
 	public function edit($id)
 	{
 
-		$brach = \Branch::findOrFail($id);
+		try {
+			$branch = \Branch::findOrFail($id);
+			$countries = \Config::get('agrivate.countries');
+		} catch(\Exception $e) {
+			return \Redirect::back()->with('info', \Lang::get('agrivate.errors.restore'));
+		}
 
-		return \View::make('admin.branch.edit')->with('branch', $branch);
+		return \View::make('admin.branch.edit')->with('branch', $branch)->with('countries', $countries);
 	}
+
+
 
 
 	/**
@@ -93,7 +107,7 @@ class BranchesController extends \BaseController {
 		$validator = \Validator::make($input, $rules);
 
 		if ($validator->fails()) {
-			return \Redirect::back()->withErrors($validator->errors());
+			return \Redirect::back()->withErrors($validator->errors())->withInput();
 		} else {
 			try {
 				$branch = \Branch::findOrFail($id);
@@ -102,9 +116,9 @@ class BranchesController extends \BaseController {
 					return \Redirect::route('admin_branches.index')->with('success', \Lang::get('agrivate.updated'));
 				}
 
-				return \Redirect::back()->withErrors($branch->errors());
+				return \Redirect::back()->withErrors($branch->errors())->withInput();
 			} catch(\Exception $e) {
-				return \Redirect::back()->withErrors((array)$e->getMessage());
+				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
 			}
 		}
 	}
@@ -130,6 +144,22 @@ class BranchesController extends \BaseController {
         // Session::set('success', 'Successfully deleted');
         return \Redirect::route('admin_branches.index')->with('success', $message);
         
+	}
+
+
+	/**
+	 * Restore deleted resource from storage.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function restore($id) {
+		$branch = \Branch::withTrashed()->where('id', $id)->first();
+		if (!$branch->restore()) {
+			return \Redirect::back()->withErrors($branch->errors());			
+		}
+
+		return \Redirect::back()->with('success', \Lang::get('agrivate.restored'));
 	}
 
 

@@ -7,8 +7,9 @@
 		 Create Product
 		</header>
 		<div class="panel-body">
-		  	<form action="{{ route('admin_sales.update') }}"  class="form-horizontal tasi-form" method="PUT">
+		  	<form action="{{ route('admin_sales.update') }}"  class="form-horizontal tasi-form" method="POST">
 		  		<input type="hidden" name="_token" value="{{ csrf_token() }}" />
+		  		<input name="_method" type="hidden" value="PUT">
 		       	<div class="form-group">
 					<label class="col-sm-2 control-label">Branch</label>
 					<div class="col-sm-10">

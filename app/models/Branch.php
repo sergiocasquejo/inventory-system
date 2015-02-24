@@ -56,6 +56,15 @@ class Branch extends Eloquent {
         return $query->where('status', 0);
     }
 
+    public function scopeSearch($query, $input) {
+    	
+    	if (isset($input['s'])) {
+    		$query->whereRaw('name LIKE "%'. array_get($input, 's', '') .'%"');
+    	}
+
+    	return $query;
+    }
+
 	public function doSave(Branch $instance, $input) {
 		$instance->name = array_get($input, 'name');
 		$instance->address = array_get($input, 'address');

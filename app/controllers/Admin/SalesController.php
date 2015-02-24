@@ -42,7 +42,7 @@ class SalesController extends \BaseController {
 		$validator = \Validator::make($input, $rules);
 
 		if ($validator->fails()) {
-			return \Redirect::back()->withErrors($validator->errors());
+			return \Redirect::back()->withErrors($validator->errors())->withInput();
 		} else {
 			try {
 				$errors = [];
@@ -59,13 +59,13 @@ class SalesController extends \BaseController {
 				});
 
 				if (count($errors))
-					return \Redirect::back()->withErrors($errors);
+					return \Redirect::back()->withErrors($errors)->withInput();
 				else
 					return \Redirect::route('admin_sales.index')->with('success', \Lang::get('agrivate.created'));
 
 				
 			} catch(\Exception $e) {
-				return \Redirect::back()->withErrors((array)$e->getMessage());
+				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
 			}
 		}
 	}
@@ -102,7 +102,7 @@ class SalesController extends \BaseController {
 		$validator = \Validator::make($input, $rules);
 
 		if ($validator->fails()) {
-			return \Redirect::back()->withErrors($validator->errors());
+			return \Redirect::back()->withErrors($validator->errors())->withInput();
 		} else {
 			try {
 				$errors = [];
@@ -119,11 +119,11 @@ class SalesController extends \BaseController {
 				});
 
 				if (count($errors))
-					return \Redirect::back()->withErrors($errors);
+					return \Redirect::back()->withErrors($errors)->withInput();
 				else
 					return \Redirect::route('admin_sales.index')->with('success', \Lang::get('agrivate.updated'));
 			} catch(\Exception $e) {
-				return \Redirect::back()->withErrors((array)$e->getMessage());
+				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
 			}
 		}
 	}

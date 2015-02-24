@@ -7,8 +7,9 @@
 		 Form Elements
 		</header>
 		<div class="panel-body">
-		  	<form action="{{ route('admin_expenses.update') }}"  class="form-horizontal tasi-form" method="PUT">
+		  	<form action="{{ route('admin_expenses.update') }}"  class="form-horizontal tasi-form" method="POST">
 		  		<input type="hidden" name="_token" value="{{ csrf_token() }}" />
+		  		<input name="_method" type="hidden" value="PUT">
 		       <div class="form-group">
 		          <label class="col-sm-2 control-label">Expense for</label>
 		          <div class="col-sm-10">
