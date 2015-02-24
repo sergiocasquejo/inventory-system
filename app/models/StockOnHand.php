@@ -9,8 +9,6 @@ class StockOnHand extends Eloquent {
     	'product_id' => 'required|exists:products,id',
     	'total_stocks'	=> 'required|numeric',
     	'uom'	           => 'required',
-    	'encoded_by' 	   => 'required|exists:users,id',
-    	'status'	       => 'required|in:0,1'
     ];
 
 
@@ -28,8 +26,6 @@ class StockOnHand extends Eloquent {
 		$instance->product_id = array_get($input, 'product_id');
 		$instance->total_stocks = array_get($input, 'total_stocks');
 		$instance->uom = array_get($input, 'uom');
-		$instance->status = array_get($input, 'status');
-		$instance->encoded_by = array_get($input, 'encoded_by');
 		
 		$instance->save();
 		return $instance;

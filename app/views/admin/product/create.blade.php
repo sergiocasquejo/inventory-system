@@ -60,7 +60,6 @@
 				              <th>Stocks</th>
 				              <th>Unit of measure</th>
 				              <th>Branch</th>
-				              <th>Status</th>
 				              <th></th>
 				          </tr>
 				        </thead>

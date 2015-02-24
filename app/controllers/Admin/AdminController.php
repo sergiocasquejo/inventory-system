@@ -42,8 +42,8 @@ class AdminController extends \BaseController {
      */
     public function logout()
     {
-        Confide::logout();
+        \Confide::logout();
 
-        return Redirect::route('admin_login');
+        return \Redirect::route('admin_login');
     }
 }

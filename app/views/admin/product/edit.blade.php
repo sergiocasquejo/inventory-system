@@ -77,7 +77,6 @@
 				              <th>Stocks</th>
 				              <th>Unit of measure</th>
 				              <th>Branch</th>
-				              <th>Status</th>
 				              <th></th>
 				          </tr>
 				        </thead>
@@ -89,11 +88,6 @@
 				                  <td>{{{ $stock->total_stocks }}}</td>
 				                  <td>{{{ $stock->uom->name }}}</td>
 				                  <td>{{{ $stock->branch->name }}}</td>
-				                  <td>
-				                      <span class="label label-{{{ $stock->status ? 'success' : 'warning' }}} label-mini">
-				                          {{{ $stock->status ? 'Active' : 'Inactive' }}}
-				                      </span>
-				                  </td>
 				                  <td>
 				                      <a href="{{{ route('admin_products.edit', $product->id) }}}" class="btn btn-primary btn-xs" title="Edit"><i class="icon-pencil"></i></a>
 				    

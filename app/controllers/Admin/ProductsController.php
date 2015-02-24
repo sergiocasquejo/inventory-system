@@ -109,9 +109,19 @@ class ProductsController extends \BaseController {
 		if (array_get($input, 'action') == 'add_stock') {
 			$product = \Product::find($id);
 
-			$repo = new \StockOnHand;
+			$rules = \StockOnHand::$rules;
 
-			
+			$repo = new \StockOnHand;
+			$validator = \Validator::make($input, $rules);
+			if ($validator->fails()) {
+				return \Response::json($validator->errors());
+			} else {
+				if ($repo->doSave($repo, $input)) {
+					return \Response::json(['message' => \Lang::get('agrivate.created')]);
+				}
+
+				return \Response::json($repo->errors());
+			}
 
 		} else {
 
