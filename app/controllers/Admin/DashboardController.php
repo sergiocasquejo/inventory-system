@@ -8,6 +8,15 @@ class DashboardController extends \BaseController {
 	 * @return Response
 	 */
 	public static function index() {
-		return View::make('admin.dashboard.index');
+		$data = [];
+
+
+
+		$data['total_users']  = \User::count();
+		$data['total_expense']  = \Expense::sum('total_amount');
+		$data['total_sales']  = \Sale::sum('total_amount');
+		
+
+		return View::make('admin.dashboard.index', $data);
 	}
 }

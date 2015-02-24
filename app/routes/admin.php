@@ -1,6 +1,5 @@
 <?php
-//'before' => 'auth', 
-Route::group(['prefix' => 'admin'], function() {
+Route::group(['before' => 'auth', 'prefix' => 'admin'], function() {
 	
 	$prefixResourceNamespace = function($prefix) {
 		return [

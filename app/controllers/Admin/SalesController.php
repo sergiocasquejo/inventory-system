@@ -9,7 +9,11 @@ class SalesController extends \BaseController {
 	 */
 	public function index()
 	{
-		//
+
+		$sales = \Sale::withTrashed();
+
+
+		return \View::make('admin.sale.index')->with('sales', $sales);
 	}
 
 
@@ -20,7 +24,7 @@ class SalesController extends \BaseController {
 	 */
 	public function create()
 	{
-		//
+		return \View::make('admin.sale.create');
 	}
 
 
@@ -31,20 +35,41 @@ class SalesController extends \BaseController {
 	 */
 	public function store()
 	{
-		//
-	}
+		$input = \Input::all();
+
+		$rules = \Sale::$rules;
+
+		$validator = \Validator::make($input, $rules);
+
+		if ($validator->fails()) {
+			return \Redirect::back()->withErrors($validator->errors());
+		} else {
+			try {
+				$errors = [];
+
+				\DB::transaction(function() use($errors) {
 
 
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function show($id)
-	{
-		//
+					$sale = new \Sale;
+
+					if (!$sale->doSave($sale, $input)) {
+						$errors = $sale->errors();
+					}
+
+				});
+
+				if (count($errors))
+					return \Redirect::back()->withErrors($errors);
+				else
+					return \Redirect::route('admin_sales.index')->with('success', \Lang::get('agrivate.created'));
+
+				
+			} catch(\Exception $e) {
+				return \Redirect::back()->withErrors((array)$e->getMessage());
+			}
+		}
 	}
+
 
 
 	/**
@@ -55,7 +80,10 @@ class SalesController extends \BaseController {
 	 */
 	public function edit($id)
 	{
-		//
+
+		$sale = \Sale::find($id);
+		
+		return \View::make('admin.sale.edit')->with('sale', $sale);
 	}
 
 
@@ -67,7 +95,37 @@ class SalesController extends \BaseController {
 	 */
 	public function update($id)
 	{
-		//
+		$input = \Input::all();
+
+		$rules = \Sale::$rules;
+
+		$validator = \Validator::make($input, $rules);
+
+		if ($validator->fails()) {
+			return \Redirect::back()->withErrors($validator->errors());
+		} else {
+			try {
+				$errors = [];
+
+				\DB::transaction(function() use($errors, $id) {
+
+
+					$sale = \Sale::find($id);
+
+					if (!$sale->doSave($sale, $input)) {
+						$errors = $sale->errors();
+					}
+
+				});
+
+				if (count($errors))
+					return \Redirect::back()->withErrors($errors);
+				else
+					return \Redirect::route('admin_sales.index')->with('success', \Lang::get('agrivate.updated'));
+			} catch(\Exception $e) {
+				return \Redirect::back()->withErrors((array)$e->getMessage());
+			}
+		}
 	}
 
 
@@ -79,7 +137,16 @@ class SalesController extends \BaseController {
 	 */
 	public function destroy($id)
 	{
-		//
+		$sale = \Sale::withTrashed()->where('id', $id)->first();
+		$message = \Lang::get('agrivate.trashed');
+		if ($sale->trashed()) {
+            $sale->forceDelete();
+            $message = \Lang::get('agrivate.deleted');
+        } else {
+            $sale->delete();
+        }
+
+        return \Redirect::route('admin_sales.index')->with('success', $message);
 	}
 
 

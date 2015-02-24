@@ -15,7 +15,7 @@ class CreateStocksOnHandTable extends Migration {
 		// Creates the users table
         Schema::create('stocks_on_hand', function ($table) {
         	$table->engine ='InnoDB';
-            $table->increments('stock_on_hand')->unsigned();
+            $table->increments('stock_on_hand_id')->unsigned();
             $table->bigInteger('product_id')->unsigned();
             $table->integer('branch_id')->unsigned();
             $table->float('total_stocks');

@@ -28,8 +28,8 @@
                     <span class="arrow"></span>
                 </a>
                 <ul class="sub">
-                    <li><a class="" href="general.html">All</a></li>
-                    <li><a class="" href="buttons.html">Add New</a></li>
+                    <li><a class="" href="{{ route('admin_expenses.index') }}">All</a></li>
+                    <li><a class="" href="{{ route('admin_expenses.create') }}">Add New</a></li>
                 </ul>
             </li>
 
@@ -52,12 +52,12 @@
                     <span class="arrow"></span>
                 </a>
                 <ul class="sub">
-                    <li><a class="" href="general.html">Branches</a></li>
+                    <li><a class="" href="{{ route('admin_branches.index') }}">Branches</a></li>
                     <li><a class="" href="buttons.html">Unit of measures</a></li>
                 </ul>
             </li>
 
-            <li class="sub-menu">
+            <!--<li class="sub-menu">
                 <a href="javascript:;" class="">
                     <i class="icon-book"></i>
                     <span>UI Elements</span>
@@ -132,7 +132,7 @@
                     <i class="icon-user"></i>
                     <span>Login Page</span>
                 </a>
-            </li>
+            </li>-->
         </ul>
         <!-- sidebar menu end-->
     </div>

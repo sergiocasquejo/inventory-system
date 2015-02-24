@@ -22,6 +22,7 @@ class CreateSalesTable extends Migration {
             $table->string('uom', 120);
             $table->decimal('total_amount', 10, 2);
             $table->integer('encoded_by')->unsigned();
+            $table->tinyInteger('status');
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('encoded_by')

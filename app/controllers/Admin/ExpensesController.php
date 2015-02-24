@@ -35,20 +35,29 @@ class ExpensesController extends \BaseController {
 	 */
 	public function store()
 	{
-		//
+		$input = \Input::all();
+
+		$rules = \Expense::$rules;
+
+		$validator = \Validator::make($input, $rules);
+
+		if ($validator->fails()) {
+			return \Redirect::back()->withErrors($validator->errors());
+		} else {
+			try {
+				$expense = new \Expense;
+
+				if ($expense->doSave($expense, $input)) {
+					return \Redirect::route('admin_branches.index')->with('success', \Lang::get('agrivate.created'));
+				}
+
+				return \Redirect::back()->withErrors($expense->errors());
+			} catch(\Exception $e) {
+				return \Redirect::back()->withErrors((array)$e->getMessage());
+			}
+		}
 	}
 
-
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function show($id)
-	{
-		//
-	}
 
 
 	/**
@@ -59,7 +68,10 @@ class ExpensesController extends \BaseController {
 	 */
 	public function edit($id)
 	{
-		//
+
+		$expense = \Expense::find($id);
+		
+		return \View::make('admin.expense.edit')->with('expense', $expense);
 	}
 
 
@@ -71,7 +83,27 @@ class ExpensesController extends \BaseController {
 	 */
 	public function update($id)
 	{
-		//
+		$input = \Input::all();
+
+		$rules = \Expense::$rules;
+
+		$validator = \Validator::make($input, $rules);
+
+		if ($validator->fails()) {
+			return \Redirect::back()->withErrors($validator->errors());
+		} else {
+			try {
+				$expense = \Expense::findOrFail($id);
+				
+				if ($expense->doSave($expense, $input)) {
+					return \Redirect::route('admin_branches.index')->with('success', \Lang::get('agrivate.updated'));
+				}
+
+				return \Redirect::back()->withErrors($expense->errors());
+			} catch(\Exception $e) {
+				return \Redirect::back()->withErrors((array)$e->getMessage());
+			}
+		}
 	}
 
 
@@ -83,7 +115,16 @@ class ExpensesController extends \BaseController {
 	 */
 	public function destroy($id)
 	{
-		//
+		$expense = \Expense::withTrashed()->where('id', $id)->first();
+		$message = \Lang::get('agrivate.trashed');
+		if ($expense->trashed()) {
+            $expense->forceDelete();
+            $message = \Lang::get('agrivate.deleted');
+        } else {
+            $expense->delete();
+        }
+
+        return \Redirect::route('admin_branches.index')->with('success', $message);
 	}
 
 

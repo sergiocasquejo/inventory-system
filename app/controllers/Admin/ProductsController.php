@@ -9,7 +9,11 @@ class ProductsController extends \BaseController {
 	 */
 	public function index()
 	{
-		//
+
+		$products = \Product::withTrashed();
+
+
+		return \View::make('admin.product.index')->with('products', $products);
 	}
 
 
@@ -20,7 +24,7 @@ class ProductsController extends \BaseController {
 	 */
 	public function create()
 	{
-		//
+		return \View::make('admin.product.create');
 	}
 
 
@@ -31,20 +35,29 @@ class ProductsController extends \BaseController {
 	 */
 	public function store()
 	{
-		//
+		$input = \Input::all();
+
+		$rules = \Product::$rules;
+
+		$validator = \Validator::make($input, $rules);
+
+		if ($validator->fails()) {
+			return \Redirect::back()->withErrors($validator->errors());
+		} else {
+			try {
+				$product = new \Product;
+
+				if ($product->doSave($product, $input)) {
+					return \Redirect::route('admin_branches.index')->with('success', \Lang::get('agrivate.created'));
+				}
+
+				return \Redirect::back()->withErrors($product->errors());
+			} catch(\Exception $e) {
+				return \Redirect::back()->withErrors((array)$e->getMessage());
+			}
+		}
 	}
 
-
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function show($id)
-	{
-		//
-	}
 
 
 	/**
@@ -55,7 +68,10 @@ class ProductsController extends \BaseController {
 	 */
 	public function edit($id)
 	{
-		//
+
+		$product = \Product::find($id);
+		
+		return \View::make('admin.product.edit')->with('product', $product);
 	}
 
 
@@ -67,7 +83,27 @@ class ProductsController extends \BaseController {
 	 */
 	public function update($id)
 	{
-		//
+		$input = \Input::all();
+
+		$rules = \Product::$rules;
+
+		$validator = \Validator::make($input, $rules);
+
+		if ($validator->fails()) {
+			return \Redirect::back()->withErrors($validator->errors());
+		} else {
+			try {
+				$product = \Product::findOrFail($id);
+				
+				if ($product->doSave($product, $input)) {
+					return \Redirect::route('admin_branches.index')->with('success', \Lang::get('agrivate.updated'));
+				}
+
+				return \Redirect::back()->withErrors($product->errors());
+			} catch(\Exception $e) {
+				return \Redirect::back()->withErrors((array)$e->getMessage());
+			}
+		}
 	}
 
 
@@ -79,7 +115,16 @@ class ProductsController extends \BaseController {
 	 */
 	public function destroy($id)
 	{
-		//
+		$product = \Product::withTrashed()->where('id', $id)->first();
+		$message = \Lang::get('agrivate.trashed');
+		if ($product->trashed()) {
+            $product->forceDelete();
+            $message = \Lang::get('agrivate.deleted');
+        } else {
+            $product->delete();
+        }
+
+        return \Redirect::route('admin_branches.index')->with('success', $message);
 	}
 
 
