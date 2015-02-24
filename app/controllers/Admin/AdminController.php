@@ -33,4 +33,17 @@ class AdminController extends \BaseController {
                 ->with('error', $err_msg);
         }
 	}
+
+
+    /**
+     * Log the user out of the application.
+     *
+     * @return  Illuminate\Http\Response
+     */
+    public function logout()
+    {
+        Confide::logout();
+
+        return Redirect::route('admin_login');
+    }
 }

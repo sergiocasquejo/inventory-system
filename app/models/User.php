@@ -26,4 +26,12 @@ class User extends Eloquent implements ConfideUserInterface {
 		return $this->hasMany('Expense');
 	}
 
+	public function branch() {
+		return $this->belongsTo('Branch', 'branch_id');
+	}
+
+	public function productPricing() {
+        return $this->hasMany('ProductPricing');
+    }
+
 }

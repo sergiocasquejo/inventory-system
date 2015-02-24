@@ -9,8 +9,8 @@
                 <i class="icon-user"></i>
             </div>
             <div class="value">
-                <h1>22</h1>
-                <p>New Users</p>
+                <h1>{{{ $total_users }}}</h1>
+                <p>Users</p>
             </div>
         </section>
     </div>
@@ -20,7 +20,7 @@
                 <i class="icon-tags"></i>
             </div>
             <div class="value">
-                <h1>140</h1>
+                <h1>{{{ $total_sales }}}</h1>
                 <p>Sales</p>
             </div>
         </section>
@@ -31,8 +31,8 @@
                 <i class="icon-shopping-cart"></i>
             </div>
             <div class="value">
-                <h1>345</h1>
-                <p>New Order</p>
+                <h1>{{{ $total_expense }}}</h1>
+                <p>Expense</p>
             </div>
         </section>
     </div>

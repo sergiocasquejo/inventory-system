@@ -4,60 +4,71 @@
         <!-- sidebar menu start-->
         <ul class="sidebar-menu">
             <li class="active">
-                <a class="" href="index.html">
+                <a class="" href="{{ route('admin_dashboard.index') }}">
                     <i class="icon-dashboard"></i>
                     <span>Dashboard</span>
                 </a>
             </li>
             <li class="sub-menu">
                 <a href="javascript:;" class="">
-                    <i class="icon-book"></i>
+                    <i class="icon-bar-chart"></i>
                     <span>Sales</span>
                     <span class="arrow"></span>
                 </a>
                 <ul class="sub">
-                    <li><a class="" href="general.html">All</a></li>
-                    <li><a class="" href="buttons.html">Add New</a></li>
+                    <li><a class="" href="{{ route('admin_sales.index') }}">All</a></li>
+                    <li><a class="" href="{{ route('admin_sales.create') }}">Add New</a></li>
                 </ul>
             </li>
 
             <li class="sub-menu">
                 <a href="javascript:;" class="">
-                    <i class="icon-book"></i>
+                    <i class="icon-money"></i>
                     <span>Expenses</span>
                     <span class="arrow"></span>
                 </a>
                 <ul class="sub">
-                    <li><a class="" href="general.html">All</a></li>
-                    <li><a class="" href="buttons.html">Add New</a></li>
+                    <li><a class="" href="{{ route('admin_expenses.index') }}">All</a></li>
+                    <li><a class="" href="{{ route('admin_expenses.create') }}">Add New</a></li>
                 </ul>
             </li>
 
             <li class="sub-menu">
                 <a href="javascript:;" class="">
-                    <i class="icon-book"></i>
+                    <i class="icon-home"></i>
+                    <span>Branches</span>
+                    <span class="arrow"></span>
+                </a>
+                <ul class="sub">
+                    <li><a class="" href="{{ route('admin_branches.index') }}">All</a></li>
+                    <li><a class="" href="{{ route('admin_branches.create') }}">Add New</a></li>
+                </ul>
+            </li>
+
+            <li class="sub-menu">
+                <a href="javascript:;" class="">
+                    <i class="icon-user"></i>
                     <span>Users</span>
                     <span class="arrow"></span>
                 </a>
                 <ul class="sub">
-                    <li><a class="" href="general.html">All</a></li>
-                    <li><a class="" href="buttons.html">Add New</a></li>
+                    <li><a class="" href="{{ route('admin_users.index') }}">All</a></li>
+                    <li><a class="" href="{{ route('admin_users.create') }}">Add New</a></li>
                 </ul>
             </li>
 
             <li class="sub-menu">
                 <a href="javascript:;" class="">
-                    <i class="icon-book"></i>
+                    <i class="icon-cogs"></i>
                     <span>Settings</span>
                     <span class="arrow"></span>
                 </a>
                 <ul class="sub">
-                    <li><a class="" href="general.html">Branches</a></li>
-                    <li><a class="" href="buttons.html">Unit of measures</a></li>
+                    <li><a class="" href="#">Unit of measures</a></li>
                 </ul>
             </li>
 
-            <li class="sub-menu">
+            <!--<li class="sub-menu">
                 <a href="javascript:;" class="">
                     <i class="icon-book"></i>
                     <span>UI Elements</span>
@@ -132,7 +143,7 @@
                     <i class="icon-user"></i>
                     <span>Login Page</span>
                 </a>
-            </li>
+            </li>-->
         </ul>
         <!-- sidebar menu end-->
     </div>

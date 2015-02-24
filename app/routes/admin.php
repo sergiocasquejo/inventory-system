@@ -1,6 +1,6 @@
 <?php
 
-Route::group(['before' => 'auth', 'prefix' => 'admin'], function() {
+Route::group(['before' => 'auth|admin', 'prefix' => 'admin'], function() {
 	
 	$prefixResourceNamespace = function($prefix) {
 		return [
@@ -20,7 +20,8 @@ Route::group(['before' => 'auth', 'prefix' => 'admin'], function() {
 	Route::get('/', ['uses' => 'Admin\DashboardController@index', 'as' => 'admin_dashboard.index']);
 	Route::get('dashboard', ['uses' => 'Admin\DashboardController@index', 'as' => 'admin_dashboard.index']);
 	// branches routes
-	Route::resource('braches', 'Admin\BranchesController', ['names' => $prefixResourceNamespace('admin_branches'), 'except' => ['show']]);
+	Route::post('branches/{id}/restore', ['uses' => 'Admin\BranchesController@restore', 'as' => 'admin_branches.restore']);
+	Route::resource('branches', 'Admin\BranchesController', ['names' => $prefixResourceNamespace('admin_branches'), 'except' => ['show']]);
 	// Users routes
 	Route::resource('users', 'Admin\UsersController', ['names' => $prefixResourceNamespace('admin_users'), 'except' => ['show']]);
 	// Categories routes

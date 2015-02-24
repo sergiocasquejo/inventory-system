@@ -40,13 +40,7 @@
                 <span class="pull-right"> <a href="{{{ URL::to('/users/forgot_password') }}}"> Forgot Password?</a></span>
             </label>
             <button class="btn btn-lg btn-login btn-block" type="submit">Sign in</button>
-            @if (Session::get('error'))
-                <div class="alert alert-error alert-danger">{{{ Session::get('error') }}}</div>
-            @endif
-
-            @if (Session::get('notice'))
-                <div class="alert">{{{ Session::get('notice') }}}</div>
-            @endif
+            @include('admin/_partials/messages')
         </div>
 
       </form>
