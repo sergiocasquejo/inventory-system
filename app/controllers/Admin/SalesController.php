@@ -9,11 +9,20 @@ class SalesController extends \BaseController {
 	 */
 	public function index()
 	{
+		$input = \Input::all();
 
-		$sales = \Sale::withTrashed();
 
+		$sales = \Sale::withTrashed()->search($input)->orderBy('id', 'desc')->paginate(intval(array_get($input, 'records_per_page', 10)));
+		
+		$totalRows = \Sale::withTrashed()->count();
 
-		return \View::make('admin.sale.index')->with('sales', $sales);
+		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
+
+		$countries = \Config::get('agrivate.countries');
+		return \View::make('admin.sale.index')
+			->with('sales', $sales)
+			->with('appends', $appends)
+			->with('totalRows', $totalRows);
 	}
 
 
@@ -24,6 +33,7 @@ class SalesController extends \BaseController {
 	 */
 	public function create()
 	{
+
 		return \View::make('admin.sale.create');
 	}
 
@@ -45,25 +55,13 @@ class SalesController extends \BaseController {
 			return \Redirect::back()->withErrors($validator->errors())->withInput();
 		} else {
 			try {
-				$errors = [];
+				$sale = new \Sale;
 
-				\DB::transaction(function() use($errors) {
+				if ($sale->doSave($sale, $input)) {
+					return \Redirect::route('admin_sale.index')->with('success', \Lang::get('agrivate.created'));
+				}
 
-
-					$sale = new \Sale;
-
-					if (!$sale->doSave($sale, $input)) {
-						$errors = $sale->errors();
-					}
-
-				});
-
-				if (count($errors))
-					return \Redirect::back()->withErrors($errors)->withInput();
-				else
-					return \Redirect::route('admin_sales.index')->with('success', \Lang::get('agrivate.created'));
-
-				
+				return \Redirect::back()->withErrors($sale->errors())->withInput();
 			} catch(\Exception $e) {
 				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
 			}
@@ -81,10 +79,16 @@ class SalesController extends \BaseController {
 	public function edit($id)
 	{
 
-		$sale = \Sale::find($id);
-		
+		try {
+			$sale = \Sale::findOrFail($id);
+		} catch(\Exception $e) {
+			return \Redirect::back()->with('info', \Lang::get('agrivate.errors.restore'));
+		}
+
 		return \View::make('admin.sale.edit')->with('sale', $sale);
 	}
+
+
 
 
 	/**
@@ -95,9 +99,13 @@ class SalesController extends \BaseController {
 	 */
 	public function update($id)
 	{
+
+
 		$input = \Input::all();
 
 		$rules = \Sale::$rules;
+
+		$rules['name'] = $rules['name'].','.$id.',id';
 
 		$validator = \Validator::make($input, $rules);
 
@@ -105,23 +113,13 @@ class SalesController extends \BaseController {
 			return \Redirect::back()->withErrors($validator->errors())->withInput();
 		} else {
 			try {
-				$errors = [];
+				$sale = \Sale::findOrFail($id);
+				
+				if ($sale->doSave($sale, $input)) {
+					return \Redirect::route('admin_sale.index')->with('success', \Lang::get('agrivate.updated'));
+				}
 
-				\DB::transaction(function() use($errors, $id) {
-
-
-					$sale = \Sale::find($id);
-
-					if (!$sale->doSave($sale, $input)) {
-						$errors = $sale->errors();
-					}
-
-				});
-
-				if (count($errors))
-					return \Redirect::back()->withErrors($errors)->withInput();
-				else
-					return \Redirect::route('admin_sales.index')->with('success', \Lang::get('agrivate.updated'));
+				return \Redirect::back()->withErrors($sale->errors())->withInput();
 			} catch(\Exception $e) {
 				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
 			}
@@ -137,7 +135,7 @@ class SalesController extends \BaseController {
 	 */
 	public function destroy($id)
 	{
-		$sale = \Sale::withTrashed()->where('id', $id)->first();
+		$sale = \Sale::withTrashed()->where('sale_id', $id)->first();
 		$message = \Lang::get('agrivate.trashed');
 		if ($sale->trashed()) {
             $sale->forceDelete();
@@ -146,7 +144,25 @@ class SalesController extends \BaseController {
             $sale->delete();
         }
 
-        return \Redirect::route('admin_sales.index')->with('success', $message);
+        // Session::set('success', 'Successfully deleted');
+        return \Redirect::route('admin_sale.index')->with('success', $message);
+        
+	}
+
+
+	/**
+	 * Restore deleted resource from storage.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function restore($id) {
+		$sale = \Sale::withTrashed()->where('sale_id', $id)->first();
+		if (!$sale->restore()) {
+			return \Redirect::back()->withErrors($sale->errors());			
+		}
+
+		return \Redirect::back()->with('success', \Lang::get('agrivate.restored'));
 	}
 
 

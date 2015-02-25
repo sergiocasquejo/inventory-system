@@ -34,7 +34,7 @@
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Unit of measure</label>
 				  <div class="col-sm-10">
-				  		{{ Form::select('uom', ['' => 'Select'], Input::old('uom', $expense->uom), ['class' => 'form-control m-bot15']) }}
+				  		{{ Form::select('uom', array_add(\Config::get('agrivate.unit_of_measure'), '', 'Select Measure'), Input::old('uom', $expense->uom), ['class' => 'form-control m-bot15']) }}
 				  </div>
 				</div>
 

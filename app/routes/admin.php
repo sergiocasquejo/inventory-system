@@ -10,6 +10,7 @@ Route::group(['before' => 'auth|admin', 'prefix' => 'admin'], function() {
 	            'show'    => $prefix.'.show',
 	            'edit'    => $prefix.'.edit',
 	            'update'  => $prefix.'.update',
+	            'restore' => $prefix.'.restore',
 	            'destroy' => $prefix.'.destroy'
 	        ];
 
@@ -28,7 +29,11 @@ Route::group(['before' => 'auth|admin', 'prefix' => 'admin'], function() {
 	Route::group(['prefix' => 'products'], function() use($prefixResourceNamespace) {
 		Route::resource('categories', 'Admin\CategoriesController', ['names' => $prefixResourceNamespace('admin_products_categoriess'), 'except' => ['show']]);
 	});
+	Route::group(['prefix' => 'products/{pid}'], function() use($prefixResourceNamespace) {
+		Route::resource('stocks', 'Admin\StockOnHandController', ['names' => $prefixResourceNamespace('admin_product_stocks'), 'except' => ['show']] );
+	});
 	// Products routes
+	Route::post('products/{id}/restore', ['uses' => 'Admin\ProductsController@restore', 'as' => 'admin_products.restore']);
 	Route::resource('products', 'Admin\ProductsController', ['names' => $prefixResourceNamespace('admin_products'), 'except' => ['show']]);
 	// Expenses routes
 	Route::resource('expenses', 'Admin\ExpensesController', ['names' => $prefixResourceNamespace('admin_expenses'), 'except' => ['show']]);

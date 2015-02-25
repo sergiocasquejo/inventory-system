@@ -36,7 +36,7 @@
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Unit of measure</label>
 				  <div class="col-sm-10">
-				      {{ Form::select('status', ['' => 'Select'], Input::old('status', $sale->status), ['class' => 'form-control m-bot15']) }}
+				      {{ Form::select('status',  array_add(\Config::get('agrivate.unit_of_measure'), '', 'Select Measure'), Input::old('status', $sale->status), ['class' => 'form-control m-bot15']) }}
 				  </div>
 				</div>
 
@@ -59,7 +59,7 @@
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Status</label>
 				  <div class="col-sm-10">
-				      {{ Form::select('status', ['' => 'Select'], Input::old('status', $sale->status), ['class' => 'form-control m-bot15']) }}
+				      {{ Form::select('status', \Config::get('agrivate.statuses'), Input::old('status', $sale->status), ['class' => 'form-control m-bot15']) }}
 				  </div>
 				</div>
 				<button type="submit" class="btn btn-shadow btn-primary">Create</button>

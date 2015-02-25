@@ -10,21 +10,48 @@
  
   var laravel = {
     initialize: function() {
-      this.methodLinks = $('a[data-method]');
- 
+      this.methodLinks  = $('a[data-method]');
+      this.fetchLinks   = $('a[data-fetch]');
       this.registerEvents();
     },
- 
     registerEvents: function() {
       this.methodLinks.on('click', this.handleMethod);
+      this.fetchLinks.on('click', this.handleFetchMethod);
     },
+    handleFetchMethod: function(e) {
+      var link = $(this);
+      console.log(link);
+      var httpFetch = link.data('fetch').toUpperCase();
  
+      // If the data-method attribute is not GET,
+      // then we don't know what to do. Just ignore.
+      if ( $.inArray(httpFetch, ['GET']) === - 1 ) {
+        return;
+      }
+
+      // Call jqXHR
+      var jqxhr = $.ajax(link.attr('href'))
+        .done(function(response) {
+          var form = $(':input[name=total_stocks]').closest('form');
+
+          $(':input[name=total_stocks]').val(response.total_stocks);
+          $(':input[name=branch_id]').val(response.branch_id);
+          $(':input[name=uom]').val(response.uom);
+          
+          form.attr('method', 'POST')
+            .attr('action', form.attr('action') + '/' + response.stock_on_hand_id);
+          form.append('<input type="hidden" name="_method" value="PUT" />');
+
+        });
+
+      e.preventDefault();
+    },
     handleMethod: function(e) {
       var link = $(this);
       var httpMethod = link.data('method').toUpperCase();
       var form;
  
-      // If the data-method attribute is not PUT or DELETE,
+      // If the data-method attribute is not PUT, RESTORE or DELETE,
       // then we don't know what to do. Just ignore.
       if ( $.inArray(httpMethod, ['PUT', 'DELETE', 'RESTORE']) === - 1 ) {
         return;
@@ -72,7 +99,9 @@
                  .appendTo('body');
     }
   };
+
+ 
+  
  
   laravel.initialize();
- 
 })();

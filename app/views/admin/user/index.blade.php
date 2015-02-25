@@ -6,156 +6,99 @@
     <div class="row">
       <div class="col-lg-12">
           <section class="panel">
-              <header class="panel-heading">
-                  Advanced Table
-              </header>
-              <table class="table table-striped table-advance table-hover">
+              <form action="{{ route('admin_users.index') }}"  class="form-horizontal tasi-form" method="GET">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+                <header class="panel-heading">
+                    Users <a class="btn btn-info btn-xs" href="{{ route('admin_users.create') }}">Add New</a> <a class="btn btn-warning btn-xs" href="{{ route('admin_users.index') }}" title="Reset"><i class=" icon-refresh"></i></a>
+                </header>
+                <div class="dataTables_wrapper form-inline">
+                  <div class="row">
+                    <div class="col-sm-6">
+                      <div id="sample_1_length" class="dataTables_length">
+                        <label>
+                          {{ Form::select('records_per_page', \Config::get('agrivate.records_per_page'), Input::get('records_per_page', 10), ['class' => 'form-control', 'size' => '1', 'onchange' => 'this.form.submit();']) }} 
+                          records per page
+                        </label>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      
+                      <div class="dataTables_filter">
+                          <label class="pull-left">Search: <input type="text" name="s" class="form-control"> </label>
+                      </div>
+                    </div>
+                  </div>
+                <table class="table table-striped table-advance table-hover">
                   <thead>
-                  <tr>
-                      <th><i class="icon-bullhorn"></i> Company</th>
-                      <th class="hidden-phone"><i class="icon-question-sign"></i> Descrition</th>
-                      <th><i class="icon-bookmark"></i> Profit</th>
-                      <th><i class=" icon-edit"></i> Status</th>
-                      <th></th>
-                  </tr>
+                    <tr>
+                        <th>Branch</th>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Unit of measure</th>
+                        <th>Total Amount</th>
+                        <th>Comments</th>
+                        <th>Encoded By</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
                   </thead>
                   <tbody>
-                  <tr>
-                      <td><a href="#">Vector Ltd</a></td>
-                      <td class="hidden-phone">Lorem Ipsum dorolo imit</td>
-                      <td>12120.00$ </td>
-                      <td><span class="label label-info label-mini">Due</span></td>
-                      <td>
-                          <button class="btn btn-success btn-xs"><i class="icon-ok"></i></button>
-                          <button class="btn btn-primary btn-xs"><i class="icon-pencil"></i></button>
-                          <button class="btn btn-danger btn-xs"><i class="icon-trash "></i></button>
-                      </td>
-                  </tr>
-                  <tr>
-                      <td>
-                          <a href="#">
-                              Adimin co
-                          </a>
-                      </td>
-                      <td class="hidden-phone">Lorem Ipsum dorolo</td>
-                      <td>56456.00$ </td>
-                      <td><span class="label label-warning label-mini">Due</span></td>
-                      <td>
-                          <button class="btn btn-success btn-xs"><i class="icon-ok"></i></button>
-                          <button class="btn btn-primary btn-xs"><i class="icon-pencil"></i></button>
-                          <button class="btn btn-danger btn-xs"><i class="icon-trash "></i></button>
-                      </td>
-                  </tr>
-                  <tr>
-                      <td>
-                          <a href="#">
-                              boka soka
-                          </a>
-                      </td>
-                      <td class="hidden-phone">Lorem Ipsum dorolo</td>
-                      <td>14400.00$ </td>
-                      <td><span class="label label-success label-mini">Paid</span></td>
-                      <td>
-                          <button class="btn btn-success btn-xs"><i class="icon-ok"></i></button>
-                          <button class="btn btn-primary btn-xs"><i class="icon-pencil"></i></button>
-                          <button class="btn btn-danger btn-xs"><i class="icon-trash "></i></button>
-                      </td>
-                  </tr>
-                  <tr>
-                      <td>
-                          <a href="#">
-                              salbal llb
-                          </a>
-                      </td>
-                      <td class="hidden-phone">Lorem Ipsum dorolo</td>
-                      <td>2323.50$ </td>
-                      <td><span class="label label-danger label-mini">Paid</span></td>
-                      <td>
-                          <button class="btn btn-success btn-xs"><i class="icon-ok"></i></button>
-                          <button class="btn btn-primary btn-xs"><i class="icon-pencil"></i></button>
-                          <button class="btn btn-danger btn-xs"><i class="icon-trash "></i></button>
-                      </td>
-                  </tr>
-                  <tr>
-                      <td><a href="#">Vector Ltd</a></td>
-                      <td class="hidden-phone">Lorem Ipsum dorolo imit</td>
-                      <td>12120.00$ </td>
-                      <td><span class="label label-primary label-mini">Due</span></td>
-                      <td>
-                          <button class="btn btn-success btn-xs"><i class="icon-ok"></i></button>
-                          <button class="btn btn-primary btn-xs"><i class="icon-pencil"></i></button>
-                          <button class="btn btn-danger btn-xs"><i class="icon-trash "></i></button>
-                      </td>
-                  </tr>
-                  <tr>
-                      <td>
-                          <a href="#">
-                              Adimin co
-                          </a>
-                      </td>
-                      <td class="hidden-phone">Lorem Ipsum dorolo</td>
-                      <td>56456.00$ </td>
-                      <td><span class="label label-warning label-mini">Due</span></td>
-                      <td>
-                          <button class="btn btn-success btn-xs"><i class="icon-ok"></i></button>
-                          <button class="btn btn-primary btn-xs"><i class="icon-pencil"></i></button>
-                          <button class="btn btn-danger btn-xs"><i class="icon-trash "></i></button>
-                      </td>
-                  </tr>
-                  <tr>
-                      <td><a href="#">Vector Ltd</a></td>
-                      <td class="hidden-phone">Lorem Ipsum dorolo imit</td>
-                      <td>12120.00$ </td>
-                      <td><span class="label label-success label-mini">Due</span></td>
-                      <td>
-                          <button class="btn btn-success btn-xs"><i class="icon-ok"></i></button>
-                          <button class="btn btn-primary btn-xs"><i class="icon-pencil"></i></button>
-                          <button class="btn btn-danger btn-xs"><i class="icon-trash "></i></button>
-                      </td>
-                  </tr>
-                  <tr>
-                      <td>
-                          <a href="#">
-                              Adimin co
-                          </a>
-                      </td>
-                      <td class="hidden-phone">Lorem Ipsum dorolo</td>
-                      <td>56456.00$ </td>
-                      <td><span class="label label-warning label-mini">Due</span></td>
-                      <td>
-                          <button class="btn btn-success btn-xs"><i class="icon-ok"></i></button>
-                          <button class="btn btn-primary btn-xs"><i class="icon-pencil"></i></button>
-                          <button class="btn btn-danger btn-xs"><i class="icon-trash "></i></button>
-                      </td>
-                  </tr>
-                  <tr>
-                      <td><a href="#">Vector Ltd</a></td>
-                      <td class="hidden-phone">Lorem Ipsum dorolo imit</td>
-                      <td>12120.00$ </td>
-                      <td><span class="label label-info label-mini">Due</span></td>
-                      <td>
-                          <button class="btn btn-success btn-xs"><i class="icon-ok"></i></button>
-                          <button class="btn btn-primary btn-xs"><i class="icon-pencil"></i></button>
-                          <button class="btn btn-danger btn-xs"><i class="icon-trash "></i></button>
-                      </td>
-                  </tr>
-                  <tr>
-                      <td>
-                          <a href="#">
-                              Adimin co
-                          </a>
-                      </td>
-                      <td class="hidden-phone">Lorem Ipsum dorolo</td>
-                      <td>56456.00$ </td>
-                      <td><span class="label label-warning label-mini">Due</span></td>
-                      <td>
-                          <button class="btn btn-success btn-xs"><i class="icon-ok"></i></button>
-                          <button class="btn btn-primary btn-xs"><i class="icon-pencil"></i></button>
-                          <button class="btn btn-danger btn-xs"><i class="icon-trash "></i></button>
-                      </td>
-                  </tr>
+
+                    @if ($users)
+                        @foreach ($users as $user)
+                        <tr>
+                            <td>{{{ $user->username }}}</td>
+                            <td>{{{ $user->email }}}</td>
+                            <td>{{{ $user->display_name }}}</td>
+                            <td>{{{ $user->first_name }}}</td>
+                            <td>{{{ $user->last_name }}}</td>
+                            <td>
+                              <span class="label label-{{{ $user->is_admin ? 'info' : 'warning' }}} label-mini">
+                                {{{ $sale->is_admin ? 'Active' : 'Inactive' }}}
+                              </span>
+                            </td>
+                            <td>
+                              <span class="label label-{{{ $user->confirmed ? 'success' : 'warning' }}} label-mini">
+                                    {{{ $user->confirmed ? 'Active' : 'Inactive' }}}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="label label-{{{ $user->status ? 'success' : 'warning' }}} label-mini">
+                                    {{{ $sale->user ? 'Active' : 'Inactive' }}}
+                                </span>
+                            </td>
+                            <td>{{{ $user->branch->name }}}</td>
+                            <td>
+                                @if ($user->trashed())
+                                  <a href="{{{ route('admin_users.restore', $user->id) }}}" data-method="RESTORE" class="btn btn-primary btn-xs" title="Restore"><i class="icon-rotate-left"></i></a>
+                                @else
+                                  <a href="{{{ route('admin_users.edit', $user->id) }}}" class="btn btn-primary btn-xs" title="Edit"><i class="icon-pencil"></i></a>
+                                @endif
+                                <a href="{{{ route('admin_users.destroy', $user->id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="{{{ $user->trashed() ? 'Delete' : 'Trash' }}}" class="btn btn-danger btn-xs">
+                                  <i class="icon-{{{ $user->trashed() ? 'remove' : 'trash' }}} "></i>
+                                </a>
+                            </td>
+                        </tr>
+                        @endforeach
+                    @else
+                        <tr>
+                          <td colspan="10">{{{ \Lang::get('agrivate.empty', 'Expense') }}}</td>
+                        </tr>
+                    @endif
                   </tbody>
-              </table>
+                </table>
+                <div class="row">
+                  <div class="col-sm-6">
+                    <div class="dataTables_length">
+                      {{{ $totalRows }}} entries</div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="dataTables_filter pagination-sm">
+                      <label>{{ $branches->appends($appends)->links() }}</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
           </section>
       </div>
   </div>

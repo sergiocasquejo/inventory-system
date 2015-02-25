@@ -68,7 +68,7 @@ class ProductsController extends \BaseController {
 
 
 				if ($product->doSave($product, $input)) {
-					return \Redirect::route('admin_products.index')->with('success', \Lang::get('agrivate.created'));
+					return \Redirect::route('admin_products.edit', $product->id)->with('success', \Lang::get('agrivate.created'));
 				}
 
 				return \Redirect::back()->withErrors($product->errors())->withInput();
@@ -105,50 +105,29 @@ class ProductsController extends \BaseController {
 	{
 		$input = \Input::all();
 
+		$rules = array_except(\Product::$rules, 'encoded_by');
 
-		if (array_get($input, 'action') == 'add_stock') {
-			$product = \Product::find($id);
+		$rules['name'] = $rules['name'].','.$id.',product_id';
 
-			$rules = \StockOnHand::$rules;
+		$validator = \Validator::make($input, $rules);
 
-			$repo = new \StockOnHand;
-			$validator = \Validator::make($input, $rules);
-			if ($validator->fails()) {
-				return \Response::json($validator->errors());
-			} else {
-				if ($repo->doSave($repo, $input)) {
-					return \Response::json(['message' => \Lang::get('agrivate.created')]);
-				}
-
-				return \Response::json($repo->errors());
-			}
-
+		if ($validator->fails()) {
+			return \Redirect::back()->withErrors($validator->errors())->withInput();
 		} else {
-
-
-			$rules = array_except(\Product::$rules, 'encoded_by');
-
-			$rules['name'] = $rules['name'].','.$id.',id';
-
-			$validator = \Validator::make($input, $rules);
-
-			if ($validator->fails()) {
-				return \Redirect::back()->withErrors($validator->errors())->withInput();
-			} else {
-				try {
-					$product = \Product::findOrFail($id);
-					
-					$input['encoded_by'] = $product->encoded_by;
-					if ($product->doSave($product, $input)) {
-						return \Redirect::route('admin_products.index')->with('success', \Lang::get('agrivate.updated'));
-					}
-
-					return \Redirect::back()->withErrors($product->errors())->withInput();
-				} catch(\Exception $e) {
-					return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
+			try {
+				$product = \Product::findOrFail($id);
+				
+				$input['encoded_by'] = $product->encoded_by;
+				if ($product->doSave($product, $input)) {
+					return \Redirect::route('admin_products.index')->with('success', \Lang::get('agrivate.updated'));
 				}
+
+				return \Redirect::back()->withErrors($product->errors())->withInput();
+			} catch(\Exception $e) {
+				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
 			}
 		}
+		
 	}
 
 
@@ -172,5 +151,19 @@ class ProductsController extends \BaseController {
         return \Redirect::route('admin_products.index')->with('success', $message);
 	}
 
+	/**
+	 * Restore deleted resource from storage.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function restore($id) {
+		$product = \Product::withTrashed()->where('id', $id)->first();
+		if (!$product->restore()) {
+			return \Redirect::back()->withErrors($product->errors());			
+		}
+
+		return \Redirect::back()->with('success', \Lang::get('agrivate.restored'));
+	}
 
 }

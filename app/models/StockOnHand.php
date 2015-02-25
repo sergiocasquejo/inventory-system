@@ -13,7 +13,7 @@ class StockOnHand extends Eloquent {
 
 
     public function product() {
-    	return $this->belongsTo('Products', 'product_id');
+    	return $this->belongsTo('Product', 'product_id');
     }
 
     public function branch() {
@@ -21,7 +21,7 @@ class StockOnHand extends Eloquent {
     }
 
 
-    public function doSave(Expense $instance, $input) {
+    public function doSave(StockOnHand $instance, $input) {
 		$instance->branch_id = array_get($input, 'branch_id');
 		$instance->product_id = array_get($input, 'product_id');
 		$instance->total_stocks = array_get($input, 'total_stocks');
