@@ -28,6 +28,20 @@
 			  			<input type="hidden" name="_token" value="{{ csrf_token() }}" />
 			  			<input name="_method" type="hidden" value="PUT">
 				       	<div class="form-group">
+				          <label class="col-sm-2 control-label">Brand</label>
+				          <div class="col-sm-10">
+				              {{ Form::select('brand_id', $brands, Input::old('brand_id', $product->brand_id), ['class' => 'form-control m-bot15']) }}
+				              <span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+				          </div>
+				      	</div>
+				      	<div class="form-group">
+				          <label class="col-sm-2 control-label">Category</label>
+				          <div class="col-sm-10">
+				              {{ Form::select('category_id', $categories, Input::old('category_id', $product->category_id), ['class' => 'form-control m-bot15', 'data-selected' => Input::old('category_id', $product->category_id)]) }}
+				              <span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+				          </div>
+				      	</div>
+				       	<div class="form-group">
 				          <label class="col-sm-2 control-label">Name</label>
 				          <div class="col-sm-10">
 				              <input type="text" name="name" maxlength="255" class="form-control" value="{{ Input::old('name', $product->name) }}" />
@@ -146,9 +160,9 @@
 				                  <td>{{{ $price->per_unit }}}</td>
 				                  <td>{{{ $price->branch->name }}}</td>
 				                  <td>
-				                      <a href="{{{ route('admin_product_stocks.edit', ['pid' => $product->id, 'stock_on_hand_id' => $stock->stock_on_hand_id]) }}}" class="btn btn-primary btn-xs" data-fetch="PRICE" title="Edit"><i class="icon-pencil"></i></a>
+				                      <a href="{{{ route('admin_product_prices.edit', ['pid' => $product->id, 'stock_on_hand_id' => $stock->stock_on_hand_id]) }}}" class="btn btn-primary btn-xs" data-fetch="PRICE" title="Edit"><i class="icon-pencil"></i></a>
 				    
-				                      <a href="{{{ route('admin_product_stocks.destroy', ['pid' => $product->id, 'stock_on_hand_id' => $stock->stock_on_hand_id]) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
+				                      <a href="{{{ route('admin_product_prices.destroy', ['pid' => $product->id, 'stock_on_hand_id' => $stock->stock_on_hand_id]) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
 				                        <i class="icon-remove"></i>
 				                      </a>
 				                  </td>

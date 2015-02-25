@@ -13,7 +13,7 @@ class CreateProductsCategoriesTable extends Migration {
 	public function up()
 	{
 		// Creates the users table
-        Schema::create('products_categories', function ($table) {
+        Schema::create('categories', function ($table) {
         	$table->engine ='InnoDB';
             $table->increments('category_id')->unsigned();
             $table->string('name', 255)->unique();
@@ -31,7 +31,7 @@ class CreateProductsCategoriesTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('products_categories');
+		Schema::drop('categories');
 	}
 
 }

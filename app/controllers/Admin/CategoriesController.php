@@ -9,7 +9,27 @@ class CategoriesController extends \BaseController {
 	 */
 	public function index()
 	{
-		//
+
+		$input = \Input::all();
+
+
+		$categories = \Category::search($input)->orderBy('category_id', 'desc')->paginate(intval(array_get($input, 'records_per_page', 10)));
+		
+		$totalRows = \Category::All()->count();
+
+		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
+
+		$countries = \Config::get('agrivate.countries');
+		return \View::make('admin.category.index')
+			->with('categories', $categories)
+			->with('appends', $appends)
+			->with('totalRows', $totalRows);
+
+
+		$categories = \Category::All();
+
+
+		;
 	}
 
 
@@ -20,7 +40,8 @@ class CategoriesController extends \BaseController {
 	 */
 	public function create()
 	{
-		//
+		return \View::make('admin.category.create')
+		->with('brands', \Brand::all());
 	}
 
 
@@ -31,20 +52,35 @@ class CategoriesController extends \BaseController {
 	 */
 	public function store()
 	{
-		//
-	}
+		$input = \Input::all();
+
+		$input['encoded_by'] = \Confide::user()->id;
+
+		$rules = \Category::$rules;
+
+		$validator = \Validator::make($input, $rules);
+
+		if ($validator->fails()) {
+			return \Redirect::back()->withErrors($validator->errors())->withInput();
+		} else {
+			try {
+				$category = new \Category;
 
 
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function show($id)
-	{
-		//
+				if ($category->doSave($category, $input)) {
+					
+					$category->brands()->sync(array_get($input, 'brand'));
+
+					return \Redirect::route('admin_categories.edit', $category->category_id)->with('success', \Lang::get('agrivate.created'));
+				}
+
+				return \Redirect::back()->withErrors($category->errors())->withInput();
+			} catch(\Exception $e) {
+				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
+			}
+		}
 	}
+
 
 
 	/**
@@ -55,7 +91,13 @@ class CategoriesController extends \BaseController {
 	 */
 	public function edit($id)
 	{
-		//
+
+		$category = \Category::find($id);
+		
+		return \View::make('admin.category.edit')
+			->with('category', $category)
+			->with('category_brands', $category->brands->lists('brand_id'))
+			->with('brands', \Brand::all());
 	}
 
 
@@ -67,7 +109,30 @@ class CategoriesController extends \BaseController {
 	 */
 	public function update($id)
 	{
-		//
+		$input = \Input::all();
+
+		$rules['name'] = 'required|unique:categories,name,'.$id.',category_id';
+
+		$validator = \Validator::make($input, $rules);
+
+		if ($validator->fails()) {
+			return \Redirect::back()->withErrors($validator->errors())->withInput();
+		} else {
+			try {
+				$category = \Category::findOrFail($id);
+				
+			
+				if ($category->doSave($category, $input)) {
+					$category->brands()->sync(array_get($input, 'brand'));
+					return \Redirect::route('admin_categories.index')->with('success', \Lang::get('agrivate.updated'));
+				}
+
+				return \Redirect::back()->withErrors($category->errors())->withInput();
+			} catch(\Exception $e) {
+				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
+			}
+		}
+		
 	}
 
 
@@ -79,8 +144,21 @@ class CategoriesController extends \BaseController {
 	 */
 	public function destroy($id)
 	{
-		//
+		try {
+			$category = \Category::findOrFail($id);
+			$message = \Lang::get('agrivate.trashed');
+			if (!$category->delete()) {
+				return \Redirect::back()->withErrors($category->errors());			
+	        }
+
+	        return \Redirect::route('admin_categories.index')->with('success', $message);
+    	} catch (\FatalErrorException $e) {
+    		return \Redirect::back()->withErrors((array)$e->getMessage());
+    	} catch (\Exception $e) {
+    		return \Redirect::back()->withErrors((array)$e->getMessage());
+    	}
 	}
+
 
 
 }

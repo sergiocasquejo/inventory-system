@@ -22,6 +22,7 @@
     <link href="{{ asset('/assets/backend/css/style-responsive.css') }}" rel="stylesheet" />
     <script type="text/javascript">
     //<![CDATA[
+      var AJAX = {'baseUrl': '<?php echo URL::to('/'); ?>'};
       var CSRF_TOKEN = '<?php echo csrf_token(); ?>';
     //]]>
     </script>

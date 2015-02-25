@@ -41,7 +41,9 @@ class ProductsController extends \BaseController {
 	 */
 	public function create()
 	{
-		return \View::make('admin.product.create');
+		return \View::make('admin.product.create')
+		->with('brands', array_add(\Brand::all()->lists('name', 'brand_id'), 0, 'Select Brand'))
+		->with('categories', array_add(\Category::all()->lists('name', 'category_id'), 0, 'Select Category'));
 	}
 
 
@@ -91,7 +93,11 @@ class ProductsController extends \BaseController {
 
 		$product = \Product::find($id);
 		
-		return \View::make('admin.product.edit')->with('product', $product)->with('branches', array_add(\Branch::all()->lists('name', 'id'), '', 'Select Branch'));
+		return \View::make('admin.product.edit')
+		->with('product', $product)
+		->with('branches', array_add(\Branch::all()->lists('name', 'id'), '', 'Select Branch'))
+		->with('brands', array_add(\Brand::all()->lists('name', 'brand_id'), 0, 'Select Brand'))
+		->with('categories', array_add(\Category::all()->lists('name', 'category_id'), 0, 'Select Category'));
 	}
 
 
@@ -107,7 +113,7 @@ class ProductsController extends \BaseController {
 
 		$rules = array_except(\Product::$rules, 'encoded_by');
 
-		$rules['name'] = $rules['name'].','.$id.',product_id';
+		$rules['name'] = $rules['name'].','.$id.',id';
 
 		$validator = \Validator::make($input, $rules);
 

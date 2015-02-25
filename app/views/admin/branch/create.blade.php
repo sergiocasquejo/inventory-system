@@ -29,25 +29,10 @@
 				      <input type="text" name="city" class="form-control" value="{{ Input::old('city') }}" />
 				  </div>
 				</div>
-
-				<div class="form-group">
-				  <label class="col-sm-2 control-label">State</label>
-				  <div class="col-sm-10">
-				  		<input type="text" name="state" class="form-control" value="{{ Input::old('state') }}" />
-				  </div>
-				</div>
-
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Zip code/Postal code</label>
 				  <div class="col-sm-10">
 				     	<input type="text" name="post_code" class="form-control" value="{{ Input::old('post_code') }}" />
-				  </div>
-				</div>
-
-				<div class="form-group">
-				  <label class="col-sm-2 control-label">Country</label>
-				  <div class="col-sm-10">
-				      {{ Form::select('country', $countries, Input::old('country', $default_country_code), ['class' => 'form-control m-bot15']) }}
 				  </div>
 				</div>
 

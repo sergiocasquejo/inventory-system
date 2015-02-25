@@ -42,14 +42,16 @@ class PricesController extends \BaseController {
 			return \Redirect::back()->withErrors($validator->errors())->withInput();
 		} else {
 			try {
-				$stock = new \ProductPricing;
-				if ($stock->doSave($stock, $input)) {
-					return \Redirect::route('admin_products.edit', $stock->id)->with('success', \Lang::get('agrivate.created'));
+				$price = new \ProductPricing;
+				if ($price->doSave($price, $input)) {
+				return \Response::json(['success' => \Lang::get('agrivate.created')]);
+					//return \Redirect::route('admin_products.edit', $stock->id)->with('success', \Lang::get('agrivate.created'));
 				}
-
-				return \Redirect::back()->withErrors($stock->errors())->withInput();
+				return \Response::json(['errors' => $price->errors()]);
+				//return \Redirect::back()->withErrors($stock->errors())->withInput();
 			} catch(\Exception $e) {
-				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
+				return \Response::json(['errors' => (array)$e->getMessage()]);
+				//return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
 			}
 		}
 	}
@@ -89,16 +91,18 @@ class PricesController extends \BaseController {
 			return \Redirect::back()->withErrors($validator->errors())->withInput();
 		} else {
 			try {
-				$stock = \ProductPricing::findOrFail($id);
+				$price = \ProductPricing::findOrFail($id);
 				
 
-				if ($stock->doSave($stock, $input)) {
-					return \Redirect::route('admin_products.index')->with('success', \Lang::get('agrivate.updated'));
+				if ($price->doSave($price, $input)) {
+					return \Response::json(['success' => \Lang::get('agrivate.created')]);
+					//return \Redirect::route('admin_products.edit', $stock->id)->with('success', \Lang::get('agrivate.created'));
 				}
-
-				return \Redirect::back()->withErrors($stock->errors())->withInput();
+				return \Response::json(['errors' => $price->errors()]);
+				//return \Redirect::back()->withErrors($stock->errors())->withInput();
 			} catch(\Exception $e) {
-				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
+				return \Response::json(['errors' => (array)$e->getMessage()]);
+				//return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
 			}
 		}
 	}

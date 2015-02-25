@@ -32,6 +32,8 @@
                     <thead>
                       <tr>
                           <th>Name</th>
+                          <th>Brand</th>
+                          <th>Category</th>
                           <th>Encoded By</th>
                           <th>Status</th>
                           <th></th>
@@ -43,6 +45,8 @@
                           @foreach ($products as $product)
                           <tr>
                               <td>{{{ $product->name }}}</td>
+                              <td>{{{ $product->brand->name }}}</td>
+                              <td>{{{ $product->category->name }}}</td>
                               <td>{{{ $product->user->username }}}</td>
                               <td>
                                   <span class="label label-{{{ $product->status ? 'success' : 'warning' }}} label-mini">

@@ -4,6 +4,8 @@ class StockOnHand extends Eloquent {
 	protected $table = 'stocks_on_hand';
 	protected $primaryKey = 'stock_on_hand_id';
 
+	public $timestamps = false;
+	
 	public static $rules = [
 		'branch_id'		=> 'required|exists:branches,id',
     	'product_id' => 'required|exists:products,id',

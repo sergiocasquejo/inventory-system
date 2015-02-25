@@ -29,12 +29,12 @@ class StockOnHandController extends \BaseController {
 	 *
 	 * @return Response
 	 */
-	public function store()
+	public function store($product_id)
 	{
 		$input = \Input::all();
 
-		$input['encoded_by'] = \Confide::user()->id;
-
+		$input['product_id'] = $product_id;
+		
 		$rules = \StockOnHand::$rules;
 
 		$validator = \Validator::make($input, $rules);

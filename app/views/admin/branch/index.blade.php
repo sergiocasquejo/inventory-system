@@ -34,9 +34,7 @@
                           <th>Name</th>
                           <th>Address</th>
                           <th>City</th>
-                          <th>State</th>
                           <th>Postcode</th>
-                          <th>Country</th>
                           <th>Status</th>
                           <th></th>
                       </tr>
@@ -48,10 +46,8 @@
                           <tr>
                               <td>{{{ $branch->name }}}</td>
                               <td>{{{ $branch->address }}}</td>
-                              <td>{{{ $branch->state }}}</td>
                               <td>{{{ $branch->city }}}</td>
                               <td>{{{ $branch->post_code }}}</td>
-                              <td>{{{ $countries[$branch->country] }}}</td>
                               <td>
                                   <span class="label label-{{{ $branch->status ? 'success' : 'warning' }}} label-mini">
                                       {{{ $branch->status ? 'Active' : 'Inactive' }}}

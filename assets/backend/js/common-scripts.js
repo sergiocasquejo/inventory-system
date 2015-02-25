@@ -121,7 +121,33 @@ var Script = function () {
 //        $('select.styled').customSelect();
 //
 //    });
+    
 
+    /**=================================================
+     * AGRIVATE CUSTOM SCRIPTS
+     *==================================================*/
+
+    $(':input[name=brand_id]').on('change', function() {
+        var brand = $(this),
+            _id = brand.val(),
+            data = [];
+            data.push($('<option>').text('Select category').val(0));
+
+        $.get(AJAX.baseUrl + '/admin/brands/'+ _id + '/categories', function(response) {
+            $.each(response, function(index, value) {
+                var option = $('<option>');
+                option.text(value).val(index);
+                if (index == $(':input[name=category_id]').data('selected')) {
+                    option.attr('selected', 'selected');    
+                }
+                
+                data.push(option)
+            });
+
+            $(':input[name=category_id]').html(data);
+
+        });
+    }).trigger('change');
 
 
 }();

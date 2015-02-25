@@ -9,6 +9,20 @@
 		<div class="panel-body">
 		  	<form action="{{ route('admin_products.store') }}"  class="form-horizontal tasi-form" method="POST">
 		  		<input type="hidden" name="_token" value="{{ csrf_token() }}" />
+		  			<div class="form-group">
+			          <label class="col-sm-2 control-label">Brand</label>
+			          <div class="col-sm-10">
+			              {{ Form::select('brand_id', $brands, Input::old('brand_id', 0), ['class' => 'form-control m-bot15']) }}
+			              <span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+			          </div>
+			      	</div>
+			      	<div class="form-group">
+			          <label class="col-sm-2 control-label">Category</label>
+			          <div class="col-sm-10">
+			              {{ Form::select('category_id', $categories, Input::old('category_id', 0), ['class' => 'form-control m-bot15', 'data-selected' => Input::old('category_id', 0)]) }}
+			              <span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+			          </div>
+			      	</div>
 			       <div class="form-group">
 			          <label class="col-sm-2 control-label">Name</label>
 			          <div class="col-sm-10">
@@ -41,4 +55,5 @@
 		</div>
 	</section>
 	<!-- page end-->
+
 @stop

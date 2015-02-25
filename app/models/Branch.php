@@ -6,15 +6,13 @@ class Branch extends Eloquent {
 
 	protected $table = 'branches';
 	protected $primaryKey = 'id';
-	protected $dates = ['deleted_at'];
-	
+	public $timestamps = false;
+    
 	public static $rules = [
     	'name' 		=> 'required|min:5|unique:branches,name',
     	'address'	=> 'required',
     	'city' 		=> 'required',
-    	'state'		=> 'required',
     	'post_code'	=> 'required',
-    	'country' 	=> 'required',
     	'status'	=> 'required|in:0,1'
     ];
 
@@ -69,9 +67,7 @@ class Branch extends Eloquent {
 		$instance->name = array_get($input, 'name');
 		$instance->address = array_get($input, 'address');
 		$instance->city = array_get($input, 'city');
-		$instance->state = array_get($input, 'state');
 		$instance->post_code = array_get($input, 'post_code');
-		$instance->country = array_get($input, 'country');
 		$instance->status = array_get($input, 'status');
 		
 		$instance->save();

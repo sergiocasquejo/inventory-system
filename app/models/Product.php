@@ -34,6 +34,14 @@ class Product extends Eloquent {
     	return $this->hasMany('StockOnHand');
     }
 
+    public function brand() {
+        return $this->belongsTo('Brand', 'brand_id');
+    }
+
+    public function category() {
+        return $this->belongsTo('Category', 'category_id');
+    }
+
     /**=================================================
      * SCOPE QUERY
      *==================================================*/
@@ -62,6 +70,8 @@ class Product extends Eloquent {
 		$instance->comments = array_get($input, 'comments');
 		$instance->status = array_get($input, 'status');
 		$instance->encoded_by = array_get($input, 'encoded_by');
+        $instance->brand_id = array_get($input, 'brand_id');
+        $instance->category_id = array_get($input, 'category_id');
 		
 		$instance->save();
 		return $instance;
