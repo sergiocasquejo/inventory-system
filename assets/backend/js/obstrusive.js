@@ -11,12 +11,15 @@
   var laravel = {
     stockForm:'',
     priceForm:'',
+    notices:'',
     initialize: function() {
       this.methodLinks  = $('a[data-method]');
+
       this.fetchLinks   = $('a[data-fetch]');
-      
+
       this.priceForm    = $('#price-form');
       this.stockForm    = $('#stock-form');
+      this.notices      = $('#notices');
 
       this.registerEvents();
     },
@@ -31,11 +34,42 @@
       var form = $(this);
       var values = form.serialize();
 
-      console.log(values);
+      $.post(form.attr('action'), values, function(response) {
+        var msg = '',
+            msgClass = 'warning';
 
+        if (response.errors) {
 
+            msgClass = 'warning';
+            msg += '<strong>Warning!</strong><ul>';
+
+            $.each(response.errors, function(index, error) { msg += '<li>'+ error +'</li>'; });
+
+            msg += '</ul>';
+            
+        } else if (response.success) {
+          msgClass = 'success';
+          msg = '<strong>Well done!</strong> ' + response.success;
+
+          laravel.resetForm(form);
+        }
+
+        // Check if message is not empty
+        if (msg != '') {
+
+          var alert = '<div class="alert alert-'+ msgClass +' fade in">'+
+                        '<button data-dismiss="alert" class="close close-sm" type="button">'+
+                          '<i class="icon-remove"></i>'+
+                        '</button>'+ msg + 
+                      '</div>';
+
+          laravel.notices.html(alert);
+        }
+
+      }, 'json')
 
       e.preventDefault();
+
     },
     handleFetchMethod: function(e) {
       var link = $(this);
@@ -44,27 +78,62 @@
  
       // If the data-method attribute is not GET,
       // then we don't know what to do. Just ignore.
-      if ( $.inArray(httpFetch, ['GET']) === - 1 ) {
+      if ( $.inArray(httpFetch, ['STOCK', 'PRICE']) === - 1 ) {
         return;
       }
 
       // Call jqXHR
       var jqxhr = $.ajax(link.attr('href'))
         .done(function(response) {
-          var form = $('#stock-form');
-
-          $(':input[name=total_stocks]').val(response.total_stocks);
-          $(':input[name=branch_id]').val(response.branch_id);
-          $(':input[name=uom]').val(response.uom);
+          var form = laravel.stockForm;
+          laravel.populateForm(response, form, httpFetch);
           
-          form.attr('method', 'POST')
-            .attr('action', form.attr('action') + '/' + response.stock_on_hand_id);
-          form.append('<input type="hidden" name="_method" value="PUT" />');
 
         });
 
       e.preventDefault();
     },
+
+    // Reset form back to normal state
+    resetForm: function(form) {
+
+      form.attr('action', form.prop('data-action'));
+      form.find(':input[name=_method]').remove();
+      form.find(':input:not(:input[name=_token])').val('');
+
+    },
+    populateForm: function(response, form, httpFetch) {
+
+      // If the data-method attribute is not GET,
+      // then we don't know what to do. Just ignore.
+      if ( $.inArray(httpFetch, ['STOCK', 'PRICE']) === - 1 ) {
+        return;
+      }
+
+      if (httpFetch == 'STOCK') {
+
+        form.find(':input[name=total_stocks]').val(response.total_stocks);
+        form.find(':input[name=branch_id]').val(response.branch_id);
+        form.find(':input[name=uom]').val(response.uom);
+        
+        form.attr('method', 'POST')
+          .attr('action', form.data('action') + '/' + response.stock_on_hand_id);
+
+      } else if (httpFetch == 'PRICE') {
+
+        form.find(':input[name=price]').val(response.price);
+        form.find(':input[name=branch_id]').val(response.branch_id);
+        form.find(':input[name=per_unit]').val(response.per_unit);
+        
+        form.attr('method', 'POST')
+          .attr('action', form.data('action') + '/' + response.price_id);  
+      }
+      
+
+      if (!form.find(':input[name=_method]').length)
+        form.append('<input type="hidden" name="_method" value="PUT" />');
+    },
+
     handleMethod: function(e) {
       var link = $(this);
       var httpMethod = link.data('method').toUpperCase();

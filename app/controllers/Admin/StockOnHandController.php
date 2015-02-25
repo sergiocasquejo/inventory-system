@@ -40,17 +40,20 @@ class StockOnHandController extends \BaseController {
 		$validator = \Validator::make($input, $rules);
 
 		if ($validator->fails()) {
-			return \Redirect::back()->withErrors($validator->errors())->withInput();
+			return \Response::json(['errors' => $validator->errors()]);
 		} else {
 			try {
 				$stock = new \StockOnHand;
 				if ($stock->doSave($stock, $input)) {
-					return \Redirect::route('admin_products.edit', $stock->id)->with('success', \Lang::get('agrivate.created'));
-				}
 
-				return \Redirect::back()->withErrors($stock->errors())->withInput();
+					return \Response::json(['success' => \Lang::get('agrivate.created')]);
+					//return \Redirect::route('admin_products.edit', $stock->id)->with('success', \Lang::get('agrivate.created'));
+				}
+				return \Response::json(['errors' => $stock->errors()]);
+				//return \Redirect::back()->withErrors($stock->errors())->withInput();
 			} catch(\Exception $e) {
-				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
+				return \Response::json(['errors' => (array)$e->getMessage()]);
+				//return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
 			}
 		}
 	}
@@ -82,24 +85,26 @@ class StockOnHandController extends \BaseController {
 
 		$rules = \StockOnHand::$rules;
 
-		$rules['branch_id'] = 'required|exists:branches,id|unique:stocks_on_hand,branch_id,product_id,'.$product_id;
+		$rules['branch_id'] = 'required|exists:branches,id|unique:stocks_on_hand,branch_id,'.$product_id.',product_id';
 
-		$validator = \StockOnHand::make($input, $rules);
+		$input['product_id'] = $product_id;
+
+		$validator = \Validator::make($input, $rules);
 
 		if ($validator->fails()) {
-			return \Redirect::back()->withErrors($validator->errors())->withInput();
+			return \Response::json(['errors' => $validator->errors()]);
 		} else {
 			try {
-				$stock = \StockOnHand::findOrFail($id);
+				$stock = \StockOnHand::findOrFail($stock_id);
 				
 
 				if ($stock->doSave($stock, $input)) {
-					return \Redirect::route('admin_products.index')->with('success', \Lang::get('agrivate.updated'));
+					return \Response::json(['success' => \Lang::get('agrivate.updated')]);
 				}
 
-				return \Redirect::back()->withErrors($stock->errors())->withInput();
+				return \Response::json(['errors' => $stock->errors()]);
 			} catch(\Exception $e) {
-				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
+				return \Response::json(['errors' => (array)$e->getMessage()]);
 			}
 		}
 	}

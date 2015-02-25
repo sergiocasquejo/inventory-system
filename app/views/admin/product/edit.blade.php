@@ -24,7 +24,7 @@
 		<div class="panel-body tab-container">
 			<div class="tab-content">
 			  	<div class="tab-pane active" id="general">
-			  		<form action="{{ route('admin_products.update', $product->id) }}"  class="form-horizontal tasi-form" method="POST">
+			  		<form data-action="{{ route('admin_products.update', $product->id) }}" action="{{ route('admin_products.update', $product->id) }}"  class="form-horizontal tasi-form" method="POST">
 			  			<input type="hidden" name="_token" value="{{ csrf_token() }}" />
 			  			<input name="_method" type="hidden" value="PUT">
 				       	<div class="form-group">
@@ -59,7 +59,7 @@
 				</div>
 				<div class="tab-pane" id="stock">
 					<div class="row">
-						<form id="stock-form" action="{{ route('admin_product_stocks.store', $product->id) }}"  class="form-horizontal tasi-form" method="POST">
+						<form id="stock-form" data-action="{{ route('admin_product_stocks.store', $product->id) }}" action="{{ route('admin_product_stocks.store', $product->id) }}"  class="form-horizontal tasi-form" method="POST">
 				  			<input type="hidden" name="_token" value="{{ csrf_token() }}" />
 							<div class="col-sm-2">
 								<input type="number" name="total_stocks" min="0" placeholder="Stocks" value="{{ Input::old('total_stocks') }}" class="form-control">
@@ -94,7 +94,7 @@
 				                  <td>{{{ $stock->uom }}}</td>
 				                  <td>{{{ $stock->branch->name }}}</td>
 				                  <td>
-				                      <a href="{{{ route('admin_product_stocks.edit', ['pid' => $product->id, 'stock_on_hand_id' => $stock->stock_on_hand_id]) }}}" class="btn btn-primary btn-xs" data-fetch="GET" title="Edit"><i class="icon-pencil"></i></a>
+				                      <a href="{{{ route('admin_product_stocks.edit', ['pid' => $product->id, 'stock_on_hand_id' => $stock->stock_on_hand_id]) }}}" class="btn btn-primary btn-xs" data-fetch="STOCK" title="Edit"><i class="icon-pencil"></i></a>
 				    
 				                      <a href="{{{ route('admin_product_stocks.destroy', ['pid' => $product->id, 'stock_on_hand_id' => $stock->stock_on_hand_id]) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
 				                        <i class="icon-remove"></i>
@@ -146,7 +146,7 @@
 				                  <td>{{{ $price->per_unit }}}</td>
 				                  <td>{{{ $price->branch->name }}}</td>
 				                  <td>
-				                      <a href="{{{ route('admin_product_stocks.edit', ['pid' => $product->id, 'stock_on_hand_id' => $stock->stock_on_hand_id]) }}}" class="btn btn-primary btn-xs" data-fetch="GET" title="Edit"><i class="icon-pencil"></i></a>
+				                      <a href="{{{ route('admin_product_stocks.edit', ['pid' => $product->id, 'stock_on_hand_id' => $stock->stock_on_hand_id]) }}}" class="btn btn-primary btn-xs" data-fetch="PRICE" title="Edit"><i class="icon-pencil"></i></a>
 				    
 				                      <a href="{{{ route('admin_product_stocks.destroy', ['pid' => $product->id, 'stock_on_hand_id' => $stock->stock_on_hand_id]) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
 				                        <i class="icon-remove"></i>

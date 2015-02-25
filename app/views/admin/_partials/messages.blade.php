@@ -1,5 +1,5 @@
 <div class="row">
-	<div class="col-lg-12">
+	<div class="col-lg-12" id="notices">
 
 		@if (Session::has('error'))
 		<div class="alert alert-block alert-danger fade in">
