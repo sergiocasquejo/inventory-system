@@ -9,14 +9,33 @@
 (function() {
  
   var laravel = {
+    stockForm:'',
+    priceForm:'',
     initialize: function() {
       this.methodLinks  = $('a[data-method]');
       this.fetchLinks   = $('a[data-fetch]');
+      
+      this.priceForm    = $('#price-form');
+      this.stockForm    = $('#stock-form');
+
       this.registerEvents();
     },
     registerEvents: function() {
       this.methodLinks.on('click', this.handleMethod);
       this.fetchLinks.on('click', this.handleFetchMethod);
+      this.priceForm.on('submit', this.submitStockForm);
+      this.stockForm.on('submit', this.submitStockForm);
+    },
+    submitStockForm: function(e) {
+
+      var form = $(this);
+      var values = form.serialize();
+
+      console.log(values);
+
+
+
+      e.preventDefault();
     },
     handleFetchMethod: function(e) {
       var link = $(this);
@@ -32,7 +51,7 @@
       // Call jqXHR
       var jqxhr = $.ajax(link.attr('href'))
         .done(function(response) {
-          var form = $(':input[name=total_stocks]').closest('form');
+          var form = $('#stock-form');
 
           $(':input[name=total_stocks]').val(response.total_stocks);
           $(':input[name=branch_id]').val(response.branch_id);

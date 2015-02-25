@@ -59,7 +59,7 @@
 				</div>
 				<div class="tab-pane" id="stock">
 					<div class="row">
-						<form action="{{ route('admin_product_stocks.store', $product->id) }}"  class="form-horizontal tasi-form" method="POST">
+						<form id="stock-form" action="{{ route('admin_product_stocks.store', $product->id) }}"  class="form-horizontal tasi-form" method="POST">
 				  			<input type="hidden" name="_token" value="{{ csrf_token() }}" />
 							<div class="col-sm-2">
 								<input type="number" name="total_stocks" min="0" placeholder="Stocks" value="{{ Input::old('total_stocks') }}" class="form-control">
@@ -79,7 +79,7 @@
 					<table class="table table-striped table-advance table-hover">
 				        <thead>
 				          <tr>
-				              <th>Stocks</th>
+				              <th>Price</th>
 				              <th>Unit of measure</th>
 				              <th>Branch</th>
 				              <th></th>
@@ -111,6 +111,56 @@
 				    </table>
 				</div>
 			  	<div class="tab-pane" id="pricing">
+			  		<div class="row">
+						<form id="price-form" action="{{ route('admin_product_prices.store', $product->id) }}"  class="form-horizontal tasi-form" method="POST">
+				  			<input type="hidden" name="_token" value="{{ csrf_token() }}" />
+							<div class="col-sm-2">
+								<input type="number" name="price" min="0" placeholder="Price" value="{{ Input::old('price') }}" class="form-control">
+							</div>
+							<div class="col-sm-2">
+								{{ Form::select('per_unit', array_add(\Config::get('agrivate.unit_of_measure'), '', 'Select Measure'), Input::old('per_unit'), ['class' => 'form-control m-bot15']) }}
+							</div>
+							<div class="col-sm-4">
+								{{ Form::select('branch_id', $branches, Input::old('branch_id'), ['class' => 'form-control m-bot15']) }}
+							</div>
+							<div class="col-sm-1">
+								<button class="btn btn-info" type="submit" name="action" value="add_stock">Add</button>
+							</div>
+						</form>
+					</div>
+
+					<table class="table table-striped table-advance table-hover">
+				        <thead>
+				          <tr>
+				              <th>Price</th>
+				              <th>Unit of measure</th>
+				              <th>Branch</th>
+				              <th></th>
+				          </tr>
+				        </thead>
+				        <tbody>
+				          @if ($product->prices)
+				              @foreach ($product->prices as $price)
+				              <tr>
+				                  <td>{{{ $price->price }}}</td>
+				                  <td>{{{ $price->per_unit }}}</td>
+				                  <td>{{{ $price->branch->name }}}</td>
+				                  <td>
+				                      <a href="{{{ route('admin_product_stocks.edit', ['pid' => $product->id, 'stock_on_hand_id' => $stock->stock_on_hand_id]) }}}" class="btn btn-primary btn-xs" data-fetch="GET" title="Edit"><i class="icon-pencil"></i></a>
+				    
+				                      <a href="{{{ route('admin_product_stocks.destroy', ['pid' => $product->id, 'stock_on_hand_id' => $stock->stock_on_hand_id]) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
+				                        <i class="icon-remove"></i>
+				                      </a>
+				                  </td>
+				              </tr>
+				              @endforeach
+				          @else
+				              <tr>
+				                <td colspan="4">{{{ \Lang::get('agrivate.empty', 'Prices') }}}</td>
+				              </tr>
+				          @endif
+				        </tbody>
+				    </table>
 				</div>
 			</div>
 			

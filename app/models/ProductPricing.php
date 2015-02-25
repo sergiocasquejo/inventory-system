@@ -5,13 +5,11 @@ class ProductPricing extends Eloquent {
 	protected $primaryKey = 'stock_on_hand_id';
 
 	public static $rules = [
-		'branch_id'		=> 'required|exists:branches,id'
+		'branch_id'		=> 'required|exists:branches,id',
     	'product_id' => 'required|exists:products,id',
     	'price'	=> 'required|numeric',
     	'per_unit'	=> 'required',
     	'uom'	           => 'required',
-    	'encoded_by' 	   => 'required|exists:users,id',
-    	'status'	       => 'required|in:0,1'
     ];
 
 
@@ -34,8 +32,6 @@ class ProductPricing extends Eloquent {
 		$instance->price = array_get($input, 'price');
 		$instance->per_unit = array_get($input, 'per_unit');
 		$instance->uom = array_get($input, 'uom');
-		$instance->status = array_get($input, 'status');
-		$instance->encoded_by = array_get($input, 'encoded_by');
 		
 		$instance->save();
 		return $instance;

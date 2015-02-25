@@ -12,12 +12,11 @@ return [
 	'unit_of_measure' => [
 			'kg' 		=> 'Kilogram',
 			'pcs' 		=> 'Pieces',
-			'sack' 		=> 'Sacks',
-			'gram' 		=> 'Gram',
+			'sack' 		=> 'Sack(s)',
+			'gram' 		=> 'Gram(s)',
 			'bottle' 	=> 'Bottle', 
 			'ml'		=> 'Milliliter'
 		],
-
 	// Default country code
 	'default_country_code' => 'PH',
 	// List of countries

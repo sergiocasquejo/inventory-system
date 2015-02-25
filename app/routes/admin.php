@@ -31,6 +31,7 @@ Route::group(['before' => 'auth|admin', 'prefix' => 'admin'], function() {
 	});
 	Route::group(['prefix' => 'products/{pid}'], function() use($prefixResourceNamespace) {
 		Route::resource('stocks', 'Admin\StockOnHandController', ['names' => $prefixResourceNamespace('admin_product_stocks'), 'except' => ['show']] );
+		Route::resource('prices', 'Admin\PricesController', ['names' => $prefixResourceNamespace('admin_product_prices'), 'except' => ['show']] );
 	});
 	// Products routes
 	Route::post('products/{id}/restore', ['uses' => 'Admin\ProductsController@restore', 'as' => 'admin_products.restore']);
