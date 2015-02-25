@@ -14,6 +14,9 @@ class CreateCreditsTable extends Migration {
 	{
 		Schema::create('credits', function($table){
 			$table->engine ='InnoDB';
+			$table->string('customer_name', 120);
+			$table->string('address', 120);
+			$table->string('contact_number', 30);
 			$table->increments('credit_id')->unsigned();
 			$table->string('product', 255);
 			$table->float('quantity');
