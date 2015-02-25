@@ -13,7 +13,7 @@ class CreditsController extends \BaseController {
 		$input = \Input::all();
 
 
-		$credits = \Credit::withTrashed()->search($input)->orderBy('id', 'desc')->paginate(intval(array_get($input, 'records_per_page', 10)));
+		$credits = \Credit::withTrashed()->search($input)->orderBy('credit_id', 'desc')->paginate(intval(array_get($input, 'records_per_page', 10)));
 		
 		$totalRows = \Credit::withTrashed()->count();
 
