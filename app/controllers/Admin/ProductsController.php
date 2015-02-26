@@ -28,9 +28,6 @@ class ProductsController extends \BaseController {
 
 
 		$products = \Product::withTrashed();
-
-
-		;
 	}
 
 

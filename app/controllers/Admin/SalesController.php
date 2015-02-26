@@ -12,7 +12,8 @@ class SalesController extends \BaseController {
 		$input = \Input::all();
 
 
-		$sales = \Sale::withTrashed()->search($input)->orderBy('id', 'desc')->paginate(intval(array_get($input, 'records_per_page', 10)));
+		$sales = \Sale::withTrashed()->orderBy('sale_id', 'desc')
+				->paginate(intval(array_get($input, 'records_per_page', 10)));
 		
 		$totalRows = \Sale::withTrashed()->count();
 
@@ -34,7 +35,9 @@ class SalesController extends \BaseController {
 	public function create()
 	{
 
-		return \View::make('admin.sale.create');
+		return \View::make('admin.sale.create')
+		->with('branches', \Branch::all()->lists('name', 'id'))
+		->with('products', \Product::all()->lists('name', 'id'));
 	}
 
 
@@ -49,6 +52,8 @@ class SalesController extends \BaseController {
 
 		$rules = \Sale::$rules;
 
+		$input['encoded_by'] = \Confide::user()->id;
+
 		$validator = \Validator::make($input, $rules);
 
 		if ($validator->fails()) {
@@ -58,7 +63,7 @@ class SalesController extends \BaseController {
 				$sale = new \Sale;
 
 				if ($sale->doSave($sale, $input)) {
-					return \Redirect::route('admin_sale.index')->with('success', \Lang::get('agrivate.created'));
+					return \Redirect::route('admin_sales.index')->with('success', \Lang::get('agrivate.created'));
 				}
 
 				return \Redirect::back()->withErrors($sale->errors())->withInput();
@@ -145,7 +150,7 @@ class SalesController extends \BaseController {
         }
 
         // Session::set('success', 'Successfully deleted');
-        return \Redirect::route('admin_sale.index')->with('success', $message);
+        return \Redirect::route('admin_sales.index')->with('success', $message);
         
 	}
 

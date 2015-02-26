@@ -21,6 +21,8 @@ class CreateSalesTable extends Migration {
             $table->float('quantity');
             $table->string('uom', 120);
             $table->decimal('total_amount', 10, 2);
+            $table->text('comments');
+            $table->date('date_of_sale');
             $table->integer('encoded_by')->unsigned();
             $table->tinyInteger('status');
             $table->timestamps();

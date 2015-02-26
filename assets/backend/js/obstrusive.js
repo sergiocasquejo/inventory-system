@@ -11,6 +11,7 @@
   var laravel = {
     stockForm:'',
     priceForm:'',
+    resetBtn:'',
     notices:'',
     initialize: function() {
       this.methodLinks  = $('a[data-method]');
@@ -21,18 +22,30 @@
       this.stockForm    = $('#stock-form');
       this.notices      = $('#notices');
 
+      this.resetBtn    = $(':button[name=reset]');
+
       this.registerEvents();
     },
     registerEvents: function() {
       this.methodLinks.on('click', this.handleMethod);
+      this.resetBtn.on('click', this.cancelForm);
       this.fetchLinks.on('click', this.handleFetchMethod);
       this.priceForm.on('submit', this.submitStockForm);
       this.stockForm.on('submit', this.submitStockForm);
+
+    },
+    cancelForm: function(e) {
+      var btn = $(this);
+      var form = btn.closest('form');
+      console.log(form);
+
+      laravel.resetForm(form);
     },
     submitStockForm: function(e) {
 
-      var form = $(this);
-      var values = form.serialize();
+      var form = $(this),
+          values = form.serialize()
+          success = false;
 
       $.post(form.attr('action'), values, function(response) {
         var msg = '',
@@ -50,7 +63,7 @@
         } else if (response.success) {
           msgClass = 'success';
           msg = '<strong>Well done!</strong> ' + response.success;
-
+          success = true;
           laravel.resetForm(form);
         }
 
@@ -64,6 +77,11 @@
                       '</div>';
 
           laravel.notices.html(alert);
+
+          //Reload if success
+          if (success)
+            setTimeout(function(){ window.location.reload(true); }, 1000);
+
         }
 
       }, 'json')
@@ -73,19 +91,20 @@
     },
     handleFetchMethod: function(e) {
       var link = $(this);
-      console.log(link);
+      
       var httpFetch = link.data('fetch').toUpperCase();
- 
+  
       // If the data-method attribute is not GET,
       // then we don't know what to do. Just ignore.
       if ( $.inArray(httpFetch, ['STOCK', 'PRICE']) === - 1 ) {
         return;
       }
 
+      var form = $(link.data('form'));
+
       // Call jqXHR
       var jqxhr = $.ajax(link.attr('href'))
         .done(function(response) {
-          var form = laravel.stockForm;
           laravel.populateForm(response, form, httpFetch);
           
 
@@ -97,9 +116,10 @@
     // Reset form back to normal state
     resetForm: function(form) {
 
-      form.attr('action', form.prop('data-action'));
+      form.attr('action', form.data('action'));
       form.find(':input[name=_method]').remove();
       form.find(':input:not(:input[name=_token])').val('');
+      form.find(':input[name=action]').text('Add');
 
     },
     populateForm: function(response, form, httpFetch) {
@@ -120,7 +140,7 @@
           .attr('action', form.data('action') + '/' + response.stock_on_hand_id);
 
       } else if (httpFetch == 'PRICE') {
-
+        console.log(form);
         form.find(':input[name=price]').val(response.price);
         form.find(':input[name=branch_id]').val(response.branch_id);
         form.find(':input[name=per_unit]').val(response.per_unit);
@@ -129,6 +149,7 @@
           .attr('action', form.data('action') + '/' + response.price_id);  
       }
       
+      form.find(':input[name=action]').text('Update');
 
       if (!form.find(':input[name=_method]').length)
         form.append('<input type="hidden" name="_method" value="PUT" />');

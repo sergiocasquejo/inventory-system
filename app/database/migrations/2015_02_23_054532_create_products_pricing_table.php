@@ -19,8 +19,7 @@ class CreateProductsPricingTable extends Migration {
             $table->bigInteger('product_id')->unsigned();
             $table->integer('branch_id')->unsigned();
             $table->decimal('price', 10, 2);
-            $table->float('per_unit');
-            $table->string('uom', 120);
+            $table->string('per_unit', 120);
             $table->foreign('product_id')
      			->references('id')->on('products')
      			->onDelete('cascade');

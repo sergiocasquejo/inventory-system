@@ -37,6 +37,7 @@ class Sale extends Eloquent {
 		return $this->belongsTo('user', 'encoded_by');
 	}
 
+
 	/**=================================================
      * SCOPE QUERY
      *==================================================*/
@@ -57,12 +58,14 @@ class Sale extends Eloquent {
      */
 
 
-	public function doSave(Expense $instance, $input) {
+	public function doSave(Sale $instance, $input) {
 		$instance->branch_id = array_get($input, 'branch_id');
 		$instance->product_id = array_get($input, 'product_id');
 		$instance->quantity = array_get($input, 'quantity');
 		$instance->uom = array_get($input, 'uom');
 		$instance->total_amount = array_get($input, 'total_amount');
+		$instance->comments = array_get($input, 'comments');
+		$instance->date_of_sale = array_get($input, 'date_of_sale');
 		$instance->encoded_by = array_get($input, 'encoded_by');
 		$instance->status = array_get($input, 'status');
 		

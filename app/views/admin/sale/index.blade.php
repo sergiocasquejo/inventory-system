@@ -36,6 +36,7 @@
                         <th>Quantity</th>
                         <th>Unit of measure</th>
                         <th>Total Amount</th>
+                        <th>Date of Sale</th>
                         <th>Comments</th>
                         <th>Encoded By</th>
                         <th>Status</th>
@@ -52,6 +53,7 @@
                             <td>{{{ $sale->quantity }}}</td>
                             <td>{{{ $sale->uom }}}</td>
                             <td>{{{ $sale->total_amount }}}</td>
+                            <td>{{{ Helper::df($sale->date_of_sale) }}}</td>
                             <td><span data-title="{{{ $sale->comments }}}">?</span></td>
                             <td>{{{ $sale->user->username }}}</td>
                             <td>
@@ -85,7 +87,7 @@
                   </div>
                   <div class="col-sm-6">
                     <div class="dataTables_filter pagination-sm">
-                      <label>{{ $branches->appends($appends)->links() }}</label>
+                      <label>{{ $sales->appends($appends)->links() }}</label>
                     </div>
                   </div>
                 </div>

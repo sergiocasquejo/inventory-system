@@ -29,17 +29,21 @@ class PricesController extends \BaseController {
 	 *
 	 * @return Response
 	 */
-	public function store()
+	public function store($product_id)
 	{
 		$input = \Input::all();
 
+		$input['product_id'] = $product_id;
 
 		$rules = \ProductPricing::$rules;
+
+
+		$rules['branch_id'] = 'required|exists:branches,id|unique:product_pricing,price_id,NULL,price_id,product_id,'.$product_id;
 
 		$validator = \Validator::make($input, $rules);
 
 		if ($validator->fails()) {
-			return \Redirect::back()->withErrors($validator->errors())->withInput();
+			return \Response::json(['errors' => $validator->errors()]);
 		} else {
 			try {
 				$price = new \ProductPricing;
@@ -81,19 +85,21 @@ class PricesController extends \BaseController {
 	{
 		$input = \Input::all();
 
+		$input['product_id'] = $product_id;
+
 		$rules = \ProductPricing::$rules;
 
-		$rules['branch_id'] = 'required|exists:branches,id|unique:product_pricing,branch_id,product_id,'.$product_id;
+		$rules['branch_id'] = 'required|exists:branches,id|unique:product_pricing,price_id,'.$price_id.',price_id,product_id,'.$product_id;
 
-		$validator = \ProductPricing::make($input, $rules);
+
+		$validator = \Validator::make($input, $rules);
 
 		if ($validator->fails()) {
-			return \Redirect::back()->withErrors($validator->errors())->withInput();
+			return \Response::json(['errors' => $validator->errors()]);
 		} else {
 			try {
-				$price = \ProductPricing::findOrFail($id);
+				$price = \ProductPricing::findOrFail($price_id);
 				
-
 				if ($price->doSave($price, $input)) {
 					return \Response::json(['success' => \Lang::get('agrivate.created')]);
 					//return \Redirect::route('admin_products.edit', $stock->id)->with('success', \Lang::get('agrivate.created'));
@@ -116,13 +122,17 @@ class PricesController extends \BaseController {
 	 */
 	public function destroy($product_id, $price_id)
 	{
-		$stock = \ProductPricing::find($price_id)->delete();
-		if ($stock) {
-			return \Redirect::back()->with('success', \Lang::get('agrivate.deleted'));
-			// return \Response::json(['success' => \Lang::get('agrivate.deleted')]);
-		} 
-		return \Redirect::back()->withErrors($stock->errors());
-		// return \Response::json($stock->errors());
+		try {
+			$stock = \ProductPricing::findOrFail($price_id)->delete();
+			if ($stock) {
+				return \Redirect::back()->with('success', \Lang::get('agrivate.deleted'));
+				// return \Response::json(['success' => \Lang::get('agrivate.deleted')]);
+			} 
+			return \Redirect::back()->withErrors($stock->errors());
+			// return \Response::json($stock->errors());
+		} catch(\Exception $e) {
+			return \Redirect::back()->withErrors((array)$e->getMessage());
+		}
 	}
 
 

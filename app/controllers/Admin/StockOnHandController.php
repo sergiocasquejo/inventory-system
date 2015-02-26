@@ -33,10 +33,18 @@ class StockOnHandController extends \BaseController {
 	{
 		$input = \Input::all();
 
+		
+
 		$input['product_id'] = $product_id;
+
+
 		
 		$rules = \StockOnHand::$rules;
 
+		$rules['branch_id'] = 'required|exists:branches,id|unique:stocks_on_hand,branch_id,NULL,stock_on_hand_id,product_id,'.$product_id;
+
+		// echo $rules['branch_id'];
+		// die;
 		$validator = \Validator::make($input, $rules);
 
 		if ($validator->fails()) {
@@ -81,11 +89,12 @@ class StockOnHandController extends \BaseController {
 	 */
 	public function update($product_id, $stock_id)
 	{
+
 		$input = \Input::all();
 
-		$rules = \StockOnHand::$rules;
+		$rules = \StockOnHand::$rules; 
 
-		$rules['branch_id'] = 'required|exists:branches,id|unique:stocks_on_hand,branch_id,'.$product_id.',product_id';
+		$rules['branch_id'] = 'required|exists:branches,id|unique:stocks_on_hand,branch_id,'.$stock_id.',stock_on_hand_id,product_id,'.$product_id;
 
 		$input['product_id'] = $product_id;
 

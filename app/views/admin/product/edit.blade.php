@@ -69,6 +69,7 @@
 						  </div>
 						</div>
 						<button type="submit" class="btn btn-shadow btn-primary">Update</button>
+
 					</form>
 				</div>
 				<div class="tab-pane" id="stock">
@@ -84,8 +85,9 @@
 							<div class="col-sm-4">
 								{{ Form::select('branch_id', $branches, Input::old('branch_id'), ['class' => 'form-control m-bot15']) }}
 							</div>
-							<div class="col-sm-1">
+							<div class="col-sm-2">
 								<button class="btn btn-info" type="submit" name="action" value="add_stock">Add</button>
+								<button class="btn btn-warning" type="reset" name="reset">Cancel</button>
 							</div>
 						</form>
 					</div>
@@ -108,7 +110,7 @@
 				                  <td>{{{ $stock->uom }}}</td>
 				                  <td>{{{ $stock->branch->name }}}</td>
 				                  <td>
-				                      <a href="{{{ route('admin_product_stocks.edit', ['pid' => $product->id, 'stock_on_hand_id' => $stock->stock_on_hand_id]) }}}" class="btn btn-primary btn-xs" data-fetch="STOCK" title="Edit"><i class="icon-pencil"></i></a>
+				                      <a href="{{{ route('admin_product_stocks.edit', ['pid' => $product->id, 'stock_on_hand_id' => $stock->stock_on_hand_id]) }}}" class="btn btn-primary btn-xs" data-form="#stock-form" data-fetch="STOCK" title="Edit"><i class="icon-pencil"></i></a>
 				    
 				                      <a href="{{{ route('admin_product_stocks.destroy', ['pid' => $product->id, 'stock_on_hand_id' => $stock->stock_on_hand_id]) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
 				                        <i class="icon-remove"></i>
@@ -126,7 +128,7 @@
 				</div>
 			  	<div class="tab-pane" id="pricing">
 			  		<div class="row">
-						<form id="price-form" action="{{ route('admin_product_prices.store', $product->id) }}"  class="form-horizontal tasi-form" method="POST">
+						<form id="price-form" data-action="{{ route('admin_product_prices.store', $product->id) }}"  action="{{ route('admin_product_prices.store', $product->id) }}"  class="form-horizontal tasi-form" method="POST">
 				  			<input type="hidden" name="_token" value="{{ csrf_token() }}" />
 							<div class="col-sm-2">
 								<input type="number" name="price" min="0" placeholder="Price" value="{{ Input::old('price') }}" class="form-control">
@@ -137,8 +139,9 @@
 							<div class="col-sm-4">
 								{{ Form::select('branch_id', $branches, Input::old('branch_id'), ['class' => 'form-control m-bot15']) }}
 							</div>
-							<div class="col-sm-1">
+							<div class="col-sm-2">
 								<button class="btn btn-info" type="submit" name="action" value="add_stock">Add</button>
+								<button class="btn btn-warning" type="reset" name="reset">Cancel</button>
 							</div>
 						</form>
 					</div>
@@ -160,9 +163,9 @@
 				                  <td>{{{ $price->per_unit }}}</td>
 				                  <td>{{{ $price->branch->name }}}</td>
 				                  <td>
-				                      <a href="{{{ route('admin_product_prices.edit', ['pid' => $product->id, 'stock_on_hand_id' => $stock->stock_on_hand_id]) }}}" class="btn btn-primary btn-xs" data-fetch="PRICE" title="Edit"><i class="icon-pencil"></i></a>
+				                      <a href="{{{ route('admin_product_prices.edit', ['pid' => $product->id, 'price_id' => $price->price_id]) }}}" class="btn btn-primary btn-xs" data-form="#price-form" data-fetch="PRICE" title="Edit"><i class="icon-pencil"></i></a>
 				    
-				                      <a href="{{{ route('admin_product_prices.destroy', ['pid' => $product->id, 'stock_on_hand_id' => $stock->stock_on_hand_id]) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
+				                      <a href="{{{ route('admin_product_prices.destroy', ['pid' => $product->id, 'price_id' => $price->price_id]) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
 				                        <i class="icon-remove"></i>
 				                      </a>
 				                  </td>
