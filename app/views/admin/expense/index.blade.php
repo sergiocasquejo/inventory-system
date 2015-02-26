@@ -53,11 +53,11 @@
                               <td>{{{ $expense->total_amount }}}</td>
                               <td>{{{ $expense->quantity }}}</td>
                               <td>{{{ $expense->uom }}}</td>
-                              <td><span data-title="{{{ $expense->comments }}}">?</span></td>
+                              <td><a class="badge bg-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="{{{ $expense->comments }}}">?</a></td>
                               <td>{{{ $expense->date_of_expense }}}</td>
                               <td>{{{ $expense->user->username }}}</td>
                               <td>
-                                  <span class="label label-{{{ $expense->status ? 'success' : 'warning' }}} label-mini">
+                                     <span class="label label-{{{ $expense->status ? 'success' : 'warning' }}} label-mini">
                                       {{{ $expense->status ? 'Active' : 'Inactive' }}}
                                   </span>
                               </td>
@@ -87,7 +87,7 @@
                   </div>
                   <div class="col-sm-6">
                     <div class="dataTables_filter pagination-sm">
-                      <label>{{ $branches->appends($appends)->links() }}</label>
+                      <label>{{ $expenses->appends($appends)->links() }}</label>
                     </div>
                   </div>
                 </div>

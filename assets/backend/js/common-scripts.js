@@ -149,5 +149,9 @@ var Script = function () {
         });
     }).trigger('change');
 
+    $(function () {
+      $('[data-toggle="popover"]').popover()
+    });
+
 
 }();

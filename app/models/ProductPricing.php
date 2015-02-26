@@ -23,6 +23,10 @@ class ProductPricing extends Eloquent {
         return $this->belongsTo('Branch', 'branch_id');
     }
 
+    public function credit() {
+        return $this->hasMany('Credit');
+    }
+
 
 
     public function doSave(ProductPricing $instance, $input) {

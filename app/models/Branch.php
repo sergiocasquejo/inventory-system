@@ -29,6 +29,11 @@ class Branch extends Eloquent {
 	}
 
 
+    public function credit() {
+        return $this->hasMany('Credit');
+    }
+
+
 	public function productPricing() {
         return $this->hasMany('ProductPricing');
     }

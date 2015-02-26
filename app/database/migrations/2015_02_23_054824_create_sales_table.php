@@ -17,23 +17,23 @@ class CreateSalesTable extends Migration {
             $table->engine ='InnoDB';
             $table->bigIncrements('sale_id')->unsigned();
             $table->integer('branch_id')->unsigned();
-            $table->bigInteger('product_id')->unsigned();
+            $table->bigInteger('product_id')->unsigned()->nullable();
             $table->float('quantity');
             $table->string('uom', 120);
             $table->decimal('total_amount', 10, 2);
             $table->text('comments');
             $table->date('date_of_sale');
-            $table->integer('encoded_by')->unsigned();
+            $table->integer('encoded_by')->unsigned()->nullable();
             $table->tinyInteger('status');
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('encoded_by')
      			->references('id')->on('users')
-     			->onDelete('cascade');
+     			->onDelete('set null');
 
      		$table->foreign('product_id')
      			->references('id')->on('products')
-     			->onDelete('cascade');
+     			->onDelete('set null');
 
      		$table->foreign('branch_id')
      			->references('id')->on('branches')

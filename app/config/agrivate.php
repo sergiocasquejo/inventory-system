@@ -2,6 +2,7 @@
 
 return [
 	'statuses' => ['1' => 'Active', '0' => 'Inactive'], 
+	'credit_statuses' => ['1' => 'Paid', '0' => 'Not Paid'], 
 	'records_per_page' => [
 		5 	=> 5,
 		10 => 10,
@@ -11,6 +12,7 @@ return [
 	// Unit of measures
 	'unit_of_measure' => [
 			'kg' 		=> 'Kilogram',
+			'pack'		=> 'Pack',
 			'pcs' 		=> 'Pieces',
 			'sack' 		=> 'Sack(s)',
 			'gram' 		=> 'Gram(s)',

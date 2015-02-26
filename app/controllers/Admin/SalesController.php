@@ -90,7 +90,10 @@ class SalesController extends \BaseController {
 			return \Redirect::back()->with('info', \Lang::get('agrivate.errors.restore'));
 		}
 
-		return \View::make('admin.sale.edit')->with('sale', $sale);
+		return \View::make('admin.sale.edit')
+		->with('sale', $sale)
+		->with('branches', \Branch::all()->lists('name', 'id'))
+		->with('products', \Product::all()->lists('name', 'id'));
 	}
 
 
@@ -109,8 +112,7 @@ class SalesController extends \BaseController {
 		$input = \Input::all();
 
 		$rules = \Sale::$rules;
-
-		$rules['name'] = $rules['name'].','.$id.',id';
+		$input['encoded_by'] = \Confide::user()->id;
 
 		$validator = \Validator::make($input, $rules);
 
@@ -121,7 +123,7 @@ class SalesController extends \BaseController {
 				$sale = \Sale::findOrFail($id);
 				
 				if ($sale->doSave($sale, $input)) {
-					return \Redirect::route('admin_sale.index')->with('success', \Lang::get('agrivate.updated'));
+					return \Redirect::route('admin_sales.index')->with('success', \Lang::get('agrivate.updated'));
 				}
 
 				return \Redirect::back()->withErrors($sale->errors())->withInput();

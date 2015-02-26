@@ -26,11 +26,6 @@ class CreditsController extends \BaseController {
 			->with('appends', $appends)
 			->with('totalRows', $totalRows);
 
-
-		$credits = \Credit::withTrashed();
-
-
-		;
 	}
 
 
@@ -41,7 +36,9 @@ class CreditsController extends \BaseController {
 	 */
 	public function create()
 	{
-		return \View::make('admin.credit.create');
+		return \View::make('admin.credit.create')
+			->with('branches', array_add(\Branch::all()->lists('name', 'id'), '0', 'Select Branch'))
+		->with('products', array_add(\Product::all()->lists('name', 'id'), '0', 'Select Product'));
 	}
 
 
@@ -68,7 +65,7 @@ class CreditsController extends \BaseController {
 
 
 				if ($credit->doSave($credit, $input)) {
-					return \Redirect::route('admin_credits.edit', $credit->id)->with('success', \Lang::get('agrivate.created'));
+					return \Redirect::route('admin_credits.edit', $credit->credit_id)->with('success', \Lang::get('agrivate.created'));
 				}
 
 				return \Redirect::back()->withErrors($credit->errors())->withInput();
@@ -91,7 +88,9 @@ class CreditsController extends \BaseController {
 
 		$credit = \Credit::find($id);
 		
-		return \View::make('admin.credit.edit')->with('credit', $credit)->with('branches', array_add(\Branch::all()->lists('name', 'id'), '', 'Select Branch'));
+		return \View::make('admin.credit.edit')->with('credit', $credit)
+		->with('branches', array_add(\Branch::all()->lists('name', 'id'), '0', 'Select Branch'))
+		->with('products', array_add(\Product::all()->lists('name', 'id'), '0', 'Select Product'));
 	}
 
 
@@ -106,8 +105,6 @@ class CreditsController extends \BaseController {
 		$input = \Input::all();
 
 		$rules = array_except(\Credit::$rules, 'encoded_by');
-
-		$rules['name'] = $rules['name'].','.$id.',credit_id';
 
 		$validator = \Validator::make($input, $rules);
 

@@ -7,10 +7,18 @@
 		 Form Elements
 		</header>
 		<div class="panel-body">
-		  	<form action="{{ route('admin_expenses.update') }}"  class="form-horizontal tasi-form" method="POST">
+		  	<form action="{{ route('admin_expenses.update', $expense->expense_id) }}"  class="form-horizontal tasi-form" method="POST">
 		  		<input type="hidden" name="_token" value="{{ csrf_token() }}" />
-		  		<input name="_method" type="hidden" value="PUT">
-		       <div class="form-group">
+		  		<input type="hidden" name="_method" value="PUT" />
+		  		
+		  		<div class="form-group">
+		          <label class="col-sm-2 control-label">Branch</label>
+		          <div class="col-sm-10">
+		              {{ Form::select('branch_id', $branches, Input::old('branch_id', $expense->branch_id), ['class' => 'form-control m-bot15']) }}
+		              <span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+		          </div>
+		      	</div>
+		       	<div class="form-group">
 		          <label class="col-sm-2 control-label">Expense for</label>
 		          <div class="col-sm-10">
 		              <input type="text" name="name" maxlength="255" class="form-control" value="{{ Input::old('name', $expense->name) }}" />
@@ -41,14 +49,14 @@
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Comments</label>
 				  <div class="col-sm-10">
-				      <textarea name="comments" class="form-control">{{{ Input::old('quantity', $expense->quantity) }}}</textarea>
+				      <textarea name="comments" class="form-control">{{{ Input::old('comments', $expense->comments) }}}</textarea>
 				  </div>
 				</div>
 
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Status</label>
 				  <div class="col-sm-10">
-				      {{ Form::select('status', ['' => 'Select'], Input::old('status', $expense->status), ['class' => 'form-control m-bot15']) }}
+				      {{ Form::select('status', \Config::get('agrivate.statuses'), Input::old('status', $expense->status), ['class' => 'form-control m-bot15']) }}
 				  </div>
 				</div>
 

@@ -11,6 +11,18 @@
             </li>
             <li class="sub-menu">
                 <a href="javascript:;" class="">
+                    <i class="icon-home"></i>
+                    <span>Branches</span>
+                    <span class="arrow"></span>
+                </a>
+                <ul class="sub">
+                    <li><a class="" href="{{ route('admin_branches.index') }}">All</a></li>
+                    <li><a class="" href="{{ route('admin_branches.create') }}">Add New</a></li>
+                </ul>
+            </li>
+            
+            <li class="sub-menu">
+                <a href="javascript:;" class="">
                     <i class="icon-bar-chart"></i>
                     <span>Catelogue</span>
                     <span class="arrow"></span>
@@ -59,17 +71,7 @@
             </li>
 
 
-            <li class="sub-menu">
-                <a href="javascript:;" class="">
-                    <i class="icon-home"></i>
-                    <span>Branches</span>
-                    <span class="arrow"></span>
-                </a>
-                <ul class="sub">
-                    <li><a class="" href="{{ route('admin_branches.index') }}">All</a></li>
-                    <li><a class="" href="{{ route('admin_branches.create') }}">Add New</a></li>
-                </ul>
-            </li>
+            
 
             <li class="sub-menu">
                 <a href="javascript:;" class="">

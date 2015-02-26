@@ -34,6 +34,10 @@ class Product extends Eloquent {
     	return $this->hasMany('StockOnHand');
     }
 
+    public function credits() {
+        return $this->hasMany('Credit');
+    }
+
     public function brand() {
         return $this->belongsTo('Brand', 'brand_id');
     }

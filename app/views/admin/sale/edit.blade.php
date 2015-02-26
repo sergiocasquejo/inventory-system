@@ -7,13 +7,14 @@
 		 Create Product
 		</header>
 		<div class="panel-body">
-		  	<form action="{{ route('admin_sales.update') }}"  class="form-horizontal tasi-form" method="POST">
+		  	<form action="{{ route('admin_sales.update', $sale->sale_id) }}"  class="form-horizontal tasi-form" method="POST">
 		  		<input type="hidden" name="_token" value="{{ csrf_token() }}" />
-		  		<input name="_method" type="hidden" value="PUT">
+		  		<input type="hidden" name="_method" value="PUT" />
+
 		       	<div class="form-group">
 					<label class="col-sm-2 control-label">Branch</label>
 					<div class="col-sm-10">
-						{{ Form::select('branch_id', ['' => 'Select'], Input::old('branch_id', $product->branch_id), ['class' => 'form-control m-bot15']) }}
+						{{ Form::select('branch_id', $branches, Input::old('branch_id', $sale->branch_id), ['class' => 'form-control m-bot15']) }}
 						<span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
 					</div>
 		      	</div>
@@ -21,7 +22,7 @@
 		      	<div class="form-group">
 					<label class="col-sm-2 control-label">Product</label>
 					<div class="col-sm-10">
-						{{ Form::select('product_id', ['' => 'Select'], Input::old('product_id', $sale->product_id), ['class' => 'form-control m-bot15']) }}
+						{{ Form::select('product_id', $products, Input::old('product_id', $sale->product_id), ['class' => 'form-control m-bot15']) }}
 						<span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
 					</div>
 		      	</div>
@@ -29,14 +30,14 @@
 		      	<div class="form-group">
 				  <label class="col-sm-2 control-label">Quantity</label>
 				  <div class="col-sm-10">
-				      <input type="number" name="quantity" value="{{ Input::old('comments', $sale->comments) }}" class="form-control">
+				      <input type="number" name="quantity" value="{{ Input::old('quantity', $sale->quantity) }}" class="form-control">
 				  </div>
 				</div>
 
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Unit of measure</label>
 				  <div class="col-sm-10">
-				      {{ Form::select('status',  array_add(\Config::get('agrivate.unit_of_measure'), '', 'Select Measure'), Input::old('status', $sale->status), ['class' => 'form-control m-bot15']) }}
+				      {{ Form::select('uom', array_add(\Config::get('agrivate.unit_of_measure'), '', 'Select Measure'), Input::old('uom', $sale->uom), ['class' => 'form-control m-bot15']) }}
 				  </div>
 				</div>
 
@@ -55,6 +56,12 @@
 					</div>
 				</div>
 
+				<div class="form-group">
+				  <label class="col-sm-2 control-label">Date of sale</label>
+				  <div class="col-sm-10">
+				      <input type="date" name="date_of_sale" value="{{ Input::old('date_of_sale', $sale->date_of_sale) }}" class="form-control">
+				  </div>
+				</div>
 				
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Status</label>
@@ -62,7 +69,7 @@
 				      {{ Form::select('status', \Config::get('agrivate.statuses'), Input::old('status', $sale->status), ['class' => 'form-control m-bot15']) }}
 				  </div>
 				</div>
-				<button type="submit" class="btn btn-shadow btn-primary">Create</button>
+				<button type="submit" class="btn btn-shadow btn-primary">Update</button>
 		  </form>
 		</div>
 	</section>

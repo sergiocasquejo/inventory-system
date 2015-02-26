@@ -11,7 +11,7 @@ class Expense extends Eloquent {
     	'name'	           => 'required:min:5',
     	'total_amount' 	   => 'required|numeric',
     	'quantity'		   => 'required|numeric',
-    	'uom'	           => 'required',
+    	//'uom'	           => 'required',
         'date_of_expense'  => 'required|date',
     	'encoded_by' 	   => 'required|exists:users,id',
     	'status'	       => 'required|in:0,1'
@@ -40,6 +40,15 @@ class Expense extends Eloquent {
 
     public function scopeInActive($query) {
         return $query->where('status', 0);
+    }
+
+    public function scopeSearch($query, $input) {
+        
+        if (isset($input['s'])) {
+            $query->whereRaw('name LIKE "%'. array_get($input, 's', '') .'%"');
+        }
+
+        return $query;
     }
 
 	public function doSave(Expense $instance, $input) {

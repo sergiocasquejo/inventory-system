@@ -12,7 +12,7 @@ class ExpensesController extends \BaseController {
 		$input = \Input::all();
 
 
-		$expenses = \Expense::withTrashed()->search($input)->orderBy('id', 'desc')->paginate(intval(array_get($input, 'records_per_page', 10)));
+		$expenses = \Expense::withTrashed()->search($input)->orderBy('expense_id', 'desc')->paginate(intval(array_get($input, 'records_per_page', 10)));
 		
 		$totalRows = \Expense::withTrashed()->count();
 
@@ -34,7 +34,8 @@ class ExpensesController extends \BaseController {
 	public function create()
 	{
 
-		return \View::make('admin.expense.create');
+		return \View::make('admin.expense.create')
+			->with('branches', \Branch::all()->lists('name', 'id'));
 	}
 
 
@@ -48,6 +49,7 @@ class ExpensesController extends \BaseController {
 		$input = \Input::all();
 
 		$rules = \Expense::$rules;
+		$input['encoded_by'] = \Confide::user()->id;
 
 		$validator = \Validator::make($input, $rules);
 
@@ -58,7 +60,7 @@ class ExpensesController extends \BaseController {
 				$expense = new \Expense;
 
 				if ($expense->doSave($expense, $input)) {
-					return \Redirect::route('admin_expense.index')->with('success', \Lang::get('agrivate.created'));
+					return \Redirect::route('admin_expenses.index')->with('success', \Lang::get('agrivate.created'));
 				}
 
 				return \Redirect::back()->withErrors($expense->errors())->withInput();
@@ -85,7 +87,9 @@ class ExpensesController extends \BaseController {
 			return \Redirect::back()->with('info', \Lang::get('agrivate.errors.restore'));
 		}
 
-		return \View::make('admin.expense.edit')->with('expense', $expense);
+		return \View::make('admin.expense.edit')
+			->with('expense', $expense)
+			->with('branches', \Branch::all()->lists('name', 'id'));
 	}
 
 
@@ -105,7 +109,7 @@ class ExpensesController extends \BaseController {
 
 		$rules = \Expense::$rules;
 
-		$rules['name'] = $rules['name'].','.$id.',id';
+		$input['encoded_by'] = \Confide::user()->id;
 
 		$validator = \Validator::make($input, $rules);
 
@@ -116,7 +120,7 @@ class ExpensesController extends \BaseController {
 				$expense = \Expense::findOrFail($id);
 				
 				if ($expense->doSave($expense, $input)) {
-					return \Redirect::route('admin_expense.index')->with('success', \Lang::get('agrivate.updated'));
+					return \Redirect::route('admin_expenses.index')->with('success', \Lang::get('agrivate.updated'));
 				}
 
 				return \Redirect::back()->withErrors($expense->errors())->withInput();
@@ -135,7 +139,7 @@ class ExpensesController extends \BaseController {
 	 */
 	public function destroy($id)
 	{
-		$expense = \Expense::withTrashed()->where('id', $id)->first();
+		$expense = \Expense::withTrashed()->where('expense_id', $id)->first();
 		$message = \Lang::get('agrivate.trashed');
 		if ($expense->trashed()) {
             $expense->forceDelete();
@@ -145,7 +149,7 @@ class ExpensesController extends \BaseController {
         }
 
         // Session::set('success', 'Successfully deleted');
-        return \Redirect::route('admin_expense.index')->with('success', $message);
+        return \Redirect::route('admin_expenses.index')->with('success', $message);
         
 	}
 
@@ -157,7 +161,7 @@ class ExpensesController extends \BaseController {
 	 * @return Response
 	 */
 	public function restore($id) {
-		$expense = \Expense::withTrashed()->where('id', $id)->first();
+		$expense = \Expense::withTrashed()->where('expense_id', $id)->first();
 		if (!$expense->restore()) {
 			return \Redirect::back()->withErrors($expense->errors());			
 		}

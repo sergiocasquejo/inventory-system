@@ -53,8 +53,11 @@
                             <td>{{{ $sale->quantity }}}</td>
                             <td>{{{ $sale->uom }}}</td>
                             <td>{{{ $sale->total_amount }}}</td>
-                            <td>{{{ Helper::df($sale->date_of_sale) }}}</td>
-                            <td><span data-title="{{{ $sale->comments }}}">?</span></td>
+                            <td>{{{ Helper::fd($sale->date_of_sale) }}}</td>
+                            <td>
+                              <a class="badge bg-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="{{{ $sale->comments }}}">?</a>
+
+                            </td>
                             <td>{{{ $sale->user->username }}}</td>
                             <td>
                                 <span class="label label-{{{ $sale->status ? 'success' : 'warning' }}} label-mini">

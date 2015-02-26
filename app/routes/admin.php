@@ -42,8 +42,10 @@ Route::group(['before' => 'auth|admin', 'prefix' => 'admin'], function() {
 	// Categories routes
 	Route::resource('categories', 'Admin\CategoriesController', ['names' => $prefixResourceNamespace('admin_categories'), 'except' => ['show']]);
 	// Credits routes
+	Route::post('credits/{id}/restore', ['uses' => 'Admin\CreditsController@restore', 'as' => 'admin_credits.restore']);
 	Route::resource('credits', 'Admin\CreditsController', ['names' => $prefixResourceNamespace('admin_credits'), 'except' => ['show']]);
 	// Expenses routes
+	Route::post('expenses/{id}/restore', ['uses' => 'Admin\ExpensesController@restore', 'as' => 'admin_expenses.restore']);
 	Route::resource('expenses', 'Admin\ExpensesController', ['names' => $prefixResourceNamespace('admin_expenses'), 'except' => ['show']]);
 	// Sales routes
 	Route::post('sales/{id}/restore', ['uses' => 'Admin\SalesController@restore', 'as' => 'admin_sales.restore']);
