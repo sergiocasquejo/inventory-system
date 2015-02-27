@@ -25,7 +25,7 @@ class Helper {
 	 * @param INT $ptime - the time to evaluate
 	 * @return STRING - elapsed time formatted to string
 	 */
-	public function timeElapsedString($ptime)
+	public static function timeElapsedString($ptime)
 	{
 	    $etime = time() - $ptime;
 
@@ -69,7 +69,7 @@ class Helper {
 	 * @return STRING  - Formatted price
 	 */
 
-	public function nf($price, $dp = 2, $ps = '.', $ts = ', ', $echo = true) {
+	public static function nf($price, $dp = 2, $ps = '.', $ts = ', ', $echo = true) {
 		$formatted =  Config::get('agrivate.default_currency').number_format($price, $dp, $ps, $ts);
 
 		if (!$echo) {

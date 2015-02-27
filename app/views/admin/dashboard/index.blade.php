@@ -20,7 +20,7 @@
                 <i class="icon-tags"></i>
             </div>
             <div class="value">
-                <h1>{{{ $total_sales }}}</h1>
+                <h1>{{{ \Helper::nf($total_sales) }}}</h1>
                 <p>Sales</p>
             </div>
         </section>
@@ -31,7 +31,7 @@
                 <i class="icon-shopping-cart"></i>
             </div>
             <div class="value">
-                <h1>{{{ $total_expense }}}</h1>
+                <h1>{{{ \Helper::nf($total_expense) }}}</h1>
                 <p>Expense</p>
             </div>
         </section>
@@ -42,7 +42,7 @@
                 <i class="icon-bar-chart"></i>
             </div>
             <div class="value">
-                <h1>34,500</h1>
+                <h1>{{{ \Helper::nf($total_sales - $total_expense) }}}</h1>
                 <p>Total Profit</p>
             </div>
         </section>

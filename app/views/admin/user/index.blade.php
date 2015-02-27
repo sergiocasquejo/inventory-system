@@ -31,13 +31,14 @@
                 <table class="table table-striped table-advance table-hover">
                   <thead>
                     <tr>
+                        <th>User Name</th>
+                        <th>Email</th>
+                        <th>Display Name</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Is Admin?</th>
+                        <th>Confirmed?</th>
                         <th>Branch</th>
-                        <th>Product</th>
-                        <th>Quantity</th>
-                        <th>Unit of measure</th>
-                        <th>Total Amount</th>
-                        <th>Comments</th>
-                        <th>Encoded By</th>
                         <th>Status</th>
                         <th></th>
                     </tr>
@@ -54,29 +55,32 @@
                             <td>{{{ $user->last_name }}}</td>
                             <td>
                               <span class="label label-{{{ $user->is_admin ? 'info' : 'warning' }}} label-mini">
-                                {{{ $sale->is_admin ? 'Active' : 'Inactive' }}}
+                                {{{ $user->is_admin ? 'Yes' : 'No' }}}
                               </span>
                             </td>
                             <td>
                               <span class="label label-{{{ $user->confirmed ? 'success' : 'warning' }}} label-mini">
-                                    {{{ $user->confirmed ? 'Active' : 'Inactive' }}}
+                                    {{{ $user->confirmed ? 'Yes' : 'No' }}}
                                 </span>
                             </td>
+                             <td>{{{ !$user->branch?'':$user->branch->name }}}</td>
                             <td>
                                 <span class="label label-{{{ $user->status ? 'success' : 'warning' }}} label-mini">
-                                    {{{ $sale->user ? 'Active' : 'Inactive' }}}
+                                    {{{ $user->user ? 'Active' : 'Inactive' }}}
                                 </span>
                             </td>
-                            <td>{{{ $user->branch->name }}}</td>
+                           
                             <td>
                                 @if ($user->trashed())
                                   <a href="{{{ route('admin_users.restore', $user->id) }}}" data-method="RESTORE" class="btn btn-primary btn-xs" title="Restore"><i class="icon-rotate-left"></i></a>
                                 @else
                                   <a href="{{{ route('admin_users.edit', $user->id) }}}" class="btn btn-primary btn-xs" title="Edit"><i class="icon-pencil"></i></a>
                                 @endif
+                                @if (!$user->is_admin)
                                 <a href="{{{ route('admin_users.destroy', $user->id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="{{{ $user->trashed() ? 'Delete' : 'Trash' }}}" class="btn btn-danger btn-xs">
                                   <i class="icon-{{{ $user->trashed() ? 'remove' : 'trash' }}} "></i>
                                 </a>
+                                @endif
                             </td>
                         </tr>
                         @endforeach
@@ -94,7 +98,7 @@
                   </div>
                   <div class="col-sm-6">
                     <div class="dataTables_filter pagination-sm">
-                      <label>{{ $branches->appends($appends)->links() }}</label>
+                      <label>{{ $users->appends($appends)->links() }}</label>
                     </div>
                   </div>
                 </div>

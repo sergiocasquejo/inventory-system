@@ -5,6 +5,51 @@
 
     <div class="row">
       <div class="col-lg-12">
+          <div class="row state-overview">
+            <div class="col-lg-3 col-sm-6">
+                <section class="panel">
+                    <div class="symbol terques">
+                        <strong>Daily</strong>
+                    </div>
+                    <div class="value">
+                        <p>1, 3000</p>
+                    </div>
+                </section>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+                <section class="panel">
+                    <div class="symbol red">
+                        <strong>Weekly</strong>
+                    </div>
+                    <div class="value">
+                        <p>1, 3000</p>
+                    </div>
+                </section>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+                <section class="panel">
+                    <div class="symbol yellow">
+                        <strong>Monthly</strong>
+                    </div>
+                    <div class="value">
+                        <p>1, 3000</p>
+                    </div>
+                </section>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+                <section class="panel">
+                    <div class="symbol blue">
+                        <strong>Yearly</strong>
+                    </div>
+                    <div class="value">
+                        <p>1, 3000</p>
+                    </div>
+                </section>
+            </div>
+          </div>
+      </div>
+      
+      <div class="col-lg-12">
           <section class="panel">
             <form action="{{ route('admin_credits.index') }}"  class="form-horizontal tasi-form" method="GET">
               <input type="hidden" name="_token" value="{{ csrf_token() }}" />
@@ -60,8 +105,8 @@
                                       {{{ $credit->is_paid ? 'Paid' : 'Not Paid' }}}
                                   </span></td>
                               <td>{{{ $credit->user->username }}}</td>
-                              <td>{{{ \Helper::fd($credit->created_at) }}}</td>
-                              <td>{{{ \Helper::fd($credit->updated_at) }}}</td>
+                              <td>{{{ \Helper::timeElapsedString(strtotime($credit->created_at)) }}}</td>
+                              <td>{{{ \Helper::timeElapsedString(strtotime($credit->updated_at)) }}}</td>
                               <td>
                                     <a href="{{{ route('admin_credits.edit', $credit->credit_id) }}}" class="btn btn-primary btn-xs" title="Edit"><i class="icon-pencil"></i></a>
                                

@@ -34,7 +34,8 @@ class UsersController extends \BaseController {
 	public function create()
 	{
 
-		return \View::make('admin.user.create');
+		return \View::make('admin.user.create')
+			->with('branches', array_add(\Branch::all()->lists('name', 'id'), '0', 'Select Branch') );
 	}
 
 
@@ -58,7 +59,7 @@ class UsersController extends \BaseController {
 				$user = new \User;
 
 				if ($user->doSave($user, $input)) {
-					return \Redirect::route('admin_user.index')->with('success', \Lang::get('agrivate.created'));
+					return \Redirect::route('admin_users.index')->with('success', \Lang::get('agrivate.created'));
 				}
 
 				return \Redirect::back()->withErrors($user->errors())->withInput();
@@ -85,7 +86,9 @@ class UsersController extends \BaseController {
 			return \Redirect::back()->with('info', \Lang::get('agrivate.errors.restore'));
 		}
 
-		return \View::make('admin.user.edit')->with('user', $user);
+		return \View::make('admin.user.edit')
+		->with('user', $user)
+		->with('branches', array_add(\Branch::all()->lists('name', 'id'), '0', 'Select Branch') );
 	}
 
 
@@ -105,7 +108,7 @@ class UsersController extends \BaseController {
 
 		$rules = \User::$rules;
 
-		$rules['name'] = $rules['name'].','.$id.',id';
+		$rules['email'] = 'required|email|unique:users,email,'.$id.',id';
 
 		$validator = \Validator::make($input, $rules);
 
@@ -116,7 +119,7 @@ class UsersController extends \BaseController {
 				$user = \User::findOrFail($id);
 				
 				if ($user->doSave($user, $input)) {
-					return \Redirect::route('admin_user.index')->with('success', \Lang::get('agrivate.updated'));
+					return \Redirect::route('admin_users.index')->with('success', \Lang::get('agrivate.updated'));
 				}
 
 				return \Redirect::back()->withErrors($user->errors())->withInput();
@@ -135,6 +138,11 @@ class UsersController extends \BaseController {
 	 */
 	public function destroy($id)
 	{
+		if (\User::withTrashed()->where('id', $id)->first()->is_admin == 1) {
+			return \Redirect::back()->with('warning', \Lang::get('agrivate.errors.delete_owner_permission'));
+		}
+
+
 		$user = \User::withTrashed()->where('id', $id)->first();
 		$message = \Lang::get('agrivate.trashed');
 		if ($user->trashed()) {
@@ -145,7 +153,7 @@ class UsersController extends \BaseController {
         }
 
         // Session::set('success', 'Successfully deleted');
-        return \Redirect::route('admin_user.index')->with('success', $message);
+        return \Redirect::route('admin_users.index')->with('success', $message);
         
 	}
 
@@ -157,6 +165,10 @@ class UsersController extends \BaseController {
 	 * @return Response
 	 */
 	public function restore($id) {
+
+		
+
+
 		$user = \User::withTrashed()->where('id', $id)->first();
 		if (!$user->restore()) {
 			return \Redirect::back()->withErrors($user->errors());			

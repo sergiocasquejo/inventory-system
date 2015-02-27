@@ -7,12 +7,12 @@
 		 Create User
 		</header>
 		<div class="panel-body">
-		  	<form action="{{ route('admin_sales.store') }}"  class="form-horizontal tasi-form" method="POST">
+		  	<form action="{{ route('admin_users.store') }}"  class="form-horizontal tasi-form" method="POST">
 		  		<input type="hidden" name="_token" value="{{ csrf_token() }}" />
 		       	<div class="form-group">
 					<label class="col-sm-2 control-label" required>Branch</label>
 					<div class="col-sm-10">
-						{{ Form::select('branch_id', $branches, Input::old('branch_id'), ['class' => 'form-control m-bot15']) }}
+						{{ Form::select('branch_id', $branches, Input::old('branch_id', 0), ['class' => 'form-control m-bot15']) }}
 						<span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
 					</div>
 		      	</div>
@@ -77,7 +77,7 @@
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Confirmed</label>
 				  <div class="col-sm-10">
-				      {{ Form::select('is_admin', ['0' => 'No', '1' => 'Yes'], Input::old('is_admin', 0), ['class' => 'form-control m-bot15']) }}
+				      {{ Form::select('confirmed', ['0' => 'No', '1' => 'Yes'], Input::old('confirmed', 0), ['class' => 'form-control m-bot15']) }}
 				  </div>
 				</div>
 

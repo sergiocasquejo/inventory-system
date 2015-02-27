@@ -14,6 +14,7 @@ return [
 	// Errors
 	'errors' => [
 		'permission' => 'You dont have permission to access the page!',
+		'delete_owner_permission' => 'You can\'t delete owner!',
 		'restore' => 'Restore in order to edit'
 	]
 ];

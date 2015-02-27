@@ -24,6 +24,7 @@ Route::group(['before' => 'auth|admin', 'prefix' => 'admin'], function() {
 	Route::post('branches/{id}/restore', ['uses' => 'Admin\BranchesController@restore', 'as' => 'admin_branches.restore']);
 	Route::resource('branches', 'Admin\BranchesController', ['names' => $prefixResourceNamespace('admin_branches'), 'except' => ['show']]);
 	// Users routes
+	Route::post('users/{id}/restore', ['uses' => 'Admin\UsersController@restore', 'as' => 'admin_users.restore']);
 	Route::resource('users', 'Admin\UsersController', ['names' => $prefixResourceNamespace('admin_users'), 'except' => ['show']]);
 	// Categories routes
 	Route::group(['prefix' => 'products'], function() use($prefixResourceNamespace) {
