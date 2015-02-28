@@ -7,9 +7,10 @@
 		 Create User
 		</header>
 		<div class="panel-body">
-		  	<form action="{{ route('admin_users.update', $user->id) }}"  class="form-horizontal tasi-form" method="POST">
+		  	<form action="{{ route('admin_users.update', $user->id) }}" enctype="multipart/form-data"  class="form-horizontal tasi-form" method="POST">
 		  		<input type="hidden" name="_token" value="{{ csrf_token() }}" />
 		  		<input type="hidden" name="_method" value="PUT" />
+
 		       	<div class="form-group">
 					<label class="col-sm-2 control-label" required>Branch</label>
 					<div class="col-sm-10">
@@ -79,6 +80,14 @@
 				  <label class="col-sm-2 control-label">Confirmed</label>
 				  <div class="col-sm-10">
 				      {{ Form::select('confirmed', ['0' => 'No', '1' => 'Yes'], Input::old('confirmed', $user->confirmed), ['class' => 'form-control m-bot15']) }}
+				  </div>
+				</div>
+
+				<div class="form-group">
+				  <label class="col-sm-2 control-label">Photo</label>
+				  <div class="col-sm-10">
+				      <img alt="" width="30" height="30" src="{{ \Confide::user()->avatar($user->id)->thumbnail }}">
+				      <input type="file" name="photo" accept="image/*"/>
 				  </div>
 				</div>
 

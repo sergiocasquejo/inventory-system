@@ -1,6 +1,15 @@
 <?php
 
 return [
+	'avatar' => [
+		'sizes' => [
+				'thumbnail' => [30, 30],
+				'medium' => [150, 150],
+			],
+		'filename' => 'avatar',
+		'extension' => '.jpg',
+		'noimage' => '/assets/backend/img/default-avatar.jpg',
+		],
 	'statuses' => ['1' => 'Active', '0' => 'Inactive'], 
 	'credit_statuses' => ['1' => 'Paid', '0' => 'Not Paid'], 
 	'records_per_page' => [

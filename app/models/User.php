@@ -14,12 +14,14 @@ class User extends Eloquent implements ConfideUserInterface {
 	public static $rules = [
 		'username' => 'required|min:5',
 		'email' => 'required|email|unique:users,email',
-		'password' => 'required_if:password,NULL',
-		'confirm_password' => 'same:password',
+		'password' => 'required|alpha_dash',
+		'confirm_password' => 'same:password|alpha_dash',
 		'first_name' => 'required',
 		'last_name' => 'required',
 		'is_admin' => 'required|in:1,0',
 		'confirmed' => 'required|in:1,0',
+        'photo'   => 'mimes:jpeg,bmp,png',
+        'size'  => '2000',
 		'status' => 'required|in:1,0',
 	];
 	/**
@@ -97,5 +99,31 @@ class User extends Eloquent implements ConfideUserInterface {
     	return $instance;
     }
 
+
+
+
+    public function avatar($id = false) {
+
+        if (!$id) {
+            $id = $this->id;
+        }
+
+
+        $avatars = array();
+        $avatar = \Config::get('agrivate.avatar');
+        $fileName = $avatar['filename'];
+        $fileExtension = $avatar['extension'];
+        
+        foreach ($avatar['sizes'] as $key => $val) {
+            $file = '/assets/uploads/'.$id.'/'.$fileName.'_'.$key.$fileExtension;
+             if (file_exists(public_path($file))) {
+                $avatars[$key] = \URL::to($file);
+             } else {
+                $avatars[$key] = \URL::to($avatar['noimage']);
+             }
+        }
+       
+        return (object)$avatars;
+    }
 }
 

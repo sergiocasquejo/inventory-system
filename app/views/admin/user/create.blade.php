@@ -7,7 +7,7 @@
 		 Create User
 		</header>
 		<div class="panel-body">
-		  	<form action="{{ route('admin_users.store') }}"  class="form-horizontal tasi-form" method="POST">
+		  	<form action="{{ route('admin_users.store') }}"  class="form-horizontal tasi-form" enctype="multipart/form-data" method="POST">
 		  		<input type="hidden" name="_token" value="{{ csrf_token() }}" />
 		       	<div class="form-group">
 					<label class="col-sm-2 control-label" required>Branch</label>
@@ -81,7 +81,13 @@
 				  </div>
 				</div>
 
-				
+				<div class="form-group">
+				  <label class="col-sm-2 control-label">Photo</label>
+				  <div class="col-sm-10">
+				      <input type="file" name="photo" accept="image/*"/>
+				  </div>
+				</div>
+
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Status</label>
 				  <div class="col-sm-10">

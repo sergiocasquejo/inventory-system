@@ -59,6 +59,8 @@ class UsersController extends \BaseController {
 				$user = new \User;
 
 				if ($user->doSave($user, $input)) {
+					$this->upload($user->id);
+					
 					return \Redirect::route('admin_users.index')->with('success', \Lang::get('agrivate.created'));
 				}
 
@@ -91,7 +93,28 @@ class UsersController extends \BaseController {
 		->with('branches', array_add(\Branch::all()->lists('name', 'id'), '0', 'Select Branch') );
 	}
 
+	
 
+	public function upload($id) {
+		if (\Input::hasFile('photo')) {
+			$avatar = \Config::get('agrivate.avatar');
+			$fileName = $avatar['filename'];
+			$fileExtension = $avatar['extension'];
+
+			$fileNameWithExtension = $fileName.$fileExtension;
+
+			$file = \Input::file('photo');
+			$uploadPath = public_path('/assets/uploads/'.$id.'/');
+
+			$file->move($uploadPath, $fileNameWithExtension);	
+			
+			foreach ($avatar['sizes'] as $name => $size) {
+				
+				$image = \Image::make($uploadPath.$fileNameWithExtension)
+				->resize($size[0], $size[1])->save($uploadPath.$fileName.'_'.$name.$fileExtension);
+			}
+		}
+	}
 
 
 	/**
@@ -108,6 +131,7 @@ class UsersController extends \BaseController {
 
 		$rules = \User::$rules;
 
+		$rules['password'] = 'alpha_dash';
 		$rules['email'] = 'required|email|unique:users,email,'.$id.',id';
 
 		$validator = \Validator::make($input, $rules);
@@ -119,6 +143,9 @@ class UsersController extends \BaseController {
 				$user = \User::findOrFail($id);
 				
 				if ($user->doSave($user, $input)) {
+					
+					$this->upload($id);
+					
 					return \Redirect::route('admin_users.index')->with('success', \Lang::get('agrivate.updated'));
 				}
 
@@ -128,6 +155,9 @@ class UsersController extends \BaseController {
 			}
 		}
 	}
+
+
+	
 
 
 	/**

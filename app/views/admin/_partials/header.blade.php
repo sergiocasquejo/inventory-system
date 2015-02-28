@@ -222,7 +222,7 @@
             <!-- user login dropdown start-->
             <li class="dropdown">
                 <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-                    <img alt="" src="{{ asset('/assets/backend/img/avatar1_small.jpg') }}">
+                    <img alt="" width="30" height="30" src="{{ \Confide::user()->avatar()->thumbnail }}">
                     <span class="username">Jhon Doue</span>
                     <b class="caret"></b>
                 </a>
