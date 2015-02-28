@@ -86,7 +86,9 @@
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Photo</label>
 				  <div class="col-sm-10">
-				      <img alt="" width="30" height="30" src="{{ \Confide::user()->avatar($user->id)->thumbnail }}">
+				  	<a tabindex="0" title="{{{ $user->display_name }}}" data-trigger="focus"  data-placement="top" rel="popover-image" data-image="{{ \Confide::user()->avatar($user->id)->avatar }}">
+				      	<img alt="" width="30" height="30" src="{{ \Confide::user()->avatar($user->id)->thumbnail }}">
+				      </a>
 				      <input type="file" name="photo" accept="image/*"/>
 				  </div>
 				</div>

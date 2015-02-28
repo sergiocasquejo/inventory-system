@@ -12,7 +12,7 @@
                         <strong>Daily</strong>
                     </div>
                     <div class="value">
-                        <p>1, 3000</p>
+                        <p>{{{ \Helper::nf($daily) }}}</p>
                     </div>
                 </section>
             </div>
@@ -22,7 +22,7 @@
                         <strong>Weekly</strong>
                     </div>
                     <div class="value">
-                        <p>1, 3000</p>
+                        <p>{{{ \Helper::nf($weekly) }}}</p>
                     </div>
                 </section>
             </div>
@@ -32,7 +32,7 @@
                         <strong>Monthly</strong>
                     </div>
                     <div class="value">
-                        <p>1, 3000</p>
+                        <p>{{{ \Helper::nf($monthly) }}}</p>
                     </div>
                 </section>
             </div>
@@ -42,7 +42,7 @@
                         <strong>Yearly</strong>
                     </div>
                     <div class="value">
-                        <p>1, 3000</p>
+                        <p>{{{ \Helper::nf($yearly) }}}</p>
                     </div>
                 </section>
             </div>
@@ -76,16 +76,30 @@
                   <table class="table table-striped table-advance table-hover">
                     <thead>
                       <tr>
-                          <th>Branch</th>
+                          <th>{{ Form::select('branch', $branches, Input::get('branch', ''), ['class' => 'form-control input-xs']) }}</th>
                           <th>Name</th>
-                          <th>Total Amount</th>
                           <th>Quantity</th>
+                          <th>{{ Form::select('total', $totals, Input::get('total', ''), ['class' => 'form-control input-xs']) }} </th>
                           <th>Unit of measure</th>
                           <th>Comments</th>
-                          <th>Expense Date</th>
+                          <th>
+                            <div class="form-group">
+                              <div class="col-md-4 padding-2px">
+                                  {{ Form::select('year', $years, Input::get('year', ''), ['class' => 'form-control input-xs']) }} 
+                              </div>
+                              <div class="col-md-4 padding-2px">
+                                {{ Form::select('month', $months, Input::get('month', ''), ['class' => 'form-control input-xs']) }} 
+                              </div>
+                              <div class="col-md-4 padding-2px">
+                                {{ Form::select('day', $days, Input::get('day', ''), ['class' => 'form-control input-xs']) }} 
+                              </div>
+                           </div>
+                          </th>
                           <th>Encoded By</th>
-                          <th>Status</th>
-                          <th></th>
+                          <th>{{ Form::select('status', $statuses, Input::get('status', ''), ['class' => 'form-control input-xs']) }} </th>
+                          <th>
+                            <button type="submit" class="btn btn-info btn-xs">Filter</button>
+                          </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -95,11 +109,11 @@
                           <tr>
                               <td>{{{ $expense->branch->name }}}</td>
                               <td>{{{ $expense->name }}}</td>
-                              <td>{{{ $expense->total_amount }}}</td>
                               <td>{{{ $expense->quantity }}}</td>
+                              <td>{{{ \Helper::nf($expense->total_amount) }}}</td>
                               <td>{{{ $expense->uom }}}</td>
                               <td><a class="badge bg-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="{{{ $expense->comments }}}">?</a></td>
-                              <td>{{{ $expense->date_of_expense }}}</td>
+                              <td>{{{ Helper::fd($expense->date_of_expense) }}}</td>
                               <td>{{{ $expense->user->username }}}</td>
                               <td>
                                      <span class="label label-{{{ $expense->status ? 'success' : 'warning' }}} label-mini">
@@ -124,6 +138,14 @@
                           </tr>
                       @endif
                     </tbody>
+                    <tfoot>
+                      <tr>
+                          <td colspan="2"></td>
+                          <td><strong>{{{ \Helper::nf($expenses->sum('quantity')) }}}</strong></td>
+                          <td><strong>{{{ \Helper::nf($expenses->sum('total_amount')) }}}</strong></td>
+                          <td colspan="6"></td>
+                      </tr>
+                  </tfoot>
                 </table>
                 <div class="row">
                   <div class="col-sm-6">

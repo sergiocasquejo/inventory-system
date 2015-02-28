@@ -12,7 +12,7 @@
                         <strong>Daily</strong>
                     </div>
                     <div class="value">
-                        <p>1, 3000</p>
+                        <p>{{{ \Helper::nf($daily) }}}</p>
                     </div>
                 </section>
             </div>
@@ -22,7 +22,7 @@
                         <strong>Weekly</strong>
                     </div>
                     <div class="value">
-                        <p>1, 3000</p>
+                        <p>{{{ \Helper::nf($weekly) }}}</p>
                     </div>
                 </section>
             </div>
@@ -32,7 +32,7 @@
                         <strong>Monthly</strong>
                     </div>
                     <div class="value">
-                        <p>1, 3000</p>
+                        <p>{{{ \Helper::nf($monthly) }}}</p>
                     </div>
                 </section>
             </div>
@@ -42,7 +42,7 @@
                         <strong>Yearly</strong>
                     </div>
                     <div class="value">
-                        <p>1, 3000</p>
+                        <p>{{{ \Helper::nf($yearly) }}}</p>
                     </div>
                 </section>
             </div>
@@ -76,16 +76,38 @@
               <table class="table table-striped table-advance table-hover">
                   <thead>
                     <tr>
-                        <th>Branch</th>
-                        <th>Product</th>
+                        <th>
+                          {{ Form::select('branch', $branches, Input::get('branch', ''), ['class' => 'form-control input-xs']) }}
+                        </th>
+                        <th>
+                          {{ Form::select('product', $products, Input::get('product', ''), ['class' => 'form-control input-xs']) }}
+                        </th>
                         <th>Quantity</th>
                         <th>Unit of measure</th>
-                        <th>Total Amount</th>
-                        <th>Date of Sale</th>
+                        <th>
+                          {{ Form::select('total', $totals, Input::get('total', ''), ['class' => 'form-control input-xs']) }} 
+                        </th>
+                        <th>
+                          <div class="form-group">
+                              <div class="col-md-4 padding-2px">
+                                  {{ Form::select('year', $years, Input::get('year', ''), ['class' => 'form-control input-xs']) }} 
+                              </div>
+                              <div class="col-md-4 padding-2px">
+                                {{ Form::select('month', $months, Input::get('month', ''), ['class' => 'form-control input-xs']) }} 
+                              </div>
+                              <div class="col-md-4 padding-2px">
+                                {{ Form::select('day', $days, Input::get('day', ''), ['class' => 'form-control input-xs']) }} 
+                              </div>
+                          </div>
+                        </th>
                         <th>Comments</th>
                         <th>Encoded By</th>
-                        <th>Status</th>
-                        <th></th>
+                        <th>
+                          {{ Form::select('status', $statuses, Input::get('status', ''), ['class' => 'form-control input-xs']) }} 
+                        </th>
+                        <th>
+                            <button type="submit" class="btn btn-info btn-xs">Filter</button>
+                        </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -127,6 +149,15 @@
                         </tr>
                     @endif
                   </tbody>
+                  <tfoot>
+                      <tr>
+                          <td colspan="2"></td>
+                          <td><strong>{{{ \Helper::nf($sales->sum('quantity')) }}}</strong></td>
+                          <td></td>
+                          <td><strong>{{{ \Helper::nf($sales->sum('total_amount')) }}}</strong></td>
+                          <td colspan="5"></td>
+                      </tr>
+                  </tfoot>
               </table>
               <div class="row">
                   <div class="col-sm-6">

@@ -50,6 +50,44 @@ class Sale extends Eloquent {
 		return $query->where('status', 0);
 	}
 
+
+	public function scopeFilter($query, $input) {
+
+		$branch = array_get($input, 'branch');
+		$status = array_get($input, 'status');
+		$product = array_get($input, 'product');
+		$total = array_get($input, 'total');
+		$year = $year = array_get($input, 'year');
+		$month = $month = array_get($input, 'month');
+		$day = $day = array_get($input, 'day');
+
+
+	 	if ($branch != '') {
+			$query->whereRaw('branch_id ='. (int) $branch);
+		}
+		if ($product != '') {
+			$query->whereRaw('product_id = '. (int) $product);
+		}
+		if ($total != '') {
+			$query->whereRaw('total_amount = '. (float)$total);
+		}
+		if ($year != '') {
+			$query->whereRaw('YEAR(date_of_sale) = '.(int)$year);
+		}
+		if ($month != '') {
+			$query->whereRaw('MONTH(date_of_sale) = '.(int)$month);
+		}
+		if ($day != '') {
+			$query->whereRaw('DAY(date_of_sale) = '. (int)$day);
+		}
+		if ($status != '') {
+			$query->whereRaw('status = '. (int)$status);
+		}
+
+
+		return $query;
+	}
+
 	/**
      * Simply saves the given instance
      *

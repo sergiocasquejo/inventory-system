@@ -20,6 +20,21 @@
     <!-- Custom styles for this template -->
     <link href="{{ asset('/assets/backend/css/style.css') }}" rel="stylesheet">
     <link href="{{ asset('/assets/backend/css/style-responsive.css') }}" rel="stylesheet" />
+    <style type="text/css">
+      /*.popover {
+        max-width: 100% !important;
+      }*/
+      .padding-2px {
+        padding:0 2px;
+      }
+
+      .input-xs {
+        padding: 0;
+        margin: 0;
+        height: 25px;
+        border-radius: 1px;
+      }
+    </style>
     <script type="text/javascript">
     //<![CDATA[
       var AJAX = {'baseUrl': '<?php echo URL::to('/'); ?>'};

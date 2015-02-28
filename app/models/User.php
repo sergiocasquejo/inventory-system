@@ -114,6 +114,8 @@ class User extends Eloquent implements ConfideUserInterface {
         $fileName = $avatar['filename'];
         $fileExtension = $avatar['extension'];
         
+        $avatars['avatar'] = URL::to('/assets/uploads/'.$id.'/'.$fileName.$fileExtension);
+        
         foreach ($avatar['sizes'] as $key => $val) {
             $file = '/assets/uploads/'.$id.'/'.$fileName.'_'.$key.$fileExtension;
              if (file_exists(public_path($file))) {

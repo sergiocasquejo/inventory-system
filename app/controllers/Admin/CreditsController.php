@@ -13,14 +13,43 @@ class CreditsController extends \BaseController {
 		$input = \Input::all();
 
 
-		$credits = \Credit::withTrashed()->search($input)->orderBy('credit_id', 'desc')->paginate(intval(array_get($input, 'records_per_page', 10)));
+		$credits = \Credit::withTrashed()
+			->filter($input)
+			->search($input)
+			->orderBy('credit_id', 'desc')
+			->paginate(intval(array_get($input, 'records_per_page', 10)));
 		
 		$totalRows = \Credit::withTrashed()->count();
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
-		$countries = \Config::get('agrivate.countries');
-		return \View::make('admin.credit.index')
+		// $countries = \Config::get('agrivate.countries');
+
+
+
+		$yearly = \Credit::whereRaw('YEAR(date_of_credit) = YEAR(CURDATE())')->sum('total_amount');
+		$monthly = \Credit::whereRaw('MONTH(date_of_credit) = MONTH(CURDATE())')->sum('total_amount');
+		$weekly = \Credit::whereRaw('WEEK(date_of_credit) = WEEK(CURDATE())')->sum('total_amount');
+		$daily = \Credit::whereRaw('DAY(date_of_credit) = DAY(CURDATE())')->sum('total_amount');
+
+		$all = [
+			'daily' => $daily,
+			'weekly' => $weekly,
+			'monthly' => $monthly,
+			'yearly' => $yearly,
+			'branches' =>array_add(\DB::table('expenses')->join('branches', 'expenses.branch_id', '=', 'branches.id')
+					->select(\DB::raw('CONCAT(SUBSTRING('.\DB::getTablePrefix().'branches.name, 1, 20),"...") AS name, '.\DB::getTablePrefix().'branches.id'))
+					 ->lists('name', 'id'), '', 'Branch'),
+			'totals' => array_add(\Credit::all()->lists('total_amount', 'total_amount'), '', 'Amount'),
+			'days' => array_add(\Credit::select(\DB::raw('DAY(date_of_credit) as day'))->lists('day', 'day'), '', 'Day'),
+			'months' => array_add(\Credit::select(\DB::raw('DATE_FORMAT(date_of_credit, "%b") as month, MONTH(date_of_credit) as month_no'))->lists('month', 'month_no'), '', 'Month'),
+			'years' => array_add(\Credit::select(\DB::raw('YEAR(date_of_credit) as year'))->lists('year', 'year'), '', 'Year'),
+			'statuses' => array_add(\Credit::select(\DB::raw('is_paid, IF (is_paid = 1, \'Paid\', \'Not Paid\') as name'))->lists('name', 'is_paid'), '', 'Is Paid?'),
+		];
+
+
+
+		return \View::make('admin.credit.index', $all)
 			->with('credits', $credits)
 			->with('branches', \Branch::all()->lists('name', 'id'))
 			->with('appends', $appends)

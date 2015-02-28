@@ -12,14 +12,43 @@ class ExpensesController extends \BaseController {
 		$input = \Input::all();
 
 
-		$expenses = \Expense::withTrashed()->search($input)->orderBy('expense_id', 'desc')->paginate(intval(array_get($input, 'records_per_page', 10)));
+		$expenses = \Expense::withTrashed()
+		->filter($input)
+		->search($input)
+		->orderBy('expense_id', 'desc')
+		->paginate(intval(array_get($input, 'records_per_page', 10)));
 		
+
+
 		$totalRows = \Expense::withTrashed()->count();
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
 		$countries = \Config::get('agrivate.countries');
-		return \View::make('admin.expense.index')
+
+
+		$yearly = \Expense::whereRaw('YEAR(date_of_expense) = YEAR(CURDATE())')->sum('total_amount');
+		$monthly = \Expense::whereRaw('MONTH(date_of_expense) = MONTH(CURDATE())')->sum('total_amount');
+		$weekly = \Expense::whereRaw('WEEK(date_of_expense) = WEEK(CURDATE())')->sum('total_amount');
+		$daily = \Expense::whereRaw('DAY(date_of_expense) = DAY(CURDATE())')->sum('total_amount');
+
+		$all = [
+			'daily' => $daily,
+			'weekly' => $weekly,
+			'monthly' => $monthly,
+			'yearly' => $yearly,
+			'branches' =>array_add(\DB::table('expenses')->join('branches', 'expenses.branch_id', '=', 'branches.id')
+					->select(\DB::raw('CONCAT(SUBSTRING('.\DB::getTablePrefix().'branches.name, 1, 20),"...") AS name, '.\DB::getTablePrefix().'branches.id'))
+					 ->lists('name', 'id'), '', 'Branch'),
+			'totals' => array_add(\Expense::all()->lists('total_amount', 'total_amount'), '', 'Amount'),
+			'days' => array_add(\Expense::select(\DB::raw('DAY(date_of_expense) as day'))->lists('day', 'day'), '', 'Day'),
+			'months' => array_add(\Expense::select(\DB::raw('DATE_FORMAT(date_of_expense, "%b") as month, MONTH(date_of_expense) as month_no'))->lists('month', 'month_no'), '', 'Month'),
+			'years' => array_add(\Expense::select(\DB::raw('YEAR(date_of_expense) as year'))->lists('year', 'year'), '', 'Year'),
+			'statuses' => array_add(\Expense::select(\DB::raw('status, IF (status = 1, \'Active\', \'Inactive\') as name'))->lists('name', 'status'), '', 'Status'),
+		];
+
+
+		return \View::make('admin.expense.index', $all)
 			->with('expenses', $expenses)
 			->with('appends', $appends)
 			->with('totalRows', $totalRows);

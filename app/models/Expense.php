@@ -51,6 +51,42 @@ class Expense extends Eloquent {
         return $query;
     }
 
+    public function scopeFilter($query, $input) {
+
+        $branch = array_get($input, 'branch');
+        $status = array_get($input, 'status');
+        $total = array_get($input, 'total');
+        $year = $year = array_get($input, 'year');
+        $month = $month = array_get($input, 'month');
+        $day = $day = array_get($input, 'day');
+
+
+        if ($branch != '') {
+            $query->whereRaw('branch_id ='. (int) $branch);
+        }
+
+        if ($total != '') {
+            $query->whereRaw('total_amount = '. (float)$total);
+        }
+        if ($year != '') {
+            $query->whereRaw('YEAR(date_of_expense) = '.(int)$year);
+        }
+        if ($month != '') {
+            $query->whereRaw('MONTH(date_of_expense) = '.(int)$month);
+        }
+        if ($day != '') {
+            $query->whereRaw('DAY(date_of_expense) = '. (int)$day);
+        }
+        if ($status != '') {
+            $query->whereRaw('status = '. (int)$status);
+        }
+
+
+        return $query;
+    }
+
+
+
 	public function doSave(Expense $instance, $input) {
 		$instance->branch_id = array_get($input, 'branch_id');
 		$instance->name = array_get($input, 'name');
