@@ -4,7 +4,7 @@
     @include ('admin._partials.breadcrumbs')
     <section class="panel">
 		<header class="panel-heading">
-		 Create User
+		 Edit User
 		</header>
 		<div class="panel-body">
 		  	<form action="{{ route('admin_users.update', $user->id) }}" enctype="multipart/form-data"  class="form-horizontal tasi-form" method="POST">

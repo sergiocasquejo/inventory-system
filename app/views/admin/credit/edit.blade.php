@@ -4,7 +4,7 @@
     @include ('admin._partials.breadcrumbs')
 	  <section class="panel">
 		<header class="panel-heading">
-		 Create Brand
+		 Edit Credit
 		</header>
 		<div class="panel-body">
 		  	<form action="{{ route('admin_credits.update', $credit->credit_id) }}"  class="form-horizontal tasi-form" method="POST">
@@ -81,7 +81,7 @@
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Date of credit</label>
 				  <div class="col-sm-10">
-				      <input type="date" name="date_of_credit" value="{{ Input::old('date_of_credit', $credit->date_of_credit) }}" class="form-control">
+				      <input type="text" name="date_of_credit" value="{{ Input::old('date_of_credit', $credit->date_of_credit) }}" class="form-control datepicker">
 				  </div>
 				</div>
 				

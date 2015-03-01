@@ -68,6 +68,18 @@ class Branch extends Eloquent {
     	return $query;
     }
 
+    public function scopeFilterBranch($query) {
+        /* Check if current user is not admin
+        * filter only his branch
+        */
+        if (!\Confide::user()->isAdmin()) {
+           $query->whereRaw('id ='. (int) \Confide::user()->branch_id); 
+        } 
+
+        return $query;
+    }
+    
+
 	public function doSave(Branch $instance, $input) {
 		$instance->name = array_get($input, 'name');
 		$instance->address = array_get($input, 'address');

@@ -9,6 +9,7 @@
                     <span>Dashboard</span>
                 </a>
             </li>
+            @if (Confide::user()->isAdmin())
             <li class="sub-menu">
                 <a href="javascript:;" class="">
                     <i class="icon-home"></i>
@@ -20,6 +21,7 @@
                     <li><a class="" href="{{ route('admin_branches.create') }}">Add New</a></li>
                 </ul>
             </li>
+            
             
             <li class="sub-menu">
                 <a href="javascript:;" class="">
@@ -33,7 +35,7 @@
                     <li><a class="" href="{{ route('admin_categories.index') }}">Categories</a></li>
                 </ul>
             </li>
-
+            @endif
             <li class="sub-menu">
                 <a href="javascript:;" class="">
                     <i class="icon-bar-chart"></i>
@@ -70,7 +72,7 @@
                 </ul>
             </li>
 
-
+            @if (Confide::user()->isAdmin())
             
 
             <li class="sub-menu">
@@ -95,6 +97,7 @@
                     <li><a class="" href="#">Unit of measures</a></li>
                 </ul>
             </li>
+            @endif
 
         </ul>
         <!-- sidebar menu end-->

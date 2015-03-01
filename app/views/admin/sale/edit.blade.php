@@ -4,7 +4,7 @@
     @include ('admin._partials.breadcrumbs')
     <section class="panel">
 		<header class="panel-heading">
-		 Create Product
+		 Edit Sale
 		</header>
 		<div class="panel-body">
 		  	<form action="{{ route('admin_sales.update', $sale->sale_id) }}"  class="form-horizontal tasi-form" method="POST">
@@ -59,7 +59,7 @@
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Date of sale</label>
 				  <div class="col-sm-10">
-				      <input type="date" name="date_of_sale" value="{{ Input::old('date_of_sale', $sale->date_of_sale) }}" class="form-control">
+				      <input type="text" name="date_of_sale" value="{{ Input::old('date_of_sale', $sale->date_of_sale) }}" class="form-control datepicker">
 				  </div>
 				</div>
 				

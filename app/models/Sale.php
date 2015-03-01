@@ -50,6 +50,12 @@ class Sale extends Eloquent {
 		return $query->where('status', 0);
 	}
 
+	public function scopeFilterBranch($query) {
+		if (!\Confide::user()->isAdmin()) {
+			$query->where('branch_id', \Confide::user()->branch_id);
+		}	
+		return $query;
+	}
 
 	public function scopeFilter($query, $input) {
 
@@ -62,9 +68,16 @@ class Sale extends Eloquent {
 		$day = $day = array_get($input, 'day');
 
 
-	 	if ($branch != '') {
-			$query->whereRaw('branch_id ='. (int) $branch);
-		}
+	 	/* Check if current user is not admin
+        * filter only his branch
+        */
+        if (!\Confide::user()->isAdmin()) {
+           $query->whereRaw('branch_id ='. (int) \Confide::user()->branch_id); 
+        } elseif ($branch != '') {
+            $query->whereRaw('branch_id ='. (int) $branch);
+        }
+
+
 		if ($product != '') {
 			$query->whereRaw('product_id = '. (int) $product);
 		}

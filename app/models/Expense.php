@@ -51,6 +51,13 @@ class Expense extends Eloquent {
         return $query;
     }
 
+    public function scopeFilterBranch($query) {
+        if (!\Confide::user()->isAdmin()) {
+            $query->where('branch_id', \Confide::user()->branch_id);
+        }   
+        return $query;
+    }
+    
     public function scopeFilter($query, $input) {
 
         $branch = array_get($input, 'branch');
@@ -61,7 +68,12 @@ class Expense extends Eloquent {
         $day = $day = array_get($input, 'day');
 
 
-        if ($branch != '') {
+        /* Check if current user is not admin
+        * filter only his branch
+        */
+        if (!\Confide::user()->isAdmin()) {
+           $query->whereRaw('branch_id ='. (int) \Confide::user()->branch_id); 
+        } elseif ($branch != '') {
             $query->whereRaw('branch_id ='. (int) $branch);
         }
 

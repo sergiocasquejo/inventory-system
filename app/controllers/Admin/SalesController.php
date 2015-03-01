@@ -17,7 +17,7 @@ class SalesController extends \BaseController {
 				->orderBy('sale_id', 'desc')
 				->paginate(intval(array_get($input, 'records_per_page', 10)));
 		
-		$totalRows = \Sale::withTrashed()->count();
+		$totalRows = \Sale::withTrashed()->filterBranch()->count();
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
@@ -25,10 +25,25 @@ class SalesController extends \BaseController {
 
 
 
-		$yearly = \Sale::whereRaw('YEAR(date_of_sale) = YEAR(CURDATE())')->sum('total_amount');
-		$monthly = \Sale::whereRaw('MONTH(date_of_sale) = MONTH(CURDATE())')->sum('total_amount');
-		$weekly = \Sale::whereRaw('WEEK(date_of_sale) = WEEK(CURDATE())')->sum('total_amount');
-		$daily = \Sale::whereRaw('DAY(date_of_sale) = DAY(CURDATE())')->sum('total_amount');
+		$yearly = \Sale::filterBranch()->whereRaw('YEAR(date_of_sale) = YEAR(CURDATE())')->sum('total_amount');
+		$monthly = \Sale::filterBranch()->whereRaw('MONTH(date_of_sale) = MONTH(CURDATE())')->sum('total_amount');
+		$weekly = \Sale::filterBranch()->whereRaw('WEEK(date_of_sale) = WEEK(CURDATE())')->sum('total_amount');
+		$daily = \Sale::filterBranch()->whereRaw('DAY(date_of_sale) = DAY(CURDATE())')->sum('total_amount');
+
+
+		$branches = \DB::table('sales')->join('branches', 'sales.branch_id', '=', 'branches.id')
+					->select(\DB::raw('CONCAT(SUBSTRING(name, 1, 20),"...") AS name, id'));
+
+		$products = \DB::table('sales')
+					->join('products', 'sales.product_id', '=', 'products.id')
+					->select(\DB::raw('CONCAT(SUBSTRING(name, 1, 20),"...") AS name, id'));
+					
+		// Filter branch if user is not owner
+		if (!\Confide::user()->isAdmin()) {
+			$branches = $branches->where('branches.id', \Confide::user()->branch_id);
+			$products = $products->where('sales.branch_id', \Confide::user()->branch_id);
+		}
+
 
 
 		$all = [
@@ -36,18 +51,13 @@ class SalesController extends \BaseController {
 			'weekly' => $weekly,
 			'monthly' => $monthly,
 			'yearly' => $yearly,
-			'branches' =>array_add(\DB::table('sales')->join('branches', 'sales.branch_id', '=', 'branches.id')
-					->select(\DB::raw('CONCAT(SUBSTRING(name, 1, 20),"...") AS name, id'))
-					 ->lists('name', 'id'), '', 'Branch'),
-			'products' => array_add(\DB::table('sales')
-					->join('products', 'sales.product_id', '=', 'products.id')
-					->select(\DB::raw('CONCAT(SUBSTRING(name, 1, 20),"...") AS name, id'))
-					->lists('name', 'id'), '', 'Product'),
-			'totals' => array_add(\Sale::all()->lists('total_amount', 'total_amount'), '', 'Amount'),
-			'days' => array_add(\Sale::select(\DB::raw('DAY(date_of_sale) as day'))->lists('day', 'day'), '', 'Day'),
-			'months' => array_add(\Sale::select(\DB::raw('DATE_FORMAT(date_of_sale, "%b") as month, MONTH(date_of_sale) as month_no'))->lists('month', 'month_no'), '', 'Month'),
-			'years' => array_add(\Sale::select(\DB::raw('YEAR(date_of_sale) as year'))->lists('year', 'year'), '', 'Year'),
-			'statuses' => array_add(\Sale::select(\DB::raw('status, IF (status = 1, \'Active\', \'Inactive\') as name'))->lists('name', 'status'), '', 'Status'),
+			'branches' => array_add($branches->lists('name', 'id'), '', 'Branch'),
+			'products' => array_add($products->lists('name', 'id'), '', 'Product'),
+			'totals' => array_add(\Sale::filterBranch()->lists('total_amount', 'total_amount'), '', 'Amount'),
+			'days' => array_add(\Sale::filterBranch()->select(\DB::raw('DAY(date_of_sale) as day'))->lists('day', 'day'), '', 'Day'),
+			'months' => array_add(\Sale::filterBranch()->select(\DB::raw('DATE_FORMAT(date_of_sale, "%b") as month, MONTH(date_of_sale) as month_no'))->lists('month', 'month_no'), '', 'Month'),
+			'years' => array_add(\Sale::filterBranch()->select(\DB::raw('YEAR(date_of_sale) as year'))->lists('year', 'year'), '', 'Year'),
+			'statuses' => array_add(\Sale::filterBranch()->select(\DB::raw('status, IF (status = 1, \'Active\', \'Inactive\') as name'))->lists('name', 'status'), '', 'Status'),
 		];
 
 		
@@ -68,8 +78,8 @@ class SalesController extends \BaseController {
 	{
 
 		return \View::make('admin.sale.create')
-		->with('branches', \Branch::all()->lists('name', 'id'))
-		->with('products', \Product::all()->lists('name', 'id'));
+		->with('branches', \Branch::filterBranch()->active()->lists('name', 'id'))
+		->with('products', \Product::active()->lists('name', 'id'));
 	}
 
 
@@ -124,8 +134,8 @@ class SalesController extends \BaseController {
 
 		return \View::make('admin.sale.edit')
 		->with('sale', $sale)
-		->with('branches', \Branch::all()->lists('name', 'id'))
-		->with('products', \Product::all()->lists('name', 'id'));
+		->with('branches', \Branch::filterBranch()->active()->lists('name', 'id'))
+		->with('products', \Product::active()->lists('name', 'id'));
 	}
 
 

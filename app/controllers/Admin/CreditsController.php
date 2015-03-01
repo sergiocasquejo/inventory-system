@@ -10,16 +10,20 @@ class CreditsController extends \BaseController {
 	public function index()
 	{
 
+
+		
+
 		$input = \Input::all();
 
 
 		$credits = \Credit::withTrashed()
+			->filterBranch()
 			->filter($input)
 			->search($input)
 			->orderBy('credit_id', 'desc')
 			->paginate(intval(array_get($input, 'records_per_page', 10)));
 		
-		$totalRows = \Credit::withTrashed()->count();
+		$totalRows = \Credit::withTrashed()->filterBranch()->count();
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
@@ -27,31 +31,40 @@ class CreditsController extends \BaseController {
 
 
 
-		$yearly = \Credit::whereRaw('YEAR(date_of_credit) = YEAR(CURDATE())')->sum('total_amount');
-		$monthly = \Credit::whereRaw('MONTH(date_of_credit) = MONTH(CURDATE())')->sum('total_amount');
-		$weekly = \Credit::whereRaw('WEEK(date_of_credit) = WEEK(CURDATE())')->sum('total_amount');
-		$daily = \Credit::whereRaw('DAY(date_of_credit) = DAY(CURDATE())')->sum('total_amount');
+		$yearly = \Credit::filterBranch()->whereRaw('YEAR(date_of_credit) = YEAR(CURDATE())')->sum('total_amount');
+		$monthly = \Credit::filterBranch()->whereRaw('MONTH(date_of_credit) = MONTH(CURDATE())')->sum('total_amount');
+		$weekly = \Credit::filterBranch()->whereRaw('WEEK(date_of_credit) = WEEK(CURDATE())')->sum('total_amount');
+		$daily = \Credit::filterBranch()->whereRaw('DAY(date_of_credit) = DAY(CURDATE())')->sum('total_amount');
+
+		$branches = \DB::table('expenses')->join('branches', 'expenses.branch_id', '=', 'branches.id')
+					->select(\DB::raw('CONCAT(SUBSTRING('.\DB::getTablePrefix().'branches.name, 1, 20),"...") AS name, '.\DB::getTablePrefix().'branches.id'));
+
+
+					
+		// Filter branch if user is not owner
+		if (!\Confide::user()->isAdmin()) {
+			$branches = $branches->where('branches.id', \Confide::user()->branch_id);
+		}
+
 
 		$all = [
 			'daily' => $daily,
 			'weekly' => $weekly,
 			'monthly' => $monthly,
 			'yearly' => $yearly,
-			'branches' =>array_add(\DB::table('expenses')->join('branches', 'expenses.branch_id', '=', 'branches.id')
-					->select(\DB::raw('CONCAT(SUBSTRING('.\DB::getTablePrefix().'branches.name, 1, 20),"...") AS name, '.\DB::getTablePrefix().'branches.id'))
-					 ->lists('name', 'id'), '', 'Branch'),
-			'totals' => array_add(\Credit::all()->lists('total_amount', 'total_amount'), '', 'Amount'),
-			'days' => array_add(\Credit::select(\DB::raw('DAY(date_of_credit) as day'))->lists('day', 'day'), '', 'Day'),
-			'months' => array_add(\Credit::select(\DB::raw('DATE_FORMAT(date_of_credit, "%b") as month, MONTH(date_of_credit) as month_no'))->lists('month', 'month_no'), '', 'Month'),
-			'years' => array_add(\Credit::select(\DB::raw('YEAR(date_of_credit) as year'))->lists('year', 'year'), '', 'Year'),
-			'statuses' => array_add(\Credit::select(\DB::raw('is_paid, IF (is_paid = 1, \'Paid\', \'Not Paid\') as name'))->lists('name', 'is_paid'), '', 'Is Paid?'),
+			'branches' =>array_add($branches->lists('name', 'id'), '', 'Branch'),
+			'totals' => array_add(\Credit::filterBranch()->lists('total_amount', 'total_amount'), '', 'Amount'),
+			'days' => array_add(\Credit::filterBranch()->select(\DB::raw('DAY(date_of_credit) as day'))->lists('day', 'day'), '', 'Day'),
+			'months' => array_add(\Credit::filterBranch()->select(\DB::raw('DATE_FORMAT(date_of_credit, "%b") as month, MONTH(date_of_credit) as month_no'))->lists('month', 'month_no'), '', 'Month'),
+			'years' => array_add(\Credit::filterBranch()->select(\DB::raw('YEAR(date_of_credit) as year'))->lists('year', 'year'), '', 'Year'),
+			'statuses' => array_add(\Credit::filterBranch()->select(\DB::raw('is_paid, IF (is_paid = 1, \'Paid\', \'Not Paid\') as name'))->lists('name', 'is_paid'), '', 'Is Paid?'),
 		];
 
 
 
 		return \View::make('admin.credit.index', $all)
 			->with('credits', $credits)
-			->with('branches', \Branch::all()->lists('name', 'id'))
+			->with('branches', \Branch::filterBranch()->lists('name', 'id'))
 			->with('appends', $appends)
 			->with('totalRows', $totalRows);
 

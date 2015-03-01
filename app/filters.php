@@ -76,19 +76,21 @@ Route::filter('guest', function()
 | Admin Filter
 |--------------------------------------------------------------------------
 |
-| The "admin" filter is the counterpart of the authentication filters as
+| The "owner" filter is the counterpart of the authentication filters as
 | it simply checks that the current user is administrator. A redirect
 | response will be issued if they are, which you may freely change.
 |
 */
 
-Route::filter('admin', function()
+Route::filter('owner', function()
 {
 	if (!Confide::user())
 		return Redirect::to('admin/login')->with('error', \Lang::get('agrivate.errors.permission'));
 	elseif(Confide::user()->is_admin != 1)
-		return Redirect::to('/')->with('error', \Lang::get('agrivate.errors.permission'));
+		return Redirect::to('/admin/dashboard')->with('error', \Lang::get('agrivate.errors.permission'));
 });
+
+
 
 
 /*

@@ -223,12 +223,12 @@
             <li class="dropdown">
                 <a data-toggle="dropdown" class="dropdown-toggle" href="#">
                     <img alt="" width="30" height="30" src="{{ \Confide::user()->avatar()->thumbnail }}">
-                    <span class="username">Jhon Doue</span>
+                    <span class="username">{{ \Confide::user()->username }}</span>
                     <b class="caret"></b>
                 </a>
                 <ul class="dropdown-menu extended logout">
                     <div class="log-arrow-up"></div>
-                    <li><a href="#"><i class=" icon-suitcase"></i>Profile</a></li>
+                    <li><a href="{{ route('admin_users.edit', \Confide::user()->id) }}"><i class=" icon-suitcase"></i>Profile</a></li>
                     <li><a href="#"><i class="icon-cog"></i> Settings</a></li>
                     <li><a href="#"><i class="icon-bell-alt"></i> Notification</a></li>
                     <li><a href="{{ route('admin_logout') }}"><i class="icon-key"></i> Log Out</a></li>

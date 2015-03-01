@@ -46,6 +46,8 @@ class Product extends Eloquent {
         return $this->belongsTo('Category', 'category_id');
     }
 
+
+    
     /**=================================================
      * SCOPE QUERY
      *==================================================*/

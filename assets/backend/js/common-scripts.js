@@ -162,4 +162,10 @@ var Script = function () {
       }
     });
 
+    if ($('.datepicker').length) {
+        $('.datepicker').datepicker({
+            format: 'mm-dd-yyyy'
+        });
+    }
+
 }();

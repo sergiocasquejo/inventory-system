@@ -16,10 +16,11 @@
     <!--external css-->
     <link href="{{ asset('/assets/backend/assets/font-awesome/css/font-awesome.css') }}" rel="stylesheet" />
     <link href="{{ asset('/assets/backend/assets/jquery-easy-pie-chart/jquery.easy-pie-chart.css') }}" rel="stylesheet" type="text/css" media="screen"/>
-    <link rel="stylesheet" href="{{ asset('/assets/backend/css/owl.carousel.css') }}" type="text/css">
+    <!-- <link rel="stylesheet" href="{{ asset('/assets/backend/css/owl.carousel.css') }}" type="text/css"> -->
     <!-- Custom styles for this template -->
     <link href="{{ asset('/assets/backend/css/style.css') }}" rel="stylesheet">
     <link href="{{ asset('/assets/backend/css/style-responsive.css') }}" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="{{ asset('/assets/backend/assets/bootstrap-datepicker/css/datepicker.css') }}" />
     <style type="text/css">
       /*.popover {
         max-width: 100% !important;
@@ -28,11 +29,19 @@
         padding:0 2px;
       }
 
+      .form-control {
+        color: #606060 !important;
+      }
+
       .input-xs {
         padding: 0;
         margin: 0;
         height: 25px;
         border-radius: 1px;
+      }
+
+      .symbol strong {
+        color: #FFF;
       }
     </style>
     <script type="text/javascript">
@@ -72,9 +81,11 @@
   <script src="{{ asset('/assets/backend/js/jquery.nicescroll.js') }}" type="text/javascript"></script>
   <script src="{{ asset('/assets/backend/js/jquery.sparkline.js') }}" type="text/javascript"></script>
   <script src="{{ asset('/assets/backend/assets/jquery-easy-pie-chart/jquery.easy-pie-chart.js') }}"></script>
-  <script src="{{ asset('/assets/backend/js/owl.carousel.js') }}" ></script>
+  <!--<script src="{{ asset('/assets/backend/js/owl.carousel.js') }}" ></script>-->
   <script src="{{ asset('/assets/backend/js/jquery.customSelect.min.js') }}" ></script>
-
+  <script type="text/javascript" src="{{ asset('/assets/backend/assets/bootstrap-datepicker/js/bootstrap-datepicker.js') }}"></script>
+  <script type="text/javascript" src="{{ asset('/assets/backend/assets/bootstrap-daterangepicker/date.js') }}"></script>
+   <script type="text/javascript" src="{{ asset('/assets/backend/assets/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
   <!--common script for all pages-->
   <script src="{{ asset('/assets/backend/js/common-scripts.js') }}"></script>
 
@@ -82,25 +93,7 @@
   <script src="{{ asset('/assets/backend/js/sparkline-chart.js') }}"></script>
   <script src="{{ asset('/assets/backend/js/easy-pie-chart.js') }}"></script>
   <script src="{{ asset('/assets/backend/js/obstrusive.js') }}"></script>
-  
-  <script>
-      //owl carousel
-      $(document).ready(function() {
-          $("#owl-demo").owlCarousel({
-              navigation : true,
-              slideSpeed : 300,
-              paginationSpeed : 400,
-              singleItem : true
 
-          });
-      });
-
-      //custom select box
-      $(function(){
-          $('select.styled').customSelect();
-      });
-
-  </script>
 
   </body>
 </html>

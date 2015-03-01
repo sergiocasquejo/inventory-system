@@ -79,4 +79,42 @@ class Helper {
 		echo $formatted;
 	  
 	}
+
+
+	/**
+	 * Bread crumbs
+	 *
+	 * @param FLOAT $price - Price
+	 * STRING $dp - decimal separator
+	 * STRING $ts - Thousand separator
+	 * @return STRING  - Formatted price
+	 */
+	public static function breadCrumbs() {
+		$current = \Request::path();
+	    $segments = explode ('/', $current);
+
+	    $arr = [];
+
+	    $url = '';
+	    foreach ($segments as $key => $value) {
+
+	    	$url .= $value. '/';
+
+	    	if (is_numeric($value)) continue;
+
+	    	switch($value) {
+	    		case 'admin':
+	    			$arr[] = sprintf('<li><a href="%s"><i class="icon-home"></i> %s</a></li>', URL::to($url), 'Home');
+	    			break;
+	    		default:
+	    			$arr[] = sprintf('<li><a href="%s"> %s</a></li>', URL::to($url), \Str::title($value));
+
+	    	}
+	    }
+	    
+
+	    foreach ($arr as $segment) {
+	    	echo $segment;
+	    }
+	}
 }

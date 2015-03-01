@@ -68,6 +68,11 @@ class User extends Eloquent implements ConfideUserInterface {
     }
 
 
+    public function isAdmin() {
+
+        return \Confide::user()->is_admin;
+    }
+
 
     public function doSave(User $instance, $input) {
 
@@ -89,8 +94,8 @@ class User extends Eloquent implements ConfideUserInterface {
     	$instance->display_name = array_get($input, 'display_name');
     	$instance->first_name = array_get($input, 'first_name');
     	$instance->last_name = array_get($input, 'last_name');
-    	$instance->is_admin = array_get($input, 'is_admin');
-    	$instance->confirmed = array_get($input, 'confirmed');
+    	$instance->is_admin = array_get($input, 'is_admin', 0);
+    	$instance->confirmed = array_get($input, 'confirmed', 0);
     	$instance->status = array_get($input, 'status');
     	$instance->branch_id = array_get($input, 'branch_id');
 

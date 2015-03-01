@@ -20,31 +20,41 @@ class ExpensesController extends \BaseController {
 		
 
 
-		$totalRows = \Expense::withTrashed()->count();
+		$totalRows = \Expense::filterBranch()->withTrashed()->count();
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
 		$countries = \Config::get('agrivate.countries');
 
 
-		$yearly = \Expense::whereRaw('YEAR(date_of_expense) = YEAR(CURDATE())')->sum('total_amount');
-		$monthly = \Expense::whereRaw('MONTH(date_of_expense) = MONTH(CURDATE())')->sum('total_amount');
-		$weekly = \Expense::whereRaw('WEEK(date_of_expense) = WEEK(CURDATE())')->sum('total_amount');
-		$daily = \Expense::whereRaw('DAY(date_of_expense) = DAY(CURDATE())')->sum('total_amount');
+		$yearly = \Expense::filterBranch()->whereRaw('YEAR(date_of_expense) = YEAR(CURDATE())')->sum('total_amount');
+		$monthly = \Expense::filterBranch()->whereRaw('MONTH(date_of_expense) = MONTH(CURDATE())')->sum('total_amount');
+		$weekly = \Expense::filterBranch()->whereRaw('WEEK(date_of_expense) = WEEK(CURDATE())')->sum('total_amount');
+		$daily = \Expense::filterBranch()->whereRaw('DAY(date_of_expense) = DAY(CURDATE())')->sum('total_amount');
+
+
+		$branches = \DB::table('expenses')->join('branches', 'expenses.branch_id', '=', 'branches.id')
+					->select(\DB::raw('CONCAT(SUBSTRING('.\DB::getTablePrefix().'branches.name, 1, 20),"...") AS name, '.\DB::getTablePrefix().'branches.id'));
+
+
+					
+		// Filter branch if user is not owner
+		if (!\Confide::user()->isAdmin()) {
+			$branches = $branches->where('branches.id', \Confide::user()->branch_id);
+		}
+
 
 		$all = [
 			'daily' => $daily,
 			'weekly' => $weekly,
 			'monthly' => $monthly,
 			'yearly' => $yearly,
-			'branches' =>array_add(\DB::table('expenses')->join('branches', 'expenses.branch_id', '=', 'branches.id')
-					->select(\DB::raw('CONCAT(SUBSTRING('.\DB::getTablePrefix().'branches.name, 1, 20),"...") AS name, '.\DB::getTablePrefix().'branches.id'))
-					 ->lists('name', 'id'), '', 'Branch'),
-			'totals' => array_add(\Expense::all()->lists('total_amount', 'total_amount'), '', 'Amount'),
-			'days' => array_add(\Expense::select(\DB::raw('DAY(date_of_expense) as day'))->lists('day', 'day'), '', 'Day'),
-			'months' => array_add(\Expense::select(\DB::raw('DATE_FORMAT(date_of_expense, "%b") as month, MONTH(date_of_expense) as month_no'))->lists('month', 'month_no'), '', 'Month'),
-			'years' => array_add(\Expense::select(\DB::raw('YEAR(date_of_expense) as year'))->lists('year', 'year'), '', 'Year'),
-			'statuses' => array_add(\Expense::select(\DB::raw('status, IF (status = 1, \'Active\', \'Inactive\') as name'))->lists('name', 'status'), '', 'Status'),
+			'branches' =>array_add($branches->lists('name', 'id'), '', 'Branch'),
+			'totals' => array_add(\Expense::filterBranch()->lists('total_amount', 'total_amount'), '', 'Amount'),
+			'days' => array_add(\Expense::filterBranch()->select(\DB::raw('DAY(date_of_expense) as day'))->lists('day', 'day'), '', 'Day'),
+			'months' => array_add(\Expense::filterBranch()->select(\DB::raw('DATE_FORMAT(date_of_expense, "%b") as month, MONTH(date_of_expense) as month_no'))->lists('month', 'month_no'), '', 'Month'),
+			'years' => array_add(\Expense::filterBranch()->select(\DB::raw('YEAR(date_of_expense) as year'))->lists('year', 'year'), '', 'Year'),
+			'statuses' => array_add(\Expense::filterBranch()->select(\DB::raw('status, IF (status = 1, \'Active\', \'Inactive\') as name'))->lists('name', 'status'), '', 'Status'),
 		];
 
 

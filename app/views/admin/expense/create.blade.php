@@ -4,7 +4,7 @@
     @include ('admin._partials.breadcrumbs')
 	  <section class="panel">
 		<header class="panel-heading">
-		 Form Elements
+		 Create Expense
 		</header>
 		<div class="panel-body">
 		  	<form action="{{ route('admin_expenses.store') }}"  class="form-horizontal tasi-form" method="POST">
@@ -62,7 +62,7 @@
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Date of expense</label>
 				  <div class="col-sm-10">
-				      <input type="date" name="date_of_expense" class="form-control" value="{{ Input::old('date_of_expense') }}" />
+				      <input type="text" name="date_of_expense" class="form-control datepicker" value="{{ Input::old('date_of_expense', date('m-d-Y')) }}" />
 				  </div>
 				</div>
 				<button type="submit" class="btn btn-shadow btn-primary">Create</button>
