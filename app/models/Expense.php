@@ -10,7 +10,7 @@ class Expense extends Eloquent {
     	'branch_id'        => 'required|exists:branches,id',
     	'name'	           => 'required:min:5',
     	'total_amount' 	   => 'required|numeric',
-    	'quantity'		   => 'required|numeric',
+    	// 'quantity'		   => 'required|numeric',
     	//'uom'	           => 'required',
         'date_of_expense'  => 'required|date',
     	'encoded_by' 	   => 'required|exists:users,id',
@@ -108,7 +108,7 @@ class Expense extends Eloquent {
 		$instance->comments = array_get($input, 'comments');
 		$instance->status = array_get($input, 'status');
         $instance->encoded_by = array_get($input, 'encoded_by');
-        $instance->date_of_expense = array_get($input, 'date_of_expense');
+        $instance->date_of_expense = date('Y-m-d', strtotime(array_get($input, 'date_of_expense')));
 		
 		$instance->save();
 		return $instance;

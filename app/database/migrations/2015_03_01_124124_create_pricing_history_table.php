@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateProductsPricingTable extends Migration {
+class CreatePricingHistoryTable extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -13,9 +13,9 @@ class CreateProductsPricingTable extends Migration {
 	public function up()
 	{
 		// Creates the users table
-        Schema::create('product_pricing', function ($table) {
+        Schema::create('product_price_history', function ($table) {
         	$table->engine ='InnoDB';
-            $table->increments('price_id');
+            $table->bigIncrements('price_history_id');
             $table->bigInteger('product_id')->unsigned();
             $table->integer('branch_id')->unsigned();
             $table->integer('supplier_id')->nullable();
@@ -40,12 +40,13 @@ class CreateProductsPricingTable extends Migration {
 	public function down()
 	{
 
-		Schema::table('product_pricing', function (Blueprint $table) {
-            $table->dropForeign('product_pricing_product_id_foreign');
-            $table->dropForeign('product_pricing_branch_id_foreign');
+		Schema::table('product_price_history', function (Blueprint $table) {
+            $table->dropForeign('product_price_history_product_id_foreign');
+            $table->dropForeign('product_price_history_branch_id_foreign');
         });
 
-		Schema::drop('product_pricing');
+
+		Schema::drop('product_price_history');
 	}
 
 }

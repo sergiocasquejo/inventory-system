@@ -18,7 +18,7 @@ class CreateStocksOnHandTable extends Migration {
             $table->increments('stock_on_hand_id')->unsigned();
             $table->bigInteger('product_id')->unsigned();
             $table->integer('branch_id')->unsigned();
-            $table->float('total_stocks');
+            $table->float('total_stocks')->unsigned();
             $table->string('uom', 120);
             $table->foreign('product_id')
      			->references('id')->on('products')
@@ -37,6 +37,11 @@ class CreateStocksOnHandTable extends Migration {
 	 */
 	public function down()
 	{
+		Schema::table('stocks_on_hand', function (Blueprint $table) {
+            $table->dropForeign('stocks_on_hand_product_id_foreign');
+            $table->dropForeign('stocks_on_hand_branch_id_foreign');
+        });
+
 		Schema::drop('stocks_on_hand');
 	}
 

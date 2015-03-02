@@ -1,14 +1,17 @@
 <?php 
 
 class CoreValidator extends Illuminate\Validation\Validator {
-	public function validateUniqueStockBranch($attribute, $value, $parameters)
+	public function validateGreaterThanEqual($attribute, $value, $parameters)
     {
-    	echo '<pre />';
-    	print_r($attribute);
-    	print_r($value);
-    	print_r($parameters);
-    	die;
-    	return false;
-        //return $value == 'foo';
+
+
+    	if (isset($parameters[0])) {
+	       	$other = array_get(Input::all(), $parameters[0]);
+
+	       	return intval($value) >= intval($other);
+       	} else {
+       		return false;
+       	}
+    
     }
 }

@@ -6,10 +6,10 @@
     <div class="row">
       <div class="col-lg-12">
           <section class="panel">
-            <form action="{{ route('admin_branches.index') }}"  class="form-horizontal tasi-form" method="GET">
+            <form action="{{ route('admin_uoms.index') }}"  class="form-horizontal tasi-form" method="GET">
               <input type="hidden" name="_token" value="{{ csrf_token() }}" />
               <header class="panel-heading">
-                  Branches <a class="btn btn-info btn-xs" href="{{ route('admin_branches.create') }}">Add New</a> <a class="btn btn-warning btn-xs" href="{{ route('admin_branches.index') }}" title="Reset"><i class=" icon-refresh"></i></a>
+                  Brands <a class="btn btn-info btn-xs" href="{{ route('admin_uoms.create') }}">Add New</a> <a class="btn btn-warning btn-xs" href="{{ route('admin_uoms.index') }}" title="Reset"><i class=" icon-refresh"></i></a>
               </header>
               <div class="dataTables_wrapper form-inline">
                 <div class="row">
@@ -32,42 +32,29 @@
                     <thead>
                       <tr>
                           <th>Name</th>
-                          <th>Address</th>
-                          <th>City</th>
-                          <th>Postcode</th>
-                          <th>Status</th>
+                          <th>Description</th>
                           <th></th>
                       </tr>
                     </thead>
                     <tbody>
 
-                      @if ($branches)
-                          @foreach ($branches as $branch)
+                      @if ($uoms)
+                          @foreach ($uoms as $uom)
                           <tr>
-                              <td>{{{ $branch->name }}}</td>
-                              <td>{{{ $branch->address }}}</td>
-                              <td>{{{ $branch->city }}}</td>
-                              <td>{{{ $branch->post_code }}}</td>
+                              <td>{{{ $uom->name }}}</td>
+                              <td>{{{ $uom->label }}}</td>
                               <td>
-                                  <span class="label label-{{{ $branch->status ? 'success' : 'warning' }}} label-mini">
-                                      {{{ $branch->status ? 'Active' : 'Inactive' }}}
-                                  </span>
-                              </td>
-                              <td>
-                                  @if ($branch->trashed())
-                                    <a href="{{{ route('admin_branches.restore', $branch->id) }}}" data-method="RESTORE" class="btn btn-primary btn-xs" title="Restore"><i class="icon-rotate-left"></i></a>
-                                  @else
-                                    <a href="{{{ route('admin_branches.edit', $branch->id) }}}" class="btn btn-primary btn-xs" title="Edit"><i class="icon-pencil"></i></a>
-                                  @endif
-                                  <a href="{{{ route('admin_branches.destroy', $branch->id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="{{{ $branch->trashed() ? 'Delete' : 'Trash' }}}" class="btn btn-danger btn-xs">
-                                    <i class="icon-{{{ $branch->trashed() ? 'remove' : 'trash' }}} "></i>
+                                    <a href="{{{ route('admin_uoms.edit', $uom->uom_id) }}}" class="btn btn-primary btn-xs" title="Edit"><i class="icon-pencil"></i></a>
+                               
+                                  <a href="{{{ route('admin_uoms.destroy', $uom->uom_id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
+                                    <i class="icon-remove"></i>
                                   </a>
                               </td>
                           </tr>
                           @endforeach
                       @else
                           <tr>
-                            <td colspan="8">{{{ \Lang::get('agrivate.empty', 'Branch') }}}</td>
+                            <td colspan="8">{{{ \Lang::get('agrivate.empty', 'Brand') }}}</td>
                           </tr>
                       @endif
                     </tbody>
@@ -79,7 +66,7 @@
                   </div>
                   <div class="col-sm-6">
                     <div class="dataTables_filter pagination-sm">
-                      <label>{{ $branches->appends($appends)->links() }}</label>
+                      <label>{{ $uoms->appends($appends)->links() }}</label>
                     </div>
                   </div>
                 </div>

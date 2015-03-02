@@ -74,7 +74,8 @@ class ExpensesController extends \BaseController {
 	{
 
 		return \View::make('admin.expense.create')
-			->with('branches', \Branch::all()->lists('name', 'id'));
+			->with('branches', \Branch::all()->lists('name', 'id'))
+			->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));
 	}
 
 
@@ -128,7 +129,8 @@ class ExpensesController extends \BaseController {
 
 		return \View::make('admin.expense.edit')
 			->with('expense', $expense)
-			->with('branches', \Branch::all()->lists('name', 'id'));
+			->with('branches', \Branch::all()->lists('name', 'id'))
+			->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));
 	}
 
 

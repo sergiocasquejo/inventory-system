@@ -89,12 +89,24 @@
 
             <li class="sub-menu">
                 <a href="javascript:;" class="">
+                    <i class="icon-bar-chart"></i>
+                    <span>Reports</span>
+                    <span class="arrow"></span>
+                </a>
+                <ul class="sub">
+                    <li><a class="" href="{{ route('admin_users.index') }}">Net Income</a></li>
+                    <li><a class="" href="{{ route('admin_users.create') }}">Expected na ginansya</a></li>
+                </ul>
+            </li>
+
+            <li class="sub-menu">
+                <a href="javascript:;" class="">
                     <i class="icon-cogs"></i>
                     <span>Settings</span>
                     <span class="arrow"></span>
                 </a>
                 <ul class="sub">
-                    <li><a class="" href="#">Unit of measures</a></li>
+                    <li><a class="" href="{{ route('admin_uoms.index') }}">Unit of measures</a></li>
                 </ul>
             </li>
             @endif

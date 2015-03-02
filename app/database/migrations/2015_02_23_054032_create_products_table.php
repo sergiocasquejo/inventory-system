@@ -19,6 +19,7 @@ class CreateProductsTable extends Migration {
             $table->string('name', 255)->unique();
             $table->text('description');
             $table->text('comments');
+            $table->string('uom', 120);
             $table->integer('brand_id')->unsigned();
             $table->integer('category_id')->unsigned();
             $table->tinyInteger('status')->default(0);

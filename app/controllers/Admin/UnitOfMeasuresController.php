@@ -1,6 +1,6 @@
 <?php namespace Admin;
 
-class BrandsController extends \BaseController {
+class UnitOfMeasuresController extends \BaseController {
 
 	/**
 	 * Display a listing of the resource.
@@ -13,15 +13,15 @@ class BrandsController extends \BaseController {
 		$input = \Input::all();
 
 
-		$brands = \Brand::search($input)->orderBy('brand_id', 'desc')->paginate(intval(array_get($input, 'records_per_page', 10)));
+		$uoms = \UnitOfMeasure::search($input)->orderBy('uom_id', 'desc')->paginate(intval(array_get($input, 'records_per_page', 10)));
 		
-		$totalRows = \Brand::All()->count();
+		$totalRows = \UnitOfMeasure::All()->count();
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
 		$countries = \Config::get('agrivate.countries');
-		return \View::make('admin.brand.index')
-			->with('brands', $brands)
+		return \View::make('admin.uom.index')
+			->with('uoms', $uoms)
 			->with('appends', $appends)
 			->with('totalRows', $totalRows);
 	}
@@ -34,7 +34,7 @@ class BrandsController extends \BaseController {
 	 */
 	public function create()
 	{
-		return \View::make('admin.brand.create');
+		return \View::make('admin.uom.create');
 	}
 
 
@@ -48,7 +48,7 @@ class BrandsController extends \BaseController {
 		$input = \Input::all();
 
 
-		$rules = \Brand::$rules;
+		$rules = \UnitOfMeasure::$rules;
 
 		$validator = \Validator::make($input, $rules);
 
@@ -56,14 +56,14 @@ class BrandsController extends \BaseController {
 			return \Redirect::back()->withErrors($validator->errors())->withInput();
 		} else {
 			try {
-				$brand = new \Brand;
+				$uom = new \UnitOfMeasure;
 
 
-				if ($brand->doSave($brand, $input)) {
-					return \Redirect::route('admin_brands.edit', $brand->brand_id)->with('success', \Lang::get('agrivate.created'));
+				if ($uom->doSave($uom, $input)) {
+					return \Redirect::route('admin_uoms.edit', $uom->uom_id)->with('success', \Lang::get('agrivate.created'));
 				}
 
-				return \Redirect::back()->withErrors($brand->errors())->withInput();
+				return \Redirect::back()->withErrors($uom->errors())->withInput();
 			} catch(\Exception $e) {
 				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
 			}
@@ -81,11 +81,10 @@ class BrandsController extends \BaseController {
 	public function edit($id)
 	{
 
-		$brand = \Brand::find($id);
+		$uom = \UnitOfMeasure::find($id);
 		
-		return \View::make('admin.brand.edit')
-			->with('brand', $brand)
-			->with('brands', array_add(\Brand::all()->lists('name', 'id'), '', 'Select Brand'));
+		return \View::make('admin.uom.edit')
+			->with('uom', $uom);
 	}
 
 
@@ -98,8 +97,9 @@ class BrandsController extends \BaseController {
 	public function update($id)
 	{
 		$input = \Input::all();
-		$rules = \Brand::$rules;
-		$rules['name'] = 'required|unique:brands,name,'.$id.',brand_id';
+		$rules = \UnitOfMeasure::$rules;
+		$rules['name'] = 'required|unique:unit_of_measures,name,'.$id.',uom_id';
+		$rules['label'] = 'required|unique:unit_of_measures,label,'.$id.',uom_id';
 
 		$validator = \Validator::make($input, $rules);
 
@@ -107,13 +107,13 @@ class BrandsController extends \BaseController {
 			return \Redirect::back()->withErrors($validator->errors())->withInput();
 		} else {
 			try {
-				$brand = \Brand::findOrFail($id);
+				$uom = \UnitOfMeasure::findOrFail($id);
 				
-				if ($brand->doSave($brand, $input)) {
-					return \Redirect::route('admin_brands.index')->with('success', \Lang::get('agrivate.updated'));
+				if ($uom->doSave($uom, $input)) {
+					return \Redirect::route('admin_uoms.index')->with('success', \Lang::get('agrivate.updated'));
 				}
 
-				return \Redirect::back()->withErrors($brand->errors())->withInput();
+				return \Redirect::back()->withErrors($uom->errors())->withInput();
 			} catch(\Exception $e) {
 				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
 			}
@@ -131,13 +131,13 @@ class BrandsController extends \BaseController {
 	public function destroy($id)
 	{
 		try {
-			$brand = \Brand::findOrFail($id);
+			$uom = \UnitOfMeasure::findOrFail($id);
 			$message = \Lang::get('agrivate.trashed');
-			if (!$brand->delete()) {
-				return \Redirect::back()->withErrors($brand->errors());			
+			if (!$uom->delete()) {
+				return \Redirect::back()->withErrors($uom->errors());			
 	        }
 
-	        return \Redirect::route('admin_brands.index')->with('success', $message);
+	        return \Redirect::route('admin_uoms.index')->with('success', $message);
 
         } catch (\FatalErrorException $e) {
     		return \Redirect::back()->withErrors((array)$e->getMessage());
@@ -146,22 +146,6 @@ class BrandsController extends \BaseController {
     	}
 	}
 
-
-	public function getCategories($id) {
-
-		if ($id == 0) return;
-
-		try {
-			$brand = \Brand::findOrFail($id);
-
-			if ($brand) {
-				return \Response::json($brand->categories->lists('name', 'category_id'));
-			}
-		} catch (\Exception $e) {
-			return \Response::json(['error' => $e->getMessage()]);
-		}
-		return [];
-	}
 
 
 }

@@ -102,12 +102,11 @@
 
       var form = $(link.data('form'));
 
+
       // Call jqXHR
       var jqxhr = $.ajax(link.attr('href'))
         .done(function(response) {
           laravel.populateForm(response, form, httpFetch);
-          
-
         });
 
       e.preventDefault();
@@ -140,8 +139,9 @@
           .attr('action', form.data('action') + '/' + response.stock_on_hand_id);
 
       } else if (httpFetch == 'PRICE') {
-        console.log(form);
-        form.find(':input[name=price]').val(response.price);
+        console.log(response);
+        form.find(':input[name=supplier_price]').val(response.supplier_price);
+        form.find(':input[name=price]').val(response.selling_price);
         form.find(':input[name=branch_id]').val(response.branch_id);
         form.find(':input[name=per_unit]').val(response.per_unit);
         

@@ -43,6 +43,10 @@ class CreateCreditsTable extends Migration {
 	 */
 	public function down()
 	{
+
+		// Schema::table('credits', function (Blueprint $table) {
+  //           $table->dropForeign('credits_encoded_by_foreign');
+  //       });
 		Schema::drop('credits');
 	}
 

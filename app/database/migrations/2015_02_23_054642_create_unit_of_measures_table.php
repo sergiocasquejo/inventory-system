@@ -18,6 +18,7 @@ class CreateUnitOfMeasuresTable extends Migration {
             $table->increments('uom_id')->unsigned();
             $table->string('name', 120)->unique();
             $table->string('label', 120)->unique();
+            $table->softDeletes();
         });
 	}
 

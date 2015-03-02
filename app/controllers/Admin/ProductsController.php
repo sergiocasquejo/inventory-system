@@ -40,7 +40,8 @@ class ProductsController extends \BaseController {
 	{
 		return \View::make('admin.product.create')
 		->with('brands', array_add(\Brand::all()->lists('name', 'brand_id'), 0, 'Select Brand'))
-		->with('categories', array_add(\Category::all()->lists('name', 'category_id'), 0, 'Select Category'));
+		->with('categories', array_add(\Category::all()->lists('name', 'category_id'), 0, 'Select Category'))
+		->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));
 	}
 
 
@@ -94,7 +95,8 @@ class ProductsController extends \BaseController {
 		->with('product', $product)
 		->with('branches', array_add(\Branch::all()->lists('name', 'id'), '', 'Select Branch'))
 		->with('brands', array_add(\Brand::all()->lists('name', 'brand_id'), 0, 'Select Brand'))
-		->with('categories', array_add(\Category::all()->lists('name', 'category_id'), 0, 'Select Category'));
+		->with('categories', array_add(\Category::all()->lists('name', 'category_id'), 0, 'Select Category'))
+		->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));
 	}
 
 
@@ -169,4 +171,23 @@ class ProductsController extends \BaseController {
 		return \Redirect::back()->with('success', \Lang::get('agrivate.restored'));
 	}
 
-}
+	/**
+	 * Show the form for editing the specified resource.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function get($id)
+	{	
+		$branch_id = \Input::get('branch_id');
+
+		$product = \ProductPricing::whereRaw(\DB::raw('product_id = '.$id));
+
+		if ($branch_id) {
+			$product = $product->where('branch_id', $branch_id);
+		}
+		$product = $product->first();
+
+		return \Response::json($product);
+	}
+}	

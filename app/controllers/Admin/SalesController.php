@@ -79,7 +79,8 @@ class SalesController extends \BaseController {
 
 		return \View::make('admin.sale.create')
 		->with('branches', \Branch::filterBranch()->active()->lists('name', 'id'))
-		->with('products', \Product::active()->lists('name', 'id'));
+		->with('products', \Product::active()->lists('name', 'id'))
+		->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));
 	}
 
 
@@ -102,13 +103,39 @@ class SalesController extends \BaseController {
 			return \Redirect::back()->withErrors($validator->errors())->withInput();
 		} else {
 			try {
-				$sale = new \Sale;
 
-				if ($sale->doSave($sale, $input)) {
+				$errors = [];
+
+				\DB::transaction(function() use($input, $errors) {
+					
+					// Get user branch
+					$branch = \ProductPricing::where('branch_id', '=', array_get($input, 'branch_id'))->first();
+
+					$input['supplier_price'] = 	$branch->supplier_price;
+					$input['selling_price'] = 	$branch->selling_price;
+
+					$sale = new \Sale;
+
+					if (!$sale->doSave($sale, $input)) {			
+						$errors = $sale->errors();
+					} else {
+						$stock = \StockOnHand::where('product_id', array_get($input, 'product_id'))
+									->where('branch_id', array_get($input, 'branch_id'))->first();
+
+						$stock->total_stocks = $stock->total_stocks - array_get($input, 'quantity');
+						$stock->save();
+					}
+				});
+				
+
+				if (count($errors) == 0) {
 					return \Redirect::route('admin_sales.index')->with('success', \Lang::get('agrivate.created'));
+				} else {
+					return \Redirect::back()->withErrors($errors)->withInput();
 				}
 
-				return \Redirect::back()->withErrors($sale->errors())->withInput();
+
+				
 			} catch(\Exception $e) {
 				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
 			}
@@ -135,7 +162,8 @@ class SalesController extends \BaseController {
 		return \View::make('admin.sale.edit')
 		->with('sale', $sale)
 		->with('branches', \Branch::filterBranch()->active()->lists('name', 'id'))
-		->with('products', \Product::active()->lists('name', 'id'));
+		->with('products', \Product::active()->lists('name', 'id'))
+		->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));
 	}
 
 
@@ -164,6 +192,12 @@ class SalesController extends \BaseController {
 			try {
 				$sale = \Sale::findOrFail($id);
 				
+				// Get user branch
+
+				$input['supplier_price'] = 	$sale->supplier_price;
+				$input['selling_price'] = 	$sale->selling_price;
+
+
 				if ($sale->doSave($sale, $input)) {
 					return \Redirect::route('admin_sales.index')->with('success', \Lang::get('agrivate.updated'));
 				}

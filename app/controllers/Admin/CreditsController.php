@@ -80,7 +80,8 @@ class CreditsController extends \BaseController {
 	{
 		return \View::make('admin.credit.create')
 			->with('branches', array_add(\Branch::all()->lists('name', 'id'), '0', 'Select Branch'))
-		->with('products', array_add(\Product::all()->lists('name', 'id'), '0', 'Select Product'));
+		->with('products', array_add(\Product::all()->lists('name', 'id'), '0', 'Select Product'))
+		->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));
 	}
 
 
@@ -132,7 +133,8 @@ class CreditsController extends \BaseController {
 		
 		return \View::make('admin.credit.edit')->with('credit', $credit)
 		->with('branches', array_add(\Branch::all()->lists('name', 'id'), '0', 'Select Branch'))
-		->with('products', array_add(\Product::all()->lists('name', 'id'), '0', 'Select Product'));
+		->with('products', array_add(\Product::all()->lists('name', 'id'), '0', 'Select Product'))
+		->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));
 	}
 
 

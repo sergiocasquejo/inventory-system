@@ -46,16 +46,27 @@ class PricesController extends \BaseController {
 			return \Response::json(['errors' => $validator->errors()]);
 		} else {
 			try {
-				$price = new \ProductPricing;
-				if ($price->doSave($price, $input)) {
-				return \Response::json(['success' => \Lang::get('agrivate.created')]);
-					//return \Redirect::route('admin_products.edit', $stock->id)->with('success', \Lang::get('agrivate.created'));
+				$errors = [];
+
+				\DB::transaction(function() use($input, $errors) {
+					$price = new \ProductPricing;
+					
+					if ($price->doSave($price, $input)) {
+						$priceHistory = new \PriceHistory;
+						if (!$priceHistory->doSave($priceHistory, $input)) {
+							$errors = $priceHistory->errors();
+						}
+					} else {
+						$errors = $price->errors();
+					}
+				});
+				if (count($errors) == 0) {
+					return \Response::json(['success' => \Lang::get('agrivate.created')]);
+				} else {
+					return \Response::json(['errors' => $price->errors()]);
 				}
-				return \Response::json(['errors' => $price->errors()]);
-				//return \Redirect::back()->withErrors($stock->errors())->withInput();
 			} catch(\Exception $e) {
 				return \Response::json(['errors' => (array)$e->getMessage()]);
-				//return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
 			}
 		}
 	}
@@ -98,17 +109,28 @@ class PricesController extends \BaseController {
 			return \Response::json(['errors' => $validator->errors()]);
 		} else {
 			try {
-				$price = \ProductPricing::findOrFail($price_id);
-				
-				if ($price->doSave($price, $input)) {
-					return \Response::json(['success' => \Lang::get('agrivate.created')]);
-					//return \Redirect::route('admin_products.edit', $stock->id)->with('success', \Lang::get('agrivate.created'));
+				$errors = [];
+
+				\DB::transaction(function() use($price_id, $input, $errors) {
+					$price = \ProductPricing::findOrFail($price_id);
+					
+					if ($price->doSave($price, $input)) {
+						$priceHistory = new \PriceHistory;
+						if (!$priceHistory->doSave($priceHistory, $input)) {
+							$errors = $priceHistory->errors();
+						}
+					} else {
+						$errors = $price->errors();
+					}
+				});
+				if (count($errors) == 0) {
+					return \Response::json(['success' => \Lang::get('agrivate.updated')]);
+				} else {
+					return \Response::json(['errors' => $price->errors()]);
 				}
-				return \Response::json(['errors' => $price->errors()]);
-				//return \Redirect::back()->withErrors($stock->errors())->withInput();
+
 			} catch(\Exception $e) {
 				return \Response::json(['errors' => (array)$e->getMessage()]);
-				//return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
 			}
 		}
 	}

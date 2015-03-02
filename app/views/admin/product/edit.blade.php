@@ -54,6 +54,12 @@
 						      <textarea name="description" class="form-control">{{ Input::old('description', $product->description) }}</textarea>
 						  </div>
 						</div>
+						<div class="form-group">
+						  <label class="col-sm-2 control-label">Unit of Measure</label>
+						  <div class="col-sm-10">
+						      {{ Form::select('uom', $measures, Input::old('uom', $product->uom), ['class' => 'form-control m-bot15']) }}
+						  </div>
+						</div>
 
 						<div class="form-group">
 						  <label class="col-sm-2 control-label">Comments</label>
@@ -80,7 +86,7 @@
 								<input type="number" name="total_stocks" min="0" placeholder="Stocks" value="{{ Input::old('total_stocks') }}" class="form-control">
 							</div>
 							<div class="col-sm-2">
-								{{ Form::select('uom', array_add(\Config::get('agrivate.unit_of_measure'), '', 'Select Measure'), Input::old('uom'), ['class' => 'form-control m-bot15']) }}
+								{{ Form::select('uom', $measures, Input::old('uom', $product->uom), ['class' => 'form-control m-bot15']) }}
 							</div>
 							<div class="col-sm-4">
 								{{ Form::select('branch_id', $branches, Input::old('branch_id'), ['class' => 'form-control m-bot15']) }}
@@ -95,7 +101,8 @@
 					<table class="table table-striped table-advance table-hover">
 				        <thead>
 				          <tr>
-				              <th>Price</th>
+			          		
+				              <th>Stocks</th>
 				              <th>Unit of measure</th>
 				              <th>Branch</th>
 				              <th></th>
@@ -131,10 +138,13 @@
 						<form id="price-form" data-action="{{ route('admin_product_prices.store', $product->id) }}"  action="{{ route('admin_product_prices.store', $product->id) }}"  class="form-horizontal tasi-form" method="POST">
 				  			<input type="hidden" name="_token" value="{{ csrf_token() }}" />
 							<div class="col-sm-2">
-								<input type="number" name="price" min="0" placeholder="Price" value="{{ Input::old('price') }}" class="form-control">
+								<input type="number" name="supplier_price" min="0" placeholder="Supplier Price" value="{{ Input::old('supplier_price') }}" class="form-control">
 							</div>
 							<div class="col-sm-2">
-								{{ Form::select('per_unit', array_add(\Config::get('agrivate.unit_of_measure'), '', 'Select Measure'), Input::old('per_unit'), ['class' => 'form-control m-bot15']) }}
+								<input type="number" name="price" min="0" placeholder="Selling Price" value="{{ Input::old('price') }}" class="form-control">
+							</div>
+							<div class="col-sm-2">
+								{{ Form::select('per_unit', $measures, Input::old('per_unit', $product->uom), ['class' => 'form-control m-bot15']) }}
 							</div>
 							<div class="col-sm-4">
 								{{ Form::select('branch_id', $branches, Input::old('branch_id'), ['class' => 'form-control m-bot15']) }}
@@ -149,26 +159,34 @@
 					<table class="table table-striped table-advance table-hover">
 				        <thead>
 				          <tr>
-				              <th>Price</th>
-				              <th>Unit of measure</th>
-				              <th>Branch</th>
-				              <th></th>
+				          	<th>Supplier Price</th>
+							<th>Selling Price</th>
+							<th>Unit of measure</th>
+							<th>Branch</th>
+							<th></th>
 				          </tr>
 				        </thead>
 				        <tbody>
 				          @if ($product->prices)
 				              @foreach ($product->prices as $price)
 				              <tr>
-				                  <td>{{{ $price->price }}}</td>
-				                  <td>{{{ $price->per_unit }}}</td>
-				                  <td>{{{ $price->branch->name }}}</td>
-				                  <td>
-				                      <a href="{{{ route('admin_product_prices.edit', ['pid' => $product->id, 'price_id' => $price->price_id]) }}}" class="btn btn-primary btn-xs" data-form="#price-form" data-fetch="PRICE" title="Edit"><i class="icon-pencil"></i></a>
-				    
-				                      <a href="{{{ route('admin_product_prices.destroy', ['pid' => $product->id, 'price_id' => $price->price_id]) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
-				                        <i class="icon-remove"></i>
-				                      </a>
-				                  </td>
+				              		<td data-supplier-price="{{{ $price->supplier_price }}}">
+				              			{{{ \Helper::nf($price->supplier_price) }}}
+				              		</td>
+				                  	<td data-selling-price="{{{ $price->selling_price }}}">
+				                  		{{{ \Helper::nf($price->selling_price) }}}
+				                  	</td>
+				                  	<td data-uom="{{{ $price->per_unit }}}">
+				                  		{{{ $price->per_unit }}}
+				                  	</td>
+				                  	<td data-branch="{{{ $price->branch_id }}}">{{{ $price->branch->name }}}</td>
+									<td>
+										<a href="{{{ route('admin_product_prices.edit', ['pid' => $product->id, 'price_id' => $price->price_id]) }}}" class="btn btn-primary btn-xs" data-id="{{ $price->price_id }}" data-form="#price-form" data-fetch="PRICE" title="Edit"><i class="icon-pencil"></i></a>
+
+										<a href="{{{ route('admin_product_prices.destroy', ['pid' => $product->id, 'price_id' => $price->price_id]) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
+										<i class="icon-remove"></i>
+										</a>
+									</td>
 				              </tr>
 				              @endforeach
 				          @else

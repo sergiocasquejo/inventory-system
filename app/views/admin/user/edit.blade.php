@@ -14,7 +14,7 @@
 		       	<div class="form-group">
 					<label class="col-sm-2 control-label" required>Branch</label>
 					<div class="col-sm-10">
-						{{ Form::select('branch_id', $branches, Input::old('branch_id', $user->id), ['class' => 'form-control m-bot15']) }}
+						{{ Form::select('branch_id', $branches, Input::old('branch_id', $user->branch_id), ['class' => 'form-control m-bot15']) }}
 						<span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
 					</div>
 		      	</div>

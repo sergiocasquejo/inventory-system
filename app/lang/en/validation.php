@@ -103,4 +103,5 @@ return array(
 			'branch_id' => 'branch'
 		),
 
+	"greater_than_equal" => "The :attribute must be greater than or equal to :field.",
 );

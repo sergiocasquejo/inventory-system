@@ -43,10 +43,11 @@ Route::group(['before' => 'auth', 'prefix' => 'admin'], function() {
 		Route::resource('brands', 'Admin\BrandsController', ['names' => $prefixResourceNamespace('admin_brands'), 'except' => ['show']]);
 		// Categories routes
 		Route::resource('categories', 'Admin\CategoriesController', ['names' => $prefixResourceNamespace('admin_categories'), 'except' => ['show']]);
+		Route::resource('uoms', 'Admin\UnitOfMeasuresController', ['names' => $prefixResourceNamespace('admin_uoms'), 'except' => ['show']]);
 	
 	});
-
-
+	
+	Route::get('products/{id}/get', ['uses' => 'Admin\ProductsController@get', 'as' => 'admin_products.get']);
 	// Credits routes
 	Route::post('credits/{id}/restore', ['uses' => 'Admin\CreditsController@restore', 'as' => 'admin_credits.restore']);
 	Route::resource('credits', 'Admin\CreditsController', ['names' => $prefixResourceNamespace('admin_credits'), 'except' => ['show']]);

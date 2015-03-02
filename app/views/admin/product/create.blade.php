@@ -36,7 +36,12 @@
 					      <textarea name="description" class="form-control">{{ Input::old('description') }}</textarea>
 					  </div>
 					</div>
-
+					<div class="form-group">
+					  <label class="col-sm-2 control-label">Unit of Measure</label>
+					  <div class="col-sm-10">
+					      {{ Form::select('uom', $measures, Input::old('uom'), ['class' => 'form-control m-bot15']) }}
+					  </div>
+					</div>
 					<div class="form-group">
 					  <label class="col-sm-2 control-label">Comments</label>
 					  <div class="col-sm-10">

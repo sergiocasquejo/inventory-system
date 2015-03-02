@@ -69,7 +69,7 @@
                   <div class="col-sm-6">
                     
                     <div class="dataTables_filter">
-                        <label class="pull-left">Search: <input type="text" name="s" class="form-control"> </label>
+                        <label class="pull-left">Search: <input type="text" name="s" value="{{ Input::get('s') }}" class="form-control"> </label>
                     </div>
                   </div>
                 </div>

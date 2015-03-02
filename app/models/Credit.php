@@ -96,7 +96,7 @@ class Credit extends Eloquent {
         $instance->uom = array_get($input, 'uom');
         $instance->total_amount = array_get($input, 'total_amount');
         $instance->comments = array_get($input, 'comments');
-        $instance->date_of_credit = array_get($input, 'date_of_credit');
+        $instance->date_of_credit = date('Y-m-d', strtotime(array_get($input, 'date_of_credit')));
         $instance->encoded_by = array_get($input, 'encoded_by');
         $instance->is_paid = array_get($input, 'is_paid');
         

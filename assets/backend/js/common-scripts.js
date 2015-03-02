@@ -151,21 +151,40 @@ var Script = function () {
 
     $(function () {
       $('[data-toggle="popover"]').popover()
-    });
 
-
-    $('a[rel=popover-image]').popover({
-      html: true,
-      trigger:'focus',
-      content: function () {
-        return '<img src="'+$(this).data('image') + '" />';
-      }
-    });
-
-    if ($('.datepicker').length) {
-        $('.datepicker').datepicker({
-            format: 'mm-dd-yyyy'
+      $('a[rel=popover-image]').popover({
+          html: true,
+          trigger:'focus',
+          content: function (context) {
+            return '<img style="width:100%;" src="'+$(this).data('image') + '" />';
+          }
         });
-    }
+
+        if ($('.datepicker').length) {
+            $('.datepicker').datepicker({
+                format: 'mm-dd-yyyy'
+            });
+        }
+
+        var saleForm = $('#saleForm');
+
+        saleForm.find(':input[name=quantity]').on('keyup', function() {
+
+            var slctdProduct = saleForm.find(':input[name=product_id]').val();
+            var slctdBranch = saleForm.find(':input[name=branch_id]').val();
+            var quantity = $(this).val();
+
+            $.get(AJAX.baseUrl+'/admin/products/'+ slctdProduct +'/get', {branch_id: slctdBranch }, function(response) {
+                if (response.selling_price) {
+                    saleForm.find(':input[name=total_amount]').val(response.selling_price * quantity)
+                }  
+            });
+            
+        }).trigger('keyup');
+        
+    });
+
+
+    
 
 }();

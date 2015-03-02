@@ -44,6 +44,11 @@ class CreateExpensesTable extends Migration {
 	 */
 	public function down()
 	{
+        Schema::table('expenses', function (Blueprint $table) {
+            $table->dropForeign('expenses_branch_id_foreign');
+            $table->dropForeign('expenses_encoded_by_foreign');
+        });
+
 		Schema::drop('expenses');
 	}
 

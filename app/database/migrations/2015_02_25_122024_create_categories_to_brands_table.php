@@ -36,6 +36,10 @@ class CreateCategoriesToBrandsTable extends Migration {
 	 */
 	public function down()
 	{
+		Schema::table('categories_to_brands', function (Blueprint $table) {
+            $table->dropForeign('categories_to_brands_brand_id_foreign');
+            $table->dropForeign('categories_to_brands_category_id_foreign');
+        });
 		Schema::drop('categories_to_brands');
 	}
 

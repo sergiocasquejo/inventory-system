@@ -11,8 +11,9 @@
 |
 */
 require_once 'routes/auth.php';
-require_once 'routes/errors.php';
+
 require_once 'routes/admin.php';
+require_once 'routes/errors.php';
 
 Route::get('/', function()
 {

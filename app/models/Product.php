@@ -12,6 +12,7 @@ class Product extends Eloquent {
     	'name'	           => 'required|min:5|unique:products,name',
     	'description'	   => 'required',
     	'encoded_by' 	   => 'required|exists:users,id',
+        'uom'               => 'required|exists:unit_of_measures,name',
     	'status'	       => 'required|in:0,1'
     ];
 
@@ -78,6 +79,8 @@ class Product extends Eloquent {
 		$instance->encoded_by = array_get($input, 'encoded_by');
         $instance->brand_id = array_get($input, 'brand_id');
         $instance->category_id = array_get($input, 'category_id');
+        $instance->uom = array_get($input, 'uom');
+        
 		
 		$instance->save();
 		return $instance;

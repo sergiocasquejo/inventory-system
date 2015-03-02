@@ -112,11 +112,13 @@ class Sale extends Eloquent {
 	public function doSave(Sale $instance, $input) {
 		$instance->branch_id = array_get($input, 'branch_id');
 		$instance->product_id = array_get($input, 'product_id');
+		$instance->supplier_price = array_get($input, 'supplier_price');
+		$instance->selling_price = array_get($input, 'selling_price');
 		$instance->quantity = array_get($input, 'quantity');
 		$instance->uom = array_get($input, 'uom');
 		$instance->total_amount = array_get($input, 'total_amount');
 		$instance->comments = array_get($input, 'comments');
-		$instance->date_of_sale = array_get($input, 'date_of_sale');
+		$instance->date_of_sale = date('Y-m-d', strtotime(array_get($input, 'date_of_sale')));
 		$instance->encoded_by = array_get($input, 'encoded_by');
 		$instance->status = array_get($input, 'status');
 		

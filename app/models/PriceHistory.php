@@ -1,14 +1,14 @@
 <?php
 
-class ProductPricing extends Eloquent {
-	protected $table = 'product_pricing';
-	protected $primaryKey = 'price_id';
+class PriceHistory extends Eloquent {
+	protected $table = 'product_price_history';
+	protected $primaryKey = 'price_history_id';
     public $timestamps = false;
 	public static $rules = [
 		'branch_id'		=> 'required|exists:branches,id',
     	'product_id' => 'required|exists:products,id',
         'supplier_price' => 'required|numeric',
-    	'price'	=> 'required|numeric|greater_than_equal:supplier_price',
+    	'price'	=> 'required|numeric',
     	'per_unit'	=> 'required',
     ];
 
@@ -30,7 +30,7 @@ class ProductPricing extends Eloquent {
 
 
 
-    public function doSave(ProductPricing $instance, $input) {
+    public function doSave(PriceHistory $instance, $input) {
 		$instance->branch_id = array_get($input, 'branch_id');
 		$instance->product_id = array_get($input, 'product_id');
         $instance->supplier_id = array_get($input, 'supplier_id');
