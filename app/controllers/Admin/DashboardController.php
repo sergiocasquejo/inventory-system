@@ -11,6 +11,8 @@ class DashboardController extends \BaseController {
 		$data = [];
 
 
+		$data['weekly_expenses'] = \Expense::select(\DB::raw('DAY(date_of_expense) as day_of_expense, TRUNCATE(SUM(total_amount), 2) as weekly_expense'))->groupBy('day_of_expense')->whereRaw('WEEK(date_of_expense) = WEEK(CURDATE())')->lists('weekly_expense');
+		$data['weekly_sales'] = \Sale::select(\DB::raw('DAY(date_of_sale) as day_of_sale, TRUNCATE(SUM(total_amount - (supplier_price * quantity)), 2) as weekly_sale'))->groupBy('day_of_sale')->whereRaw('WEEK(date_of_sale) = WEEK(CURDATE())')->lists('weekly_sale');
 
 		$data['total_users']  = \User::count();
 		$data['total_expense']  = \Expense::sum('total_amount');
@@ -33,6 +35,9 @@ TRUNCATE((SUM(CASE WHEN MONTH(date_of_sale) = 12 THEN total_amount  - (supplier_
 	
 								->groupBy('the_year')->first();
 
+		// SELECT SUM(total_amount), (SELECT SUM(total_amount) FROM sales_expenses WHERE DAY(date_of_expense) = DAY(sales_sales.date_of_sale) GROUP BY DAY(date_of_expense)) as ab FROM `sales_sales` GROUP BY DAY(date_of_sale)
+
+		// dd($data['weekly_sales']);
 
 		return View::make('admin.dashboard.index', $data);
 	}
