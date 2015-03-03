@@ -41,7 +41,7 @@
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Unit of measure</label>
 				  <div class="col-sm-10">
-				  		{{ Form::select('uom', $measures, '', 'Select Measure'), Input::old('uom'), ['class' => 'form-control m-bot15']) }}
+				  		{{ Form::select('uom', $measures, Input::old('uom'), ['class' => 'form-control m-bot15']) }}
 				  </div>
 				</div>
 

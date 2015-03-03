@@ -59,51 +59,51 @@
         <div class="custom-bar-chart">
             <div class="bar">
                 <div class="title">JAN</div>
-                <div class="value tooltips" data-original-title="80%" data-toggle="tooltip" data-placement="top">80%</div>
+                <div class="value tooltips" data-original-title="{{{ $earning->Total_Jan }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_Jan }}}%</div>
             </div>
             <div class="bar doted">
                 <div class="title">FEB</div>
-                <div class="value tooltips" data-original-title="50%" data-toggle="tooltip" data-placement="top">50%</div>
+                <div class="value tooltips" data-original-title="{{{ $earning->Total_Feb }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_Feb }}}%</div>
             </div>
             <div class="bar ">
                 <div class="title">MAR</div>
-                <div class="value tooltips" data-original-title="40%" data-toggle="tooltip" data-placement="top">40%</div>
+                <div class="value tooltips" data-original-title="{{{ $earning->Total_Mar }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_Mar }}}%</div>
             </div>
             <div class="bar doted">
                 <div class="title">APR</div>
-                <div class="value tooltips" data-original-title="55%" data-toggle="tooltip" data-placement="top">55%</div>
+                <div class="value tooltips" data-original-title="{{{ $earning->Total_Apr }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_Apr }}}%</div>
             </div>
             <div class="bar">
                 <div class="title">MAY</div>
-                <div class="value tooltips" data-original-title="20%" data-toggle="tooltip" data-placement="top">20%</div>
+                <div class="value tooltips" data-original-title="{{{ $earning->Total_May }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_May }}}%</div>
             </div>
             <div class="bar doted">
                 <div class="title">JUN</div>
-                <div class="value tooltips" data-original-title="39%" data-toggle="tooltip" data-placement="top">39%</div>
+                <div class="value tooltips" data-original-title="{{{ $earning->Total_Jun }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_Jun }}}%</div>
             </div>
             <div class="bar">
                 <div class="title">JUL</div>
-                <div class="value tooltips" data-original-title="75%" data-toggle="tooltip" data-placement="top">75%</div>
+                <div class="value tooltips" data-original-title="{{{ $earning->Total_Jul }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_Jul }}}%</div>
             </div>
             <div class="bar doted">
                 <div class="title">AUG</div>
-                <div class="value tooltips" data-original-title="45%" data-toggle="tooltip" data-placement="top">45%</div>
+                <div class="value tooltips" data-original-title="{{{ $earning->Total_Aug }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_Aug }}}%</div>
             </div>
             <div class="bar ">
                 <div class="title">SEP</div>
-                <div class="value tooltips" data-original-title="50%" data-toggle="tooltip" data-placement="top">50%</div>
+                <div class="value tooltips" data-original-title="{{{ $earning->Total_Sep }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_Sep }}}%</div>
             </div>
             <div class="bar doted">
                 <div class="title">OCT</div>
-                <div class="value tooltips" data-original-title="42%" data-toggle="tooltip" data-placement="top">42%</div>
+                <div class="value tooltips" data-original-title="{{{ $earning->Total_Oct }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_Oct }}}%</div>
             </div>
             <div class="bar ">
                 <div class="title">NOV</div>
-                <div class="value tooltips" data-original-title="60%" data-toggle="tooltip" data-placement="top">60%</div>
+                <div class="value tooltips" data-original-title="{{{ $earning->Total_Nov }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_Nov }}}%</div>
             </div>
             <div class="bar doted">
                 <div class="title">DEC</div>
-                <div class="value tooltips" data-original-title="90%" data-toggle="tooltip" data-placement="top">90%</div>
+                <div class="value tooltips" data-original-title="{{{ $earning->Total_Dec }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_Dec }}}%</div>
             </div>
         </div>
         <!--custom chart end-->
@@ -117,17 +117,19 @@
                         <span>Friday</span>
                         <strong>$ 57,00 | 15%</strong>
                     </div>
-                    <div class="sparkline" data-type="line" data-resize="true" data-height="75" data-width="90%" data-line-width="1" data-line-color="#fff" data-spot-color="#fff" data-fill-color="" data-highlight-line-color="#fff" data-spot-radius="4" data-data="[200,135,667,333,526,996,564,123,890,564,455]"></div>
+                    <div id="sales" class="sparkline" data-type="line" data-resize="true" data-height="75" data-width="90%" data-line-width="1" data-line-color="#fff" data-spot-color="#fff" data-fill-color="" data-highlight-line-color="#fff" data-spot-radius="4" data-data="[10,100,50,20,200,100,564,123,890,564,455]"></div>
+                    <div id="expenses" class="sparkline" data-type="bar" data-resize="true" data-height="75" data-width="90%" data-line-width="5" data-line-color="#EF6F66" data-spot-color="#EF6F66" data-fill-color="" data-highlight-line-color="#EF6F66" data-spot-radius="4" data-data="[200,135,667,333,526,996,564,123,890,564,455]"></div>
+                    <div id="credits" class="sparkline" data-type="line" data-resize="true" data-height="75" data-width="90%" data-line-width="1" data-line-color="#4d90fe" data-spot-color="#4d90fe" data-fill-color="" data-highlight-line-color="#4d90fe" data-spot-radius="4" data-data="[100,20,33,12,526,100,564,15,890,54,200]"></div>
                 </div>
             </div>
             <div class="chart-tittle">
                 <span class="title">New Earning</span>
                 <span class="value">
-                    <a href="#" class="active">Market</a>
+                    <a href="#sales" class="active">Sales</a>
                     |
-                    <a href="#">Referal</a>
+                    <a href="#expenses">Expenses</a>
                     |
-                    <a href="#">Online</a>
+                    <a href="#credits">Credits</a>
                 </span>
             </div>
         </div>
