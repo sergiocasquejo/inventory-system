@@ -120,19 +120,19 @@
                         <span>This Week</span>
                         <strong>$ 57,00 | 15%</strong>
                     </div>
-                    <div id="sales" class="sparkline" data-type="line" data-resize="true" data-height="75" data-width="90%" data-line-width="1" data-line-color="#fff" data-spot-color="#fff" data-fill-color="" data-highlight-line-color="#fff" data-spot-radius="4" data-data="[10,100,50,20,200,100,564,123,890,564,455]"></div>
-                    <div id="expenses" class="sparkline" data-type="line" data-resize="true" data-height="75" data-width="90%" data-line-width="1" data-line-color="#EF6F66" data-spot-color="#EF6F66" data-fill-color="" data-highlight-line-color="#EF6F66" data-spot-radius="4" data-data="[200,135,667,333,526,996,564,123,890,564,455]"></div>
-                    <div id="credits" class="sparkline" data-type="line" data-resize="true" data-height="75" data-width="90%" data-line-width="1" data-line-color="#4d90fe" data-spot-color="#4d90fe" data-fill-color="" data-highlight-line-color="#4d90fe" data-spot-radius="4" data-data="[100,20,33,12,526,100,564,15,890,54,200]"></div>
+                    <div id="sales" class="sparkline" data-type="line" data-resize="true" data-height="75" data-width="90%" data-line-width="1" data-line-color="#A9D86E" data-spot-color="#A9D86E" data-fill-color="" data-highlight-line-color="#A9D86E" data-spot-radius="4" data-data="[10,100,50,20,200,100,564,123,890,564,455]"></div>
+                    <div id="expenses" class="sparkline" data-type="line" data-resize="true" data-height="75" data-width="90%" data-line-width="1" data-line-color="#FCB322" data-spot-color="#FCB322" data-fill-color="" data-highlight-line-color="#FCB322" data-spot-radius="4" data-data="[200,135,667,333,526,996,564,123,890,564,455]"></div>
+                    <div id="credits" class="sparkline" data-type="line" data-resize="true" data-height="75" data-width="90%" data-line-width="1" data-line-color="#8175c7" data-spot-color="#8175c7" data-fill-color="" data-highlight-line-color="#8175c7" data-spot-radius="4" data-data="[100,20,33,12,526,100,564,15,890,54,200]"></div>
                 </div>
             </div>
             <div class="chart-tittle">
                 <span class="title">New Earning</span>
                 <span class="value">
-                    <a href="#sales" class="active">Sales</a>
+                    <a href="#sales" class="label label-success  label-mini active">Sales</a>
                     |
-                    <a href="#expenses">Expenses</a>
+                    <a class="label label-warning  label-mini">Expenses</a>
                     |
-                    <a href="#credits">Credits</a>
+                    <a class="label label-info  label-mini">Credits</a>
                 </span>
             </div>
         </div>
