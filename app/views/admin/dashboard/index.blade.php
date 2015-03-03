@@ -51,7 +51,7 @@
 <!--state overview end-->
 
 <div class="row">
-    <div class="col-lg-12">
+    <div class="col-lg-8">
         <!--custom chart start-->
         <div class="border-head">
             <h3>Earning Graph</h3>
@@ -108,12 +108,11 @@
         </div>
         <!--custom chart end-->
     </div>
-   
-</div>
-
-<div class="row">
-     <div class="col-lg-6">
+    <div class="col-lg-4">
         <!--new earning start-->
+        <div class="border-head">
+            <h3>This Week</h3>
+        </div>
         <div class="panel terques-chart">
             <div class="panel-body chart-texture">
                 <div class="chart">
@@ -138,11 +137,9 @@
             </div>
         </div>
         <!--new earning end-->
-    </div>
 
-    <div class="col-lg-6">    
         <!--total earning start-->
-        <div class="panel green-chart">
+        <!--<div class="panel green-chart">
             <div class="panel-body">
                 <div class="chart">
                     <div class="heading">
@@ -156,8 +153,16 @@
                 <span class="title">Total Earning</span>
                 <span class="value">$, 76,54,678</span>
             </div>
-        </div>
+        </div>-->
         <!--total earning end-->
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-6">
+        
+    </div>
+    <div class="col-lg-6">
+        
     </div>
 </div>
 @stop
