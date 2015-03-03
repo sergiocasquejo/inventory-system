@@ -28,13 +28,23 @@
                     </div>
                   </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-6">
+                      {{ Form::select('branch', $branches, Input::get('branch', ''), ['class' => 'form-control', 'size' => '1']) }} 
+                    </div>
+                    <div class="col-md-5">
+                      {{ Form::select('category', $categories, Input::get('category', ''), ['class' => 'form-control', 'size' => '1']) }} 
+                    </div>
+                    <div class="col-md-1">
+                      <button type="submit" class="btn btn-info">Filter</button>
+                    </div>
+                </div>
                 <table class="table table-striped table-advance table-hover">
                     <thead>
                       <tr>
                           <th>Name</th>
-                          <th>Brand</th>
-                          <th>Category</th>
-                          <th>Encoded By</th>
+                          <th>SELLING PRICE PER KILO/BTL/PCK/PCS</th>
+                          <th>SELLING PRICE PER SACK</th>
                           <th>Status</th>
                           <th></th>
                       </tr>
@@ -47,7 +57,6 @@
                               <td>{{{ $product->name }}}</td>
                               <td>{{{ $product->brand->name }}}</td>
                               <td>{{{ $product->category->name }}}</td>
-                              <td>{{{ $product->user->username }}}</td>
                               <td>
                                   <span class="label label-{{{ $product->status ? 'success' : 'warning' }}} label-mini">
                                       {{{ $product->status ? 'Active' : 'Inactive' }}}

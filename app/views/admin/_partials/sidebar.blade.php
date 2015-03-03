@@ -35,6 +35,13 @@
                     <li><a class="" href="{{ route('admin_categories.index') }}">Categories</a></li>
                 </ul>
             </li>
+
+            <li class="sub-menu">
+                <a href="javascript:;" class="">
+                    <i class="icon-bar-chart"></i>
+                    <span>Stocks</span>
+                </a>
+            </li>
             @endif
             <li class="sub-menu">
                 <a href="javascript:;" class="">
@@ -88,15 +95,10 @@
             </li>
 
             <li class="sub-menu">
-                <a href="javascript:;" class="">
+                <a href="{{ route('admin_reports.index') }}" class="">
                     <i class="icon-bar-chart"></i>
                     <span>Reports</span>
-                    <span class="arrow"></span>
                 </a>
-                <ul class="sub">
-                    <li><a class="" href="{{ route('admin_users.index') }}">Net Income</a></li>
-                    <li><a class="" href="{{ route('admin_users.create') }}">Expected na ginansya</a></li>
-                </ul>
             </li>
 
             <li class="sub-menu">

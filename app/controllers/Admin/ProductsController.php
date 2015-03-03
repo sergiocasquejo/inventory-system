@@ -22,7 +22,8 @@ class ProductsController extends \BaseController {
 		$countries = \Config::get('agrivate.countries');
 		return \View::make('admin.product.index')
 			->with('products', $products)
-			->with('branches', \Branch::all()->lists('name', 'id'))
+			->with('categories', array_add(\Category::all()->lists('name', 'category_id'), 0, 'Select Category'))
+			->with('branches', array_add(\Branch::all()->lists('name', 'id'), '', 'Select Branch'))
 			->with('appends', $appends)
 			->with('totalRows', $totalRows);
 

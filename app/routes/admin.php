@@ -58,4 +58,5 @@ Route::group(['before' => 'auth', 'prefix' => 'admin'], function() {
 	Route::post('sales/{id}/restore', ['uses' => 'Admin\SalesController@restore', 'as' => 'admin_sales.restore']);
 	Route::resource('sales', 'Admin\SalesController', ['names' => $prefixResourceNamespace('admin_sales'), 'except' => ['show']]);
 
+	Route::get('reports', ['uses' => 'Admin\ReportsController@index', 'as' => 'admin_reports.index']);
 });
