@@ -14,7 +14,8 @@ class DashboardController extends \BaseController {
 
 		$data['total_users']  = \User::count();
 		$data['total_expense']  = \Expense::sum('total_amount');
-		$data['total_sales']  = \Sale::sum('total_amount');
+		$data['total_sales'] = \Sale::select(\DB::raw('TRUNCATE(SUM(total_amount - (supplier_price * quantity)), 2) as total_sale'))->pluck('total_sale');
+
 		$data['earning'] = \Sale::select(\DB::raw('YEAR(date_of_sale) as the_year,
 TRUNCATE(SUM(total_amount - (supplier_price * quantity)), 2) as total_amount,
 TRUNCATE((SUM(CASE WHEN MONTH(date_of_sale) = 1 THEN total_amount - (supplier_price * quantity) ELSE 0 END) / total_amount) * 100, 2) AS Total_Jan,
@@ -31,7 +32,7 @@ TRUNCATE((SUM(CASE WHEN MONTH(date_of_sale) = 11 THEN total_amount  - (supplier_
 TRUNCATE((SUM(CASE WHEN MONTH(date_of_sale) = 12 THEN total_amount  - (supplier_price * quantity) ELSE 0 END)/ total_amount) * 100, 2) AS Total_Dec'))
 	
 								->groupBy('the_year')->first();
-		// dd($data['earning_graph']);
+
 
 		return View::make('admin.dashboard.index', $data);
 	}
