@@ -44,7 +44,7 @@
             </li>
             @endif
             <li class="sub-menu">
-                <a href="javascript:;" class="">
+                <a href="{{ route('admin_reports.stocks') }}" class="">
                     <i class="icon-bar-chart"></i>
                     <span>Sales</span>
                     <span class="arrow"></span>

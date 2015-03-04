@@ -60,8 +60,8 @@
   <body>
 
   <section id="container" class="">
-      {{-- @include('admin/_partials/header') --}}
-      {{-- @include('admin/_partials/sidebar') --}}
+      @include('admin/_partials/header')
+      @include('admin/_partials/sidebar')
       
       <!--main content start-->
       <section id="main-content">
