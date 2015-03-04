@@ -16,8 +16,8 @@ class CreateBranchesTable extends Migration {
         Schema::create('branches', function ($table) {
         	$table->engine ='InnoDB';
             $table->increments('id')->unsigned();
-            $table->string('name', 120)->unique();
-            $table->string('address', 255);
+            $table->string('name', 120);
+            $table->string('address', 255)->unique();
             $table->string('city', 100);
             $table->string('state', 100);
             $table->string('post_code', 45);

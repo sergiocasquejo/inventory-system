@@ -28,7 +28,7 @@ class AdminController extends \BaseController {
                 $err_msg = \Lang::get('confide::confide.alerts.wrong_credentials');
             }
 
-            return \Redirect::route('admin_login')
+            return \Redirect::to('admin/login')
                 ->withInput(\Input::except('password'))
                 ->with('error', $err_msg);
         }

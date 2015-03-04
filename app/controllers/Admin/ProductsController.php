@@ -97,7 +97,7 @@ class ProductsController extends \BaseController {
 		
 		return \View::make('admin.product.edit')
 		->with('product', $product)
-		->with('branches', array_add(\Branch::all()->lists('name', 'id'), '', 'Select Branch'))
+		->with('branches', array_add(\Branch::nameWithAddress()->lists('name', 'id'), '', 'Select Branch'))
 		->with('brands', array_add(\Brand::all()->lists('name', 'brand_id'), 0, 'Select Brand'))
 		->with('categories', array_add(\Category::all()->lists('name', 'category_id'), 0, 'Select Category'))
 		->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));

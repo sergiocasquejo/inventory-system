@@ -9,8 +9,8 @@ class Branch extends Eloquent {
 	public $timestamps = false;
     
 	public static $rules = [
-    	'name' 		=> 'required|min:5|unique:branches,name',
-    	'address'	=> 'required',
+    	'name' 		=> 'required',
+    	'address'	=> 'required|min:5|unique:branches,name,NULL,id',
     	'city' 		=> 'required',
     	'post_code'	=> 'required',
     	'status'	=> 'required|in:0,1'
@@ -66,6 +66,10 @@ class Branch extends Eloquent {
     	}
 
     	return $query;
+    }
+
+    public function scopeNameWithAddress($query) {
+        return $query->select(\DB::raw('CONCAT(name," (",address,")") AS name'), 'id' );
     }
 
     public function scopeFilterBranch($query) {

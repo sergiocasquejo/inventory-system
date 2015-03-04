@@ -49,6 +49,7 @@ class BrandsController extends \BaseController {
 
 
 		$rules = \Brand::$rules;
+		// $rules['name'] = 'required|min:5|unique:branches,name,NULL,id,city,'.array_get($input, 'city'); 
 
 		$validator = \Validator::make($input, $rules);
 
@@ -99,7 +100,7 @@ class BrandsController extends \BaseController {
 	{
 		$input = \Input::all();
 		$rules = \Brand::$rules;
-		$rules['name'] = 'required|unique:brands,name,'.$id.',brand_id';
+		$rules['address'] = 'required|unique:branches,name,'.$id.',id';
 
 		$validator = \Validator::make($input, $rules);
 

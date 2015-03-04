@@ -110,7 +110,7 @@ class BranchesController extends \BaseController {
 
 		$rules = \Branch::$rules;
 
-		$rules['name'] = $rules['name'].','.$id.',id';
+		// $rules['name'] = $rules['name'].','.$id.',id';
 
 		$validator = \Validator::make($input, $rules);
 

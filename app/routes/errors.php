@@ -3,11 +3,11 @@
 App::error(function(Exception $exception, $code)
 {
 
-    // Log::error($exception);
+    Log::error($exception);
 
-    // if (Config::get('app.debug')) {
-    //     return;
-    // }
+    if (Config::get('app.debug')) {
+        return;
+    }
 
     switch ($code)
     {

@@ -115,7 +115,7 @@
 				              <tr>
 				                  <td>{{{ $stock->total_stocks }}}</td>
 				                  <td>{{{ $stock->uom }}}</td>
-				                  <td>{{{ $stock->branch->name }}}</td>
+				                  <td>{{{ $stock->branch->name .' ('.$stock->branch->address.')' }}}</td>
 				                  <td>
 				                      <a href="{{{ route('admin_product_stocks.edit', ['pid' => $product->id, 'stock_on_hand_id' => $stock->stock_on_hand_id]) }}}" class="btn btn-primary btn-xs" data-form="#stock-form" data-fetch="STOCK" title="Edit"><i class="icon-pencil"></i></a>
 				    
@@ -179,7 +179,7 @@
 				                  	<td data-uom="{{{ $price->per_unit }}}">
 				                  		{{{ $price->per_unit }}}
 				                  	</td>
-				                  	<td data-branch="{{{ $price->branch_id }}}">{{{ $price->branch->name }}}</td>
+				                  	<td data-branch="{{{ $price->branch_id }}}">{{{ $price->branch->name  .' ('.$stock->branch->address.')' }}}</td>
 									<td>
 										<a href="{{{ route('admin_product_prices.edit', ['pid' => $product->id, 'price_id' => $price->price_id]) }}}" class="btn btn-primary btn-xs" data-id="{{ $price->price_id }}" data-form="#price-form" data-fetch="PRICE" title="Edit"><i class="icon-pencil"></i></a>
 
