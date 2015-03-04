@@ -37,11 +37,11 @@ class StockOnHandController extends \BaseController {
 
 		$input['product_id'] = $product_id;
 
-
+		$uom = array_get($input, 'uom');
 		
 		$rules = \StockOnHand::$rules;
 
-		$rules['branch_id'] = 'required|exists:branches,id|unique:stocks_on_hand,branch_id,NULL,stock_on_hand_id,product_id,'.$product_id;
+		$rules['branch_id'] = 'required|exists:branches,id|unique:stocks_on_hand,branch_id,NULL,stock_on_hand_id,product_id,'.$product_id.',uom,'.$uom;
 
 		// echo $rules['branch_id'];
 		// die;
@@ -94,7 +94,9 @@ class StockOnHandController extends \BaseController {
 
 		$rules = \StockOnHand::$rules; 
 
-		$rules['branch_id'] = 'required|exists:branches,id|unique:stocks_on_hand,branch_id,'.$stock_id.',stock_on_hand_id,product_id,'.$product_id;
+		$uom = array_get($input, 'uom');
+		
+		$rules['branch_id'] = 'required|exists:branches,id|unique:stocks_on_hand,branch_id,'.$stock_id.',stock_on_hand_id,product_id,'.$product_id.',uom,'.$uom;
 
 		$input['product_id'] = $product_id;
 

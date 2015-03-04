@@ -61,14 +61,42 @@ class Product extends Eloquent {
         return $query->where('status', 0);
     }
 
-    public function scopeSearch($query, $input) {
-    	
-    	if (isset($input['s'])) {
-    		$query->whereRaw('name LIKE "%'. array_get($input, 's', '') .'%"');
-    	}
+    public function scopeFilter($query, $input) {
+        
+        $px = \DB::getTablePrefix();
 
-    	return $query;
+        if (isset($input['s'])) {
+            $s = array_get($input, 's', '');
+            
+            $query->whereRaw("{$px}products.name LIKE  '%".$s."%'");
+        }
+
+
+        if (isset($input['branch']) && $input['branch'] != '') {
+            $branch = array_get($input, 'branch');
+            $query->whereRaw("{$px}product_pricing.branch_id = $branch");   
+        }
+
+        if (isset($input['category']) && $input['category'] != '') {
+            $category = array_get($input, 'category');
+            $query->whereRaw("{$px}products.category_id = $category");   
+        }
+
+        return $query;
     }
+
+
+
+    public function scopeSearch($query, $input) {
+        
+        if (isset($input['s'])) {
+            $s = array_get($input, 's', '');
+            $query->whereRaw('name LIKE  "%'.$s.'%"');
+        }
+
+        return $query;
+    }
+
 
 
 	public function doSave(Product $instance, $input) {

@@ -28,18 +28,20 @@
 		      	</div>
 
 		      	<div class="form-group">
+				  <label class="col-sm-2 control-label">Unit of measure</label>
+				  <div class="col-sm-10">
+				      {{ Form::select('uom', $measures, Input::old('uom', $sale->uom), ['class' => 'form-control m-bot15']) }}
+				  </div>
+				</div>
+
+		      	<div class="form-group">
 				  <label class="col-sm-2 control-label">Quantity</label>
 				  <div class="col-sm-10">
 				      <input type="number" name="quantity" value="{{ Input::old('quantity', $sale->quantity) }}" class="form-control">
 				  </div>
 				</div>
 
-				<div class="form-group">
-				  <label class="col-sm-2 control-label">Unit of measure</label>
-				  <div class="col-sm-10">
-				      {{ Form::select('uom', $measures, Input::old('uom', $sale->uom), ['class' => 'form-control m-bot15']) }}
-				  </div>
-				</div>
+				
 
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Total Amount</label>

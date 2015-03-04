@@ -13,8 +13,14 @@ class ProductsController extends \BaseController {
 		$input = \Input::all();
 
 
-		$products = \Product::withTrashed()->search($input)->orderBy('id', 'desc')->paginate(intval(array_get($input, 'records_per_page', 10)));
-		
+		$products = \Product::withTrashed()
+		->join('product_pricing', 'products.id', '=', 'product_pricing.product_id')
+		->join('branches', 'branches.id', '=', 'product_pricing.branch_id')
+		->select('products.id', 'products.status', 'branches.name as branch_name', 'products.name', 'product_pricing.selling_price', 'product_pricing.per_unit')
+		->filter($input)
+		->orderBy('id', 'desc')
+		->paginate(intval(array_get($input, 'records_per_page', 10)));
+
 		$totalRows = \Product::withTrashed()->count();
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
@@ -22,13 +28,10 @@ class ProductsController extends \BaseController {
 		$countries = \Config::get('agrivate.countries');
 		return \View::make('admin.product.index')
 			->with('products', $products)
-			->with('categories', array_add(\Category::all()->lists('name', 'category_id'), 0, 'Select Category'))
+			->with('categories', array_add(\Category::all()->lists('name', 'category_id'), '', 'Select Category'))
 			->with('branches', array_add(\Branch::all()->lists('name', 'id'), '', 'Select Branch'))
 			->with('appends', $appends)
 			->with('totalRows', $totalRows);
-
-
-		$products = \Product::withTrashed();
 	}
 
 
@@ -181,8 +184,9 @@ class ProductsController extends \BaseController {
 	public function get($id)
 	{	
 		$branch_id = \Input::get('branch_id');
+		$unit = \Input::get('uom');
 
-		$product = \ProductPricing::whereRaw(\DB::raw('product_id = '.$id));
+		$product = \ProductPricing::whereRaw(\DB::raw('product_id = '.$id.' AND per_unit = "'.$unit.'"'));
 
 		if ($branch_id) {
 			$product = $product->where('branch_id', $branch_id);
@@ -190,5 +194,30 @@ class ProductsController extends \BaseController {
 		$product = $product->first();
 
 		return \Response::json($product);
+	}
+
+
+	/**
+	 * Show the form for editing the specified resource.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function uom($id)
+	{	
+		$branch = \Input::get('branch_id');
+
+		$uoms = \ProductPricing::whereRaw(\DB::raw('product_id = '.$id))
+			->join('unit_of_measures', 'product_pricing.per_unit', '=', 'unit_of_measures.name')
+			->groupBy('unit_of_measures.uom_id')
+			->select('name', 'label');
+
+		if ($branch) {
+			$uoms = $uoms->where('branch_id', $branch);
+		}
+		
+
+
+		return \Response::json($uoms->get());
 	}
 }	

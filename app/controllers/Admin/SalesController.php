@@ -109,10 +109,15 @@ class SalesController extends \BaseController {
 				\DB::transaction(function() use($input, $errors) {
 					
 					// Get user branch
-					$branch = \ProductPricing::where('branch_id', '=', array_get($input, 'branch_id'))->first();
+					$branch_id = array_get($input, 'branch_id');
+					$uom = array_get($input, 'uom');
+					$product = array_get($input, 'product_id');
+
+					$branch = \ProductPricing::whereRaw("branch_id = {$branch_id} AND product_id = {$product}  AND per_unit = '{$uom}'")->first();
 
 					$input['supplier_price'] = 	$branch->supplier_price;
 					$input['selling_price'] = 	$branch->selling_price;
+
 
 					$sale = new \Sale;
 

@@ -47,6 +47,7 @@ Route::group(['before' => 'auth', 'prefix' => 'admin'], function() {
 	
 	});
 	
+	Route::get('products/{id}/uom', ['uses' => 'Admin\ProductsController@uom', 'as' => 'admin_products.uom']);
 	Route::get('products/{id}/get', ['uses' => 'Admin\ProductsController@get', 'as' => 'admin_products.get']);
 	// Credits routes
 	Route::post('credits/{id}/restore', ['uses' => 'Admin\CreditsController@restore', 'as' => 'admin_credits.restore']);
@@ -58,5 +59,6 @@ Route::group(['before' => 'auth', 'prefix' => 'admin'], function() {
 	Route::post('sales/{id}/restore', ['uses' => 'Admin\SalesController@restore', 'as' => 'admin_sales.restore']);
 	Route::resource('sales', 'Admin\SalesController', ['names' => $prefixResourceNamespace('admin_sales'), 'except' => ['show']]);
 
+	Route::get('reports/stocks', ['uses' => 'Admin\ReportsController@stocks', 'as' => 'admin_reports.stocks']);
 	Route::get('reports', ['uses' => 'Admin\ReportsController@index', 'as' => 'admin_reports.index']);
 });

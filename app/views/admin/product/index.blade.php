@@ -22,17 +22,17 @@
                     </div>
                   </div>
                   <div class="col-sm-6">
-                    
-                    <div class="dataTables_filter">
-                        <label class="pull-left">Search: <input type="text" name="s"  value="{{ Input::get('s') }}" class="form-control"> </label>
-                    </div>
                   </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-2">
+                      <input type="text" name="s"  value="{{ Input::get('s') }}" placeholder="Search" class="form-control">               
+                    </div>
+                    <div class="col-md-4">
                       {{ Form::select('branch', $branches, Input::get('branch', ''), ['class' => 'form-control', 'size' => '1']) }} 
                     </div>
-                    <div class="col-md-5">
+                    <div class="col-md-4">
                       {{ Form::select('category', $categories, Input::get('category', ''), ['class' => 'form-control', 'size' => '1']) }} 
                     </div>
                     <div class="col-md-1">
@@ -42,10 +42,10 @@
                 <table class="table table-striped table-advance table-hover">
                     <thead>
                       <tr>
-                          <th>Name</th>
-                          <th>SELLING PRICE PER KILO/BTL/PCK/PCS</th>
-                          <th>SELLING PRICE PER SACK</th>
-                          <th>Status</th>
+                          <th>BRANCH</th>
+                          <th>PRODUCT NAME</th>
+                          <th>SELLING PRICE PER KILO/BTL/PCK/PCS/SACKS</th>
+                          <th>STATUS</th>
                           <th></th>
                       </tr>
                     </thead>
@@ -54,9 +54,9 @@
                       @if ($products)
                           @foreach ($products as $product)
                           <tr>
+                              <td>{{{ $product->branch_name }}}</td>
                               <td>{{{ $product->name }}}</td>
-                              <td>{{{ $product->brand->name }}}</td>
-                              <td>{{{ $product->category->name }}}</td>
+                              <td>{{{ \Helper::nf($product->selling_price).' '.$product->per_unit }}}</td>
                               <td>
                                   <span class="label label-{{{ $product->status ? 'success' : 'warning' }}} label-mini">
                                       {{{ $product->status ? 'Active' : 'Inactive' }}}

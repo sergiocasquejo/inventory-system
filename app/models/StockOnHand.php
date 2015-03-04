@@ -23,6 +23,24 @@ class StockOnHand extends Eloquent {
     }
 
 
+    public function scopeFilter($query, $input) {
+
+		$branch = array_get($input, 'branch');
+
+
+	 	/* Check if current user is not admin
+        * filter only his branch
+        */
+        if ($branch != '') {
+            $query->whereRaw('branch_id ='. (int) $branch);
+        }
+
+
+
+		return $query;
+	}
+
+
     public function doSave(StockOnHand $instance, $input) {
 		$instance->branch_id = array_get($input, 'branch_id');
 		$instance->product_id = array_get($input, 'product_id');

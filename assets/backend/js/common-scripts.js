@@ -166,21 +166,66 @@ var Script = function () {
             });
         }
 
-        var saleForm = $('#saleForm');
+        var saleForm = $('#saleForm'),
+            qtyField = saleForm.find(':input[name=quantity]'),
+            productField = saleForm.find(':input[name=product_id]'),
+            uomField = saleForm.find(':input[name=uom]'),
+            branchField = saleForm.find(':input[name=branch_id]');
 
-        saleForm.find(':input[name=quantity]').on('keyup', function() {
+
+        qtyField.on('keyup', function() {
 
             var slctdProduct = saleForm.find(':input[name=product_id]').val();
             var slctdBranch = saleForm.find(':input[name=branch_id]').val();
+            var slctdUOM = saleForm.find(':input[name=uom]').val();
             var quantity = $(this).val();
 
-            $.get(AJAX.baseUrl+'/admin/products/'+ slctdProduct +'/get', {branch_id: slctdBranch }, function(response) {
+
+            $.get(AJAX.baseUrl+'/admin/products/'+ slctdProduct +'/get', {branch_id: slctdBranch, uom:slctdUOM }, function(response) {
                 if (response.selling_price) {
                     saleForm.find(':input[name=total_amount]').val(response.selling_price * quantity)
                 }  
             });
             
         }).trigger('keyup');
+
+
+        productField.on('change', function() {
+            var self = $(this);
+            var slctdProduct = self.val();
+            var slctdBranch = saleForm.find(':input[name=branch_id]').val();
+
+            var slctUOM = saleForm.find(':input[name=uom]');
+            
+            slctUOM.html('');
+            // slctUOM.html($('<option>').val('').text('Select Measure'));
+
+            $.get(AJAX.baseUrl+'/admin/products/'+ slctdProduct +'/uom', {branch_id: slctdBranch }, function(response) {
+                $('span.alert-warning').remove();
+                if (response.length) {
+                    $.each(response, function(index, uom){
+                        slctUOM.append($('<option>').val(uom.name).text(uom.label));
+                    });
+                    
+                } else {
+                    $("<span class='alert alert-warning'>")
+                        .html('<a href="'+ AJAX.baseUrl +'/admin/products/'+ slctdProduct +'/edit">Click here</a> to setup pricing for this branch')
+                        .insertAfter(self);
+                }
+            });
+
+        }).trigger('change');
+
+
+        // Trigger qty to change price
+        uomField.on('change', function () {
+            saleForm.find(':input[name=quantity]').trigger('keyup');
+        })
+        branchField.on('change', function() {
+            saleForm.find(':input[name=product_id]').trigger('change');
+            saleForm.find(':input[name=quantity]').trigger('keyup');
+
+        });
         
     });
 

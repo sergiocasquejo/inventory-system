@@ -15,6 +15,7 @@ class CreateCreditsTable extends Migration {
 		Schema::create('credits', function($table){
 			$table->bigIncrements('credit_id')->unsigned();
 			$table->engine ='InnoDB';
+			$table->integer('branch_id')->unsigned();
 			$table->string('customer_name', 120);
 			$table->string('address', 120);
 			$table->string('contact_number', 30);
