@@ -42,7 +42,7 @@
                 <i class="icon-bar-chart"></i>
             </div>
             <div class="value">
-                <h1>{{{ \Helper::nf($earning->total_amount - $total_expense) }}}</h1>
+                <h1>{{{ \Helper::nf(!$earning?0:$earning->total_amount - $total_expense) }}}</h1>
                 <p>Total Profit</p>
             </div>
         </section>
@@ -59,51 +59,51 @@
         <div class="custom-bar-chart">
             <div class="bar">
                 <div class="title">JAN</div>
-                <div class="value tooltips" data-original-title="{{{ $earning->Total_Jan }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_Jan }}}%</div>
+                <div class="value tooltips" data-original-title="{{{ !$earning?0:$earning->Total_Jan }}}%" data-toggle="tooltip" data-placement="top">{{{ !$earning?0:$earning->Total_Jan }}}%</div>
             </div>
             <div class="bar doted">
                 <div class="title">FEB</div>
-                <div class="value tooltips" data-original-title="{{{ $earning->Total_Feb }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_Feb }}}%</div>
+                <div class="value tooltips" data-original-title="{{{ !$earning?0:$earning->Total_Feb }}}%" data-toggle="tooltip" data-placement="top">{{{ !$earning?0:$earning->Total_Feb }}}%</div>
             </div>
             <div class="bar ">
                 <div class="title">MAR</div>
-                <div class="value tooltips" data-original-title="{{{ $earning->Total_Mar }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_Mar }}}%</div>
+                <div class="value tooltips" data-original-title="{{{ !$earning?0:$earning->Total_Mar }}}%" data-toggle="tooltip" data-placement="top">{{{ !$earning?0:$earning->Total_Mar }}}%</div>
             </div>
             <div class="bar doted">
                 <div class="title">APR</div>
-                <div class="value tooltips" data-original-title="{{{ $earning->Total_Apr }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_Apr }}}%</div>
+                <div class="value tooltips" data-original-title="{{{ !$earning?0:$earning->Total_Apr }}}%" data-toggle="tooltip" data-placement="top">{{{ !$earning?0:$earning->Total_Apr }}}%</div>
             </div>
             <div class="bar">
                 <div class="title">MAY</div>
-                <div class="value tooltips" data-original-title="{{{ $earning->Total_May }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_May }}}%</div>
+                <div class="value tooltips" data-original-title="{{{ !$earning?0:$earning->Total_May }}}%" data-toggle="tooltip" data-placement="top">{{{ !$earning?0:$earning->Total_May }}}%</div>
             </div>
             <div class="bar doted">
                 <div class="title">JUN</div>
-                <div class="value tooltips" data-original-title="{{{ $earning->Total_Jun }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_Jun }}}%</div>
+                <div class="value tooltips" data-original-title="{{{ !$earning?0:$earning->Total_Jun }}}%" data-toggle="tooltip" data-placement="top">{{{ !$earning?0:$earning->Total_Jun }}}%</div>
             </div>
             <div class="bar">
                 <div class="title">JUL</div>
-                <div class="value tooltips" data-original-title="{{{ $earning->Total_Jul }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_Jul }}}%</div>
+                <div class="value tooltips" data-original-title="{{{ !$earning?0:$earning->Total_Jul }}}%" data-toggle="tooltip" data-placement="top">{{{ !$earning?0:$earning->Total_Jul }}}%</div>
             </div>
             <div class="bar doted">
                 <div class="title">AUG</div>
-                <div class="value tooltips" data-original-title="{{{ $earning->Total_Aug }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_Aug }}}%</div>
+                <div class="value tooltips" data-original-title="{{{ !$earning?0:$earning->Total_Aug }}}%" data-toggle="tooltip" data-placement="top">{{{ !$earning?0:$earning->Total_Aug }}}%</div>
             </div>
             <div class="bar ">
                 <div class="title">SEP</div>
-                <div class="value tooltips" data-original-title="{{{ $earning->Total_Sep }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_Sep }}}%</div>
+                <div class="value tooltips" data-original-title="{{{ !$earning?0:$earning->Total_Sep }}}%" data-toggle="tooltip" data-placement="top">{{{ !$earning?0:$earning->Total_Sep }}}%</div>
             </div>
             <div class="bar doted">
                 <div class="title">OCT</div>
-                <div class="value tooltips" data-original-title="{{{ $earning->Total_Oct }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_Oct }}}%</div>
+                <div class="value tooltips" data-original-title="{{{ !$earning?0:$earning->Total_Oct }}}%" data-toggle="tooltip" data-placement="top">{{{ !$earning?0:$earning->Total_Oct }}}%</div>
             </div>
             <div class="bar ">
                 <div class="title">NOV</div>
-                <div class="value tooltips" data-original-title="{{{ $earning->Total_Nov }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_Nov }}}%</div>
+                <div class="value tooltips" data-original-title="{{{ !$earning?0:$earning->Total_Nov }}}%" data-toggle="tooltip" data-placement="top">{{{ !$earning?0:$earning->Total_Nov }}}%</div>
             </div>
             <div class="bar doted">
                 <div class="title">DEC</div>
-                <div class="value tooltips" data-original-title="{{{ $earning->Total_Dec }}}%" data-toggle="tooltip" data-placement="top">{{{ $earning->Total_Dec }}}%</div>
+                <div class="value tooltips" data-original-title="{{{ !$earning?0:$earning->Total_Dec }}}%" data-toggle="tooltip" data-placement="top">{{{ !$earning?0:$earning->Total_Dec }}}%</div>
             </div>
         </div>
         <!--custom chart end-->

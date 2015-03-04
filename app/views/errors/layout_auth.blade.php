@@ -8,16 +8,16 @@
     <meta name="keyword" content="FlatLab, Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina">
     <link rel="shortcut icon" href="img/favicon.png">
 
-    <title>500</title>
+    <title>{{{ $code }}}</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="{{ assets('/admin/backend/css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ assets('/admin/backend/css/bootstrap-reset.css') }}" rel="stylesheet">
+    <link href="{{ asset('/assets/backend/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('/assets/backend/css/bootstrap-reset.css') }}" rel="stylesheet">
     <!--external css-->
-    <link href="{{ assets('/admin/backend/assets/font-awesome/css/font-awesome.css') }}" rel="stylesheet" />
+    <link href="{{ asset('/assets/backend/assets/font-awesome/css/font-awesome.css') }}" rel="stylesheet" />
     <!-- Custom styles for this template -->
-    <link href="{{ assets('/admin/backend/css/style.css') }}" rel="stylesheet">
-    <link href="{{ assets('/admin/backend/css/style-responsive.css') }}" rel="stylesheet" />
+    <link href="{{ asset('/assets/backend/css/style.css') }}" rel="stylesheet">
+    <link href="{{ asset('/assets/backend/css/style-responsive.css') }}" rel="stylesheet" />
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 tooltipss and media queries -->
     <!--[if lt IE 9]>
@@ -26,7 +26,7 @@
     <![endif]-->
 </head>
   <!-- body-500, body-404 -->
-  <body class="body-500">
+  <body class="body-{{{ $code }}}">
 
     <div class="container">
 
