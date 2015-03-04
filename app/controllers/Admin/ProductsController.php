@@ -16,7 +16,7 @@ class ProductsController extends \BaseController {
 		$products = \Product::withTrashed()
 		->join('product_pricing', 'products.id', '=', 'product_pricing.product_id')
 		->join('branches', 'branches.id', '=', 'product_pricing.branch_id')
-		->select('products.id', 'products.status', 'branches.name as branch_name', 'products.name', 'product_pricing.selling_price', 'product_pricing.per_unit')
+		->select('products.id', 'products.status', \DB::raw('CONCAT(sales_branches.name, "(", sales_branches.address, ")") as branch_name'), 'products.name', 'product_pricing.selling_price', 'product_pricing.per_unit')
 		->filter($input)
 		->orderBy('id', 'desc')
 		->paginate(intval(array_get($input, 'records_per_page', 10)));
@@ -29,7 +29,7 @@ class ProductsController extends \BaseController {
 		return \View::make('admin.product.index')
 			->with('products', $products)
 			->with('categories', array_add(\Category::all()->lists('name', 'category_id'), '', 'Select Category'))
-			->with('branches', array_add(\Branch::all()->lists('name', 'id'), '', 'Select Branch'))
+			->with('branches', array_add(\Branch::dropdown(), '', 'Select Branch'))
 			->with('appends', $appends)
 			->with('totalRows', $totalRows);
 	}
@@ -43,7 +43,7 @@ class ProductsController extends \BaseController {
 	public function create()
 	{
 		return \View::make('admin.product.create')
-		->with('brands', array_add(\Brand::all()->lists('name', 'brand_id'), 0, 'Select Brand'))
+		->with('brands', array_add(\Branch::dropdown(), '', 'Select Branch'))
 		->with('categories', array_add(\Category::all()->lists('name', 'category_id'), 0, 'Select Category'))
 		->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));
 	}
@@ -94,10 +94,11 @@ class ProductsController extends \BaseController {
 	{
 
 		$product = \Product::find($id);
-		
+
+
 		return \View::make('admin.product.edit')
 		->with('product', $product)
-		->with('branches', array_add(\Branch::nameWithAddress()->lists('name', 'id'), '', 'Select Branch'))
+		->with('branches', array_add(\Branch::dropdown(), '', 'Select Branch'))
 		->with('brands', array_add(\Brand::all()->lists('name', 'brand_id'), 0, 'Select Brand'))
 		->with('categories', array_add(\Category::all()->lists('name', 'category_id'), 0, 'Select Category'))
 		->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));

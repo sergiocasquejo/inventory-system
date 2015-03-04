@@ -10,7 +10,7 @@ class Branch extends Eloquent {
     
 	public static $rules = [
     	'name' 		=> 'required',
-    	'address'	=> 'required|min:5|unique:branches,name,NULL,id',
+    	'address'	=> 'required|unique:branches,name,NULL,id',
     	'city' 		=> 'required',
     	'post_code'	=> 'required',
     	'status'	=> 'required|in:0,1'
@@ -81,6 +81,10 @@ class Branch extends Eloquent {
         } 
 
         return $query;
+    }
+
+    public function scopeDropdown($query) {
+        return $query->select(\DB::raw('CONCAT(name," (",address,")") AS name'), 'id' )->lists('name', 'id');
     }
     
 

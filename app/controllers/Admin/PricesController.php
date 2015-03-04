@@ -35,10 +35,12 @@ class PricesController extends \BaseController {
 
 		$input['product_id'] = $product_id;
 
+		$per_unit = array_get($input, 'per_unit');
+
 		$rules = \ProductPricing::$rules;
-
-
-		$rules['branch_id'] = 'required|exists:branches,id|unique:product_pricing,price_id,NULL,price_id,product_id,'.$product_id;
+	
+		$rules['branch_id'] = 'required|exists:branches,id|unique:product_pricing,branch_id,NULL,price_id,product_id,'.$product_id.',per_unit,'.$per_unit;
+		
 
 		$validator = \Validator::make($input, $rules);
 
@@ -100,8 +102,11 @@ class PricesController extends \BaseController {
 
 		$rules = \ProductPricing::$rules;
 
-		$rules['branch_id'] = 'required|exists:branches,id|unique:product_pricing,price_id,'.$price_id.',price_id,product_id,'.$product_id;
+		$per_unit = array_get($input, 'per_unit');
+		
+		$rules = \ProductPricing::$rules;
 
+		$rules['branch_id'] = 'required|exists:branches,id|unique:product_pricing,branch_id,'.$price_id.',price_id,product_id,'.$product_id.',per_unit,'.$per_unit;
 
 		$validator = \Validator::make($input, $rules);
 

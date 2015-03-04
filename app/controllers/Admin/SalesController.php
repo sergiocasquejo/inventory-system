@@ -32,7 +32,7 @@ class SalesController extends \BaseController {
 
 
 		$branches = \DB::table('sales')->join('branches', 'sales.branch_id', '=', 'branches.id')
-					->select(\DB::raw('CONCAT(SUBSTRING(name, 1, 20),"...") AS name, id'));
+					->select(\DB::raw('CONCAT(name," (",address,")") AS name, id'));
 
 		$products = \DB::table('sales')
 					->join('products', 'sales.product_id', '=', 'products.id')
@@ -78,7 +78,7 @@ class SalesController extends \BaseController {
 	{
 
 		return \View::make('admin.sale.create')
-		->with('branches', \Branch::filterBranch()->active()->lists('name', 'id'))
+		->with('branches', \Branch::filterBranch()->dropdown())
 		->with('products', \Product::active()->lists('name', 'id'))
 		->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));
 	}
@@ -124,8 +124,11 @@ class SalesController extends \BaseController {
 					if (!$sale->doSave($sale, $input)) {			
 						$errors = $sale->errors();
 					} else {
+
 						$stock = \StockOnHand::where('product_id', array_get($input, 'product_id'))
-									->where('branch_id', array_get($input, 'branch_id'))->first();
+									->where('branch_id', array_get($input, 'branch_id'))
+									->where('uom', array_get($input, 'uom'))
+									->first();
 
 						$stock->total_stocks = $stock->total_stocks - array_get($input, 'quantity');
 						$stock->save();
@@ -202,6 +205,20 @@ class SalesController extends \BaseController {
 				$input['supplier_price'] = 	$sale->supplier_price;
 				$input['selling_price'] = 	$sale->selling_price;
 
+
+				$stock = \StockOnHand::where('product_id', array_get($input, 'product_id'))
+									->where('branch_id', array_get($input, 'branch_id'))
+									->where('uom', array_get($input, 'uom'))
+									->first();
+
+
+				if ($sale->quantity > array_get($input, 'quantity')) {
+						$stock->total_stocks = $stock->total_stocks +  ($sale->quantity - array_get($input, 'quantity'));
+						$stock->save();
+				} else if ($sale->quantity < array_get($input, 'quantity')) {
+					$stock->total_stocks = $stock->total_stocks -  (array_get($input, 'quantity') - $sale->quantity);
+					$stock->save();
+				}
 
 				if ($sale->doSave($sale, $input)) {
 					return \Redirect::route('admin_sales.index')->with('success', \Lang::get('agrivate.updated'));

@@ -204,7 +204,11 @@ var Script = function () {
                 $('span.alert-warning').remove();
                 if (response.length) {
                     $.each(response, function(index, uom){
-                        slctUOM.append($('<option>').val(uom.name).text(uom.label));
+                        var opt = $('<option>').val(uom.name).text(uom.label);
+                        if (uom.name == slctUOM.data('selected')) {
+                            opt.attr('selected', 'selected');
+                        }
+                        slctUOM.append(opt);
                     });
                     
                 } else {

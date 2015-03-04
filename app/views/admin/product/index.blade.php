@@ -54,7 +54,7 @@
                       @if ($products)
                           @foreach ($products as $product)
                           <tr>
-                              <td>{{{ $product->branch_name }}}</td>
+                              <td>{{{ $product->branch_name  }}}</td>
                               <td>{{{ $product->name }}}</td>
                               <td>{{{ \Helper::nf($product->selling_price).' '.$product->per_unit }}}</td>
                               <td>

@@ -68,8 +68,9 @@ class CategoriesController extends \BaseController {
 
 
 				if ($category->doSave($category, $input)) {
-					
-					$category->brands()->sync(array_get($input, 'brand'));
+					if (count(array_get($input, 'brand')) != 0) {
+						$category->brands()->sync(array_get($input, 'brand'));
+					}
 
 					return \Redirect::route('admin_categories.edit', $category->category_id)->with('success', \Lang::get('agrivate.created'));
 				}

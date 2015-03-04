@@ -30,14 +30,14 @@
 		      	<div class="form-group">
 				  <label class="col-sm-2 control-label">Unit of measure</label>
 				  <div class="col-sm-10">
-				      {{ Form::select('uom', $measures, Input::old('uom', $sale->uom), ['class' => 'form-control m-bot15']) }}
+				      {{ Form::select('uom', $measures, Input::old('uom', $sale->uom), ['class' => 'form-control m-bot15', 'data-selected' => $sale->uom]) }}
 				  </div>
 				</div>
 
 		      	<div class="form-group">
 				  <label class="col-sm-2 control-label">Quantity</label>
 				  <div class="col-sm-10">
-				      <input type="number" name="quantity" value="{{ Input::old('quantity', $sale->quantity) }}" class="form-control">
+				      <input type="number" step="any"  name="quantity" value="{{ Input::old('quantity', $sale->quantity) }}" class="form-control">
 				  </div>
 				</div>
 
@@ -46,7 +46,7 @@
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Total Amount</label>
 				  <div class="col-sm-10">
-				      <input type="number" name="total_amount" value="{{ Input::old('total_amount', $sale->total_amount) }}" class="form-control">
+				      <input type="number" name="total_amount" value="{{ Input::old('total_amount', $sale->total_amount) }}" class="form-control" readonly>
 				  </div>
 				</div>
 

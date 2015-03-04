@@ -10,7 +10,7 @@ class Product extends Eloquent {
 
 	public static $rules = [
     	'name'	           => 'required|min:5|unique:products,name',
-    	'description'	   => 'required',
+    	// 'description'	   => 'required',
     	'encoded_by' 	   => 'required|exists:users,id',
         'uom'               => 'required|exists:unit_of_measures,name',
     	'status'	       => 'required|in:0,1'

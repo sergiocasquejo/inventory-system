@@ -25,6 +25,7 @@
                   <table class="table table-striped table-advance table-hover">
                       <thead>
                         <tr>
+                            <th>BRANCH</th>
                             <th>PRODUCT NAME</th>
                             <th>STOCKS</th>
                         </tr>
@@ -33,8 +34,9 @@
                         @if ($stocks)
                           @foreach ($stocks as $stock)
                           <tr>
-                              <td>{{{ $stock->product->name }}}</td>
-                              <td>{{{ \Helper::nf($stock->total_stocks).' '.$stock->uom }}}</td>
+                              <td>{{{ $stock['branch'] }}}</td>
+                              <td>{{{ $stock['product_name'] }}}</td>
+                              <td>{{{ $stock['stocks'] }}}</td>
                           </tr>
                           @endforeach
                        @endif
