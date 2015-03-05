@@ -25,7 +25,12 @@
 		          </div>
 		      	</div>
 
-
+		      	<div class="form-group">
+		          <label class="col-sm-2 control-label">Use Decimal Places?</label>
+		          <div class="col-sm-10">
+		              <input type="checkbox" name="is_decimal" value="{{ Input::old('is_decimal', $uom->is_decimal) }}" {{ Input::old('is_decimal', $uom->is_decimal) == 1 ? 'checked="checked"' : '' }}  />
+		          </div>
+		      	</div>
 
 				<button type="submit" class="btn btn-shadow btn-primary">Update</button>
 		  </form>

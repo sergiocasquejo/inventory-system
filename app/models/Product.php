@@ -107,7 +107,7 @@ class Product extends Eloquent {
 		$instance->encoded_by = array_get($input, 'encoded_by');
         $instance->brand_id = array_get($input, 'brand_id');
         $instance->category_id = array_get($input, 'category_id');
-        $instance->uom = array_get($input, 'uom');
+        $instance->uom = json_encode(array_get($input, 'uom'));
         
 		
 		$instance->save();

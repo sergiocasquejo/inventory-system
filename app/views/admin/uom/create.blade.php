@@ -23,6 +23,13 @@
 		              <input type="text" name="label" maxlength="255" class="form-control" value="{{ Input::old('label') }}" />
 		          </div>
 		      	</div>
+
+		      	<div class="form-group">
+		          <label class="col-sm-2 control-label">Use Decimal Places?</label>
+		          <div class="col-sm-10">
+		              <input type="checkbox" name="is_decimal" value="{{ Input::old('is_decimal') }}" {{ Input::old('is_decimal', 0) == 1 ? 'checked="checked"' : '' }}  />
+		          </div>
+		      	</div>
 				<button type="submit" class="btn btn-shadow btn-primary">Create</button>
 		  </form>
 		</div>

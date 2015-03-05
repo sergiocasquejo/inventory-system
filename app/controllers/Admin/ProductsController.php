@@ -14,8 +14,8 @@ class ProductsController extends \BaseController {
 
 
 		$products = \Product::withTrashed()
-		->join('product_pricing', 'products.id', '=', 'product_pricing.product_id')
-		->join('branches', 'branches.id', '=', 'product_pricing.branch_id')
+		->leftJoin('product_pricing', 'products.id', '=', 'product_pricing.product_id')
+		->leftJoin('branches', 'branches.id', '=', 'product_pricing.branch_id')
 		->select('products.id', 'products.status', \DB::raw('CONCAT(sales_branches.name, "(", sales_branches.address, ")") as branch_name'), 'products.name', 'product_pricing.selling_price', 'product_pricing.per_unit')
 		->filter($input)
 		->orderBy('product_id', 'desc')
@@ -45,7 +45,7 @@ class ProductsController extends \BaseController {
 		return \View::make('admin.product.create')
 		->with('brands', array_add(\Branch::dropdown(), '', 'Select Branch'))
 		->with('categories', array_add(\Category::all()->lists('name', 'category_id'), 0, 'Select Category'))
-		->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));
+		->with('measures', \UnitOfMeasure::all()->lists('label', 'name'));
 	}
 
 
@@ -95,13 +95,19 @@ class ProductsController extends \BaseController {
 
 		$product = \Product::find($id);
 
+		$uoms = implode("','", json_decode($product->uom));
+
+		$measures = \UnitOfMeasure::whereRaw("name IN ('$uoms')")->lists('label', 'name');
+
+
 
 		return \View::make('admin.product.edit')
 		->with('product', $product)
 		->with('branches', array_add(\Branch::dropdown(), '', 'Select Branch'))
 		->with('brands', array_add(\Brand::all()->lists('name', 'brand_id'), 0, 'Select Brand'))
 		->with('categories', array_add(\Category::all()->lists('name', 'category_id'), 0, 'Select Category'))
-		->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));
+		->with('dd_measures', array_add($measures, '', 'Select Measure'))
+		->with('measures', \UnitOfMeasure::all()->lists('label', 'name'));
 	}
 
 

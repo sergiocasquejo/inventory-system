@@ -37,9 +37,14 @@
 					  </div>
 					</div>
 					<div class="form-group">
-					  <label class="col-sm-2 control-label">Unit of Measure</label>
+					  <label class="col-sm-2 control-label">Unit of Measures</label>
 					  <div class="col-sm-10">
-					      {{ Form::select('uom', $measures, Input::old('uom'), ['class' => 'form-control m-bot15']) }}
+					  		@if ($measures)
+					  			@foreach ($measures as $key => $value)
+					  				<input type="checkbox" name="uom[]" value="{{ $key }}" 
+					  				{{ in_array( $key, Input::old('uom[]', []) ) ? 'checked="checked"' : '' }} /> {{ $value }}
+					  			@endforeach
+					  		@endif
 					  </div>
 					</div>
 					<div class="form-group">

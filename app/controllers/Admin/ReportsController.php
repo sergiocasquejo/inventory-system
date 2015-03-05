@@ -50,6 +50,11 @@ class ReportsController extends \BaseController {
 
 	public function stocks() {
 		$input = \Input::all();
+
+
+
+		// $stocks = \DB::select(\DB::raw(''))
+
 		$stocks = \StockOnHand::filter($input)->orderBy('branch_id', 'asc')->get();
 
 		$newStocks = [];

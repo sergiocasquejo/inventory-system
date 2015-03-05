@@ -55,9 +55,14 @@
 						  </div>
 						</div>
 						<div class="form-group">
-						  <label class="col-sm-2 control-label">Unit of Measure</label>
-						  <div class="col-sm-10">
-						      {{ Form::select('uom', $measures, Input::old('uom', $product->uom), ['class' => 'form-control m-bot15']) }}
+						  <label class="col-sm-2 control-label">Description</label>
+						<div class="col-sm-10">
+						  		@if ($measures)
+						  			@foreach ($measures as $key => $value)
+						  				<input type="checkbox" name="uom[]" value="{{ $key }}" 
+						  				{{ in_array( $key, Input::old('uom[]', (array)json_decode($product->uom)) ) ? 'checked="checked"' : '' }} /> {{ $value }}
+						  			@endforeach
+						  		@endif
 						  </div>
 						</div>
 
@@ -86,7 +91,7 @@
 								<input type="number" step="any"  name="total_stocks" min="0" placeholder="Stocks" value="{{ Input::old('total_stocks') }}" class="form-control">
 							</div>
 							<div class="col-sm-2">
-								{{ Form::select('uom', $measures, Input::old('uom', $product->uom), ['class' => 'form-control m-bot15']) }}
+								{{ Form::select('uom', $dd_measures, Input::old('uom', $product->uom), ['class' => 'form-control m-bot15']) }}
 							</div>
 							<div class="col-sm-4">
 								{{ Form::select('branch_id', $branches, Input::old('branch_id'), ['class' => 'form-control m-bot15']) }}
@@ -144,7 +149,7 @@
 								<input type="number" step="any"  name="price" min="0" placeholder="Selling Price" value="{{ Input::old('price') }}" class="form-control">
 							</div>
 							<div class="col-sm-2">
-								{{ Form::select('per_unit', $measures, Input::old('per_unit', $product->uom), ['class' => 'form-control m-bot15']) }}
+								{{ Form::select('per_unit', $dd_measures, Input::old('per_unit', $product->uom), ['class' => 'form-control m-bot15']) }}
 							</div>
 							<div class="col-sm-4">
 								{{ Form::select('branch_id', $branches, Input::old('branch_id'), ['class' => 'form-control m-bot15']) }}

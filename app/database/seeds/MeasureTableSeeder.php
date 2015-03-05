@@ -9,7 +9,7 @@ class MeasureTableSeeder extends Seeder {
 				['name' => 'kg', 'label' => 'Kilogram'],
 				['name' => 'pack', 'label' => 'Pack'],
 				['name' => 'pcs', 'label' => 'Pieces'],
-				['name' => 'sack', 'label' => 'Sack(s)'],
+				['name' => 'sacks', 'label' => 'Sacks'],
 				['name' => 'gram', 'label' => 'Gram(s)'],
 				['name' => 'bottle', 'label' => 'Bottle'],
 				['name' => 'ml', 'label' => 'Milliliter'],

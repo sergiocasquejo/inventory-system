@@ -33,13 +33,41 @@ class StockOnHandController extends \BaseController {
 	{
 		$input = \Input::all();
 
-		
+		$stock = new \StockOnHand;
 
 		$input['product_id'] = $product_id;
+		$branch_id = array_get($input, 'branch_id');
+
+		// Do conversion sacks to kilogram
+		$uomInput = array_get($input, 'uom');
+		if ($uomInput == 'sacks') {
+			
+			$equi_config = \Config::get('agrivate.equivalent_measure.sacks');
+			$input['uom'] = $equi_config['to'];
+			$total_stocks = array_get($input, 'total_stocks', 0) * $equi_config['per'];
+
+
+			// Get user branch
+			$branch_id = array_get($input, 'branch_id');
+			$uom = array_get($input, 'uom');
+			$product = array_get($input, 'product_id');
+			$stock = \StockOnHand::whereRaw("branch_id = {$branch_id} AND product_id = {$product_id}  AND per_unit = 'kg'")->first();
+
+			$input['total_stocks'] = $stock->total_stocks + $total_stocks;
+
+		}
+
+
+
+		
 
 		$uom = array_get($input, 'uom');
 		
 		$rules = \StockOnHand::$rules;
+
+		
+
+
 
 		$rules['branch_id'] = 'required|exists:branches,id|unique:stocks_on_hand,branch_id,NULL,stock_on_hand_id,product_id,'.$product_id.',uom,'.$uom;
 
@@ -51,7 +79,7 @@ class StockOnHandController extends \BaseController {
 			return \Response::json(['errors' => $validator->errors()]);
 		} else {
 			try {
-				$stock = new \StockOnHand;
+				
 				if ($stock->doSave($stock, $input)) {
 
 					return \Response::json(['success' => \Lang::get('agrivate.created')]);

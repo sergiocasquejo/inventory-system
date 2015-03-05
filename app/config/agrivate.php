@@ -1,6 +1,8 @@
 <?php
 
 return [
+	// 1 sack is equivalent to 50 kilogram
+	'equivalent_measure' => ['sacks' => ['to' => 'kg', 'per' => 50]]
 	'avatar' => [
 		'sizes' => [
 				'thumbnail' => [30, 30],
