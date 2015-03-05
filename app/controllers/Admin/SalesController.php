@@ -106,32 +106,45 @@ class SalesController extends \BaseController {
 
 				$errors = [];
 
-				\DB::transaction(function() use($input, $errors) {
+				\DB::transaction(function() use($input, &$errors) {
 					
+
 					// Get user branch
 					$branch_id = array_get($input, 'branch_id');
 					$uom = array_get($input, 'uom');
 					$product = array_get($input, 'product_id');
 
-					$branch = \ProductPricing::whereRaw("branch_id = {$branch_id} AND product_id = {$product}  AND per_unit = '{$uom}'")->first();
 
-					$input['supplier_price'] = 	$branch->supplier_price;
-					$input['selling_price'] = 	$branch->selling_price;
-
-
-					$sale = new \Sale;
-
-					if (!$sale->doSave($sale, $input)) {			
-						$errors = $sale->errors();
-					} else {
-
-						$stock = \StockOnHand::where('product_id', array_get($input, 'product_id'))
-									->where('branch_id', array_get($input, 'branch_id'))
-									->where('uom', array_get($input, 'uom'))
+					$stock = \StockOnHand::where('product_id', $product)
+									->where('branch_id', $branch_id)
+									->where('uom', $uom)
 									->first();
 
-						$stock->total_stocks = $stock->total_stocks - array_get($input, 'quantity');
-						$stock->save();
+		
+					if ($stock->total_stocks > 0) {
+
+						if ($stock->total_stocks >= array_get($input, 'quantity', 0)) {
+							$branch = \ProductPricing::whereRaw("branch_id = {$branch_id} AND product_id = {$product}  AND per_unit = '{$uom}'")->first();
+
+							$input['supplier_price'] = 	$branch->supplier_price;
+							$input['selling_price'] = 	$branch->selling_price;
+
+
+							$sale = new \Sale;
+
+							if (!$sale->doSave($sale, $input)) {			
+								$errors = $sale->errors();
+							} else {
+								$stock->total_stocks = $stock->total_stocks - array_get($input, 'quantity');
+								$stock->save();
+							}
+						} else {
+							$errors = [\Lang::get('agrivate.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
+						}
+
+					} else {
+						$errors = [\Lang::get('agrivate.errors.out_of_stocks')];
+
 					}
 				});
 				
@@ -198,30 +211,69 @@ class SalesController extends \BaseController {
 			return \Redirect::back()->withErrors($validator->errors())->withInput();
 		} else {
 			try {
-				$sale = \Sale::findOrFail($id);
-				
-				// Get user branch
-
-				$input['supplier_price'] = 	$sale->supplier_price;
-				$input['selling_price'] = 	$sale->selling_price;
 
 
-				$stock = \StockOnHand::where('product_id', array_get($input, 'product_id'))
-									->where('branch_id', array_get($input, 'branch_id'))
-									->where('uom', array_get($input, 'uom'))
+
+				$errors = [];
+
+				\DB::transaction(function() use($input,$id, &$errors) {
+					
+
+					// Get user branch
+					$branch_id = array_get($input, 'branch_id');
+					$uom = array_get($input, 'uom');
+					$product = array_get($input, 'product_id');
+
+					$quantity = array_get($input, 'quantity', 0);
+
+					$stock = \StockOnHand::where('product_id', $product)
+									->where('branch_id', $branch_id)
+									->where('uom', $uom)
 									->first();
 
+					$branch = \ProductPricing::whereRaw("branch_id = {$branch_id} AND product_id = {$product}  AND per_unit = '{$uom}'")->first();
 
-				if ($sale->quantity > array_get($input, 'quantity')) {
-						$stock->total_stocks = $stock->total_stocks +  ($sale->quantity - array_get($input, 'quantity'));
+					$input['supplier_price'] = 	$branch->supplier_price;
+					$input['selling_price'] = 	$branch->selling_price;
+
+
+					$sale = \Sale::findOrFail($id);
+
+					if ($sale->quantity > $quantity) {
+							$stock->total_stocks = $stock->total_stocks +  ($sale->quantity - array_get($input, 'quantity'));
+							$stock->save();
+					} else if ($sale->quantity < $quantity) {
+						
+						$total = $stock->total_stocks -  ($quantity - $sale->quantity);
+
+
+						// Check if stock is insufficient
+						if ($total < 0) {
+							$errors = [\Lang::get('agrivate.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
+							return;
+						}
+
+						$stock->total_stocks = $total;
+
 						$stock->save();
-				} else if ($sale->quantity < array_get($input, 'quantity')) {
-					$stock->total_stocks = $stock->total_stocks -  (array_get($input, 'quantity') - $sale->quantity);
-					$stock->save();
-				}
 
-				if ($sale->doSave($sale, $input)) {
-					return \Redirect::route('admin_sales.index')->with('success', \Lang::get('agrivate.updated'));
+					}
+
+
+					if (!$sale->doSave($sale, $input)) {			
+						$errors = $sale->errors();
+					} else {
+						$stock->total_stocks = $stock->total_stocks - $quantity;
+						$stock->save();
+					}
+
+				});
+				
+
+				if (count($errors) == 0) {
+					return \Redirect::route('admin_sales.index')->with('success', \Lang::get('agrivate.created'));
+				} else {
+					return \Redirect::back()->withErrors($errors)->withInput();
 				}
 
 				return \Redirect::back()->withErrors($sale->errors())->withInput();

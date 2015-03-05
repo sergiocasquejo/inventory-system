@@ -15,6 +15,8 @@ return [
 	'errors' => [
 		'permission' => 'You dont have permission to access the page!',
 		'delete_owner_permission' => 'You can\'t delete owner!',
-		'restore' => 'Restore in order to edit'
+		'restore' => 'Restore in order to edit',
+		'out_of_stocks' => 'Out of Stocks',
+		'insufficient_stocks' => 'Insufficient Stocks, only :stocks of stocks available'
 	]
 ];
