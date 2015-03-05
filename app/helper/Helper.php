@@ -2,6 +2,8 @@
 
 class Helper {
 
+	private static $str = '';
+
 	/**
 	 * Format date
 	 *@param $date - The date, $format - The expected date format
@@ -116,5 +118,23 @@ class Helper {
 	    foreach ($arr as $segment) {
 	    	echo $segment;
 	    }
+	}
+
+	/**
+	 * DONT REPEAT YOUR SELF
+	 *
+	 * @param FLOAT $price - Price
+	 * STRING $dp - decimal separator
+	 * STRING $ts - Thousand separator
+	 * @return STRING  - Formatted price
+	 */
+
+	public static function drus($name) {
+		if ($name == static::$str) {
+			return '....';
+		} else {
+			static::$str = $name;
+			return static::$str;
+		}
 	}
 }

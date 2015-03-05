@@ -55,7 +55,7 @@
                           @foreach ($products as $product)
                           <tr>
                               <td>{{{ $product->branch_name  }}}</td>
-                              <td>{{{ $product->name }}}</td>
+                              <td>{{{ \Helper::drus($product->name) }}}</td>
                               <td>{{{ \Helper::nf($product->selling_price).' '.$product->per_unit }}}</td>
                               <td>
                                   <span class="label label-{{{ $product->status ? 'success' : 'warning' }}} label-mini">

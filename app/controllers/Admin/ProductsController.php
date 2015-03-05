@@ -18,7 +18,7 @@ class ProductsController extends \BaseController {
 		->join('branches', 'branches.id', '=', 'product_pricing.branch_id')
 		->select('products.id', 'products.status', \DB::raw('CONCAT(sales_branches.name, "(", sales_branches.address, ")") as branch_name'), 'products.name', 'product_pricing.selling_price', 'product_pricing.per_unit')
 		->filter($input)
-		->orderBy('branch_id', 'desc')
+		->orderBy('product_id', 'desc')
 		->paginate(intval(array_get($input, 'records_per_page', 10)));
 
 		$totalRows = \Product::withTrashed()->count();
