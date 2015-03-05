@@ -2,7 +2,8 @@
 
 return [
 	// 1 sack is equivalent to 50 kilogram
-	'equivalent_measure' => ['sacks' => ['to' => 'kg', 'per' => 50]]
+	'equivalent_measure' => ['sacks' => ['to' => 'kg', 'per' => 50]],
+	
 	'avatar' => [
 		'sizes' => [
 				'thumbnail' => [30, 30],
@@ -25,7 +26,7 @@ return [
 			'kg' 		=> 'Kilogram',
 			'pack'		=> 'Pack',
 			'pcs' 		=> 'Pieces',
-			'sack' 		=> 'Sack(s)',
+			'sacks' 		=> 'Sack(s)',
 			'gram' 		=> 'Gram(s)',
 			'bottle' 	=> 'Bottle', 
 			'ml'		=> 'Milliliter'
