@@ -24,7 +24,6 @@ class SalesController extends \BaseController {
 		$countries = \Config::get('agrivate.countries');
 
 
-
 		$yearly = \Sale::filterBranch()->whereRaw('YEAR(date_of_sale) = YEAR(CURDATE())')->sum('total_amount');
 		$monthly = \Sale::filterBranch()->whereRaw('MONTH(date_of_sale) = MONTH(CURDATE())')->sum('total_amount');
 		$weekly = \Sale::filterBranch()->whereRaw('WEEK(date_of_sale) = WEEK(CURDATE())')->sum('total_amount');

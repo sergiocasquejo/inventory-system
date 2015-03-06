@@ -62,7 +62,7 @@
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Date of expense</label>
 				  <div class="col-sm-10">
-				      <input type="text" name="date_of_expense" class="form-control datepicker" value="{{ Input::old('date_of_expense', date('m-d-Y')) }}" />
+				      <input type="text" name="date_of_expense" class="form-control datepicker" value="{{ Input::old('date_of_expense', date('Y-m-d')) }}" />
 				  </div>
 				</div>
 				<button type="submit" class="btn btn-shadow btn-primary">Create</button>

@@ -61,7 +61,7 @@
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Date of sale</label>
 				  <div class="col-sm-10">
-				      <input type="text" name="date_of_sale" value="{{ Input::old('date_of_sale', date('m-d-Y')) }}" class="form-control datepicker">
+				      <input type="text" name="date_of_sale" value="{{ Input::old('date_of_sale', date('Y-m-d')) }}" class="form-control datepicker">
 				  </div>
 				</div>
 				

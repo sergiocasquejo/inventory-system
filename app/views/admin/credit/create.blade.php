@@ -80,7 +80,7 @@
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Date of credit</label>
 				  <div class="col-sm-10">
-				      <input type="text" name="date_of_credit" value="{{ Input::old('date_of_credit', date('m-d-Y')) }}" class="form-control datepicker">
+				      <input type="text" name="date_of_credit" value="{{ Input::old('date_of_credit', date('Y-m-d')) }}" class="form-control datepicker">
 				  </div>
 				</div>
 				
