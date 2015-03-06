@@ -44,8 +44,7 @@
                       <tr>
                           <th>BRANCH</th>
                           <th>PRODUCT NAME</th>
-                          <th>SELLING PRICE PER KILO/BTL/PCK/PCS</th>
-                          <th>SELLING PRICE PER SACKS</th>
+                          <th>SELLING PRICE PER KILO/BTL/PCK/PCS/SACKS</th>
                           <th>STATUS</th>
                           <th></th>
                       </tr>
@@ -57,8 +56,7 @@
                           <tr>
                               <td>{{{ $product->branch_name  }}}</td>
                               <td>{{{ \Helper::drus($product->name) }}}</td>
-                              <td>{{{ $product->other }}}</td>
-                              <td>{{{ $product->sacks }}}</td>
+                              <td>{{{ str_replace(',', ' and ', $product->selling_price) }}}</td>
                               <td>
                                   <span class="label label-{{{ $product->status ? 'success' : 'warning' }}} label-mini">
                                       {{{ $product->status ? 'Active' : 'Inactive' }}}

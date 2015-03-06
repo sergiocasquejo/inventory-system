@@ -15,27 +15,24 @@ class ProductsController extends \BaseController {
 		$px = \DB::getTablePrefix();
 
 		$products = \Product::withTrashed()->select(
-			"products.id", "products.status", "branches.name as branch_name", "products.name",
-			\DB::raw(
-				"CONCAT(SUM(IF({$px}product_pricing.per_unit ='sacks', {$px}product_pricing.selling_price, NULL  )), ' ', 'sacks') as sacks"
+					"products.id", "products.status", "branches.name as branch_name", "products.name",
+					\DB::raw("GROUP_CONCAT('P', selling_price, '/', per_unit) as selling_price")
+				)
+			/*\DB::raw(
+				"CONCAT(TRUNCATE(SUM(IF({$px}product_pricing.per_unit ='sacks', {$px}product_pricing.selling_price, NULL  )), 0), ' ', 'sacks') as sacks"
 			),
 			\DB::raw(
-				"CONCAT(IF({$px}product_pricing.per_unit = 'sacks', SUM({$px}product_pricing.selling_price) - SUM(IF({$px}product_pricing.per_unit ='sacks', {$px}product_pricing.selling_price, NULL  )), SUM({$px}product_pricing.selling_price)  ), ' ', {$px}product_pricing.per_unit) as other")
-			)
+				"CONCAT(IF({$px}product_pricing.per_unit = 'sacks', SUM({$px}product_pricing.selling_price) - SUM(IF({$px}product_pricing.per_unit ='sacks', {$px}product_pricing.selling_price, NULL  )), SUM({$px}product_pricing.selling_price)  ), ' ', IF ({$px}product_pricing.per_unit = 'sacks', 'kg', {$px}product_pricing.per_unit )) as other")
+			)*/
 			->filter($input)
 			->join('product_pricing', 'products.id', '=', 'product_pricing.product_id')
 			->join('branches', 'product_pricing.branch_id', '=', 'branches.id')
-			->groupBy('product_pricing.product_id')
+			->groupBy('products.id')
 			->paginate(intval(array_get($input, 'records_per_page', 10)));
 
 
-// 		$products = \DB::select(\DB::raw("SELECT a.product_id, c.status, b.name as branch_name, c.name,
-// CONCAT(SUM(IF(a.per_unit ='sacks', a.selling_price, NULL  )), ' ', 'sacks') as sacks,
-// CONCAT(IF(a.per_unit = 'sacks', SUM(a.selling_price) - SUM(IF(a.per_unit ='sacks', a.selling_price, NULL  )), SUM(a.selling_price)  ), ' ', per_unit) as other
-// FROM `sales_product_pricing` a JOIN sales_branches b ON a.branch_id = b.id 
-// JOIN sales_products as c ON a.product_id = c.id
-// GROUP BY a.product_id"));//->paginate(intval(array_get($input, 'records_per_page', 10)));
 
+			
 
 		/*$products = \Product::withTrashed()
 		->leftJoin('product_pricing', 'products.id', '=', 'product_pricing.product_id')
