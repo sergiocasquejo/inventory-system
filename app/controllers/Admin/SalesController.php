@@ -137,6 +137,7 @@ class SalesController extends \BaseController {
 
 							$input['supplier_price'] = 	$branch->supplier_price;
 							$input['selling_price'] = 	$branch->selling_price;
+							$input['total_amount'] = 	$branch->selling_price * $input['quantity'];
 
 
 							$sale = new \Sale;
@@ -236,8 +237,14 @@ class SalesController extends \BaseController {
 					$branch_id = array_get($input, 'branch_id');
 					$uom = array_get($input, 'uom');
 					$product = array_get($input, 'product_id');
-
 					$quantity = array_get($input, 'quantity', 0);
+
+					// Convert sack to kg
+					if ($uom == 'sacks') {
+						$oldMeasure = $input['uom'];
+						$input['quantity'] = $quantity * \Config::get('agrivate.equivalent_measure.sacks.per');
+						$input['uom'] = $uom = 'kg';
+					}
 
 					$stock = \StockOnHand::where('product_id', $product)
 									->where('branch_id', $branch_id)
@@ -272,7 +279,7 @@ class SalesController extends \BaseController {
 
 					}
 
-
+					$input['total_amount'] = 	$branch->selling_price * $input['quantity'];
 					if (!$sale->doSave($sale, $input)) {			
 						$errors = $sale->errors();
 					} else {
