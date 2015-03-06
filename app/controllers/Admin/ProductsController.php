@@ -236,7 +236,7 @@ class ProductsController extends \BaseController {
 		$branch = \Input::get('branch_id');
 
 		$uoms = \ProductPricing::whereRaw(\DB::raw('product_id = '.$id))
-			->join('unit_of_measures', '{$px}product_pricing.per_unit', '=', 'unit_of_measures.name')
+			->join('unit_of_measures', 'product_pricing.per_unit', '=', 'unit_of_measures.name')
 			->groupBy('unit_of_measures.uom_id')
 			->select('name', 'label');
 

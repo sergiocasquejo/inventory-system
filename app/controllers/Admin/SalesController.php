@@ -106,13 +106,20 @@ class SalesController extends \BaseController {
 
 				$errors = [];
 
-				\DB::transaction(function() use($input, &$errors) {
+				\DB::transaction(function() use(&$input, &$errors) {
 					
 
 					// Get user branch
 					$branch_id = array_get($input, 'branch_id');
 					$uom = array_get($input, 'uom');
 					$product = array_get($input, 'product_id');
+					$quantity = array_get($input, 'quantity');
+
+					// Convert sack to kg
+					if ($uom == 'sacks') {
+						$input['quantity'] = $quantity * \Config::get('agrivate.equivalent_measure.sacks.per');
+						$input['uom'] = $uom = 'kg';
+					}
 
 
 					$stock = \StockOnHand::where('product_id', $product)
@@ -121,7 +128,7 @@ class SalesController extends \BaseController {
 									->first();
 
 		
-					if ($stock->total_stocks > 0) {
+					if ($stock && $stock->total_stocks > 0) {
 
 						if ($stock->total_stocks >= array_get($input, 'quantity', 0)) {
 							$branch = \ProductPricing::whereRaw("branch_id = {$branch_id} AND product_id = {$product}  AND per_unit = '{$uom}'")->first();
@@ -152,13 +159,13 @@ class SalesController extends \BaseController {
 				if (count($errors) == 0) {
 					return \Redirect::route('admin_sales.index')->with('success', \Lang::get('agrivate.created'));
 				} else {
-					return \Redirect::back()->withErrors($errors)->withInput();
+					return \Redirect::back()->withErrors($errors)->withInput($input);
 				}
 
 
 				
 			} catch(\Exception $e) {
-				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
+				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput($input);
 			}
 		}
 	}
