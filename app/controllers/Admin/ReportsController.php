@@ -84,14 +84,14 @@ class ReportsController extends \BaseController {
 				$quantity = (float)$stock->total_stocks / (float)$sackEqui;
 
 				$total_stocks = '';
-				
+
 				if ($stock->total_stocks  >= $sackEqui) {
 					$sack = floor( $quantity );
 					$total_stocks = $sackStr = $sack .' sacks';
 				}
 
 				
-				$kg = ($quantity - $sack) * $sackEqui; // results in 0.75
+				$kg = ($quantity - $sack) * $sackEqui;
 
 
 				if ($kg != 0) {
