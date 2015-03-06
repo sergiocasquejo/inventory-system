@@ -12,7 +12,7 @@ class User extends Eloquent implements ConfideUserInterface {
 	 use SoftDeletingTrait;
 
 	public static $rules = [
-		'username' => 'required|min:5',
+		'username' => 'required|alpha_dash|min:5',
 		'email' => 'required|email|unique:users,email',
 		'password' => 'required|alpha_dash',
 		'confirm_password' => 'same:password|alpha_dash',
@@ -79,17 +79,24 @@ class User extends Eloquent implements ConfideUserInterface {
 
     	$instance->username = array_get($input, 'username');
     	$instance->email = array_get($input, 'email');
+
+
+        if (array_get($input, 'confirm_password') != '' &&  array_get($input, 'password') != '') {
+            $instance->password = array_get($input, 'password');
+            $instance->password_confirmation = array_get($input, 'confirm_password');
+        }    	
+        
     	
-    	$instance->password = array_get($input, 'password');
 
         // The password confirmation will be removed from model
         // before saving. This field will be used in Ardent's
         // auto validation.
-        $instance->password_confirmation = array_get($input, 'confirm_password');
+        
 
     	// if (array_get($input, 'password_confirmed') != '') {
     	// 	$instance->password = \Hash::make(array_get($input, 'password_confirmed'));
     	// }
+
 
     	$instance->display_name = array_get($input, 'display_name');
     	$instance->first_name = array_get($input, 'first_name');
@@ -100,6 +107,7 @@ class User extends Eloquent implements ConfideUserInterface {
     	$instance->branch_id = array_get($input, 'branch_id');
 
     	$instance->save();
+
 
     	return $instance;
     }

@@ -93,6 +93,7 @@ class SalesController extends \BaseController {
 	{
 		$input = \Input::all();
 
+
 		$rules = \Sale::$rules;
 
 		$input['encoded_by'] = \Confide::user()->id;
@@ -117,6 +118,7 @@ class SalesController extends \BaseController {
 
 					// Convert sack to kg
 					if ($uom == 'sacks') {
+						$oldMeasure = $input['uom'];
 						$input['quantity'] = $quantity * \Config::get('agrivate.equivalent_measure.sacks.per');
 						$input['uom'] = $uom = 'kg';
 					}
@@ -146,10 +148,12 @@ class SalesController extends \BaseController {
 								$stock->save();
 							}
 						} else {
+							if ($oldMeasure == 'sacks') $input['uom'] = $oldMeasure;
 							$errors = [\Lang::get('agrivate.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
 						}
 
 					} else {
+						if ($oldMeasure == 'sacks') $input['uom'] = $oldMeasure;
 						$errors = [\Lang::get('agrivate.errors.out_of_stocks')];
 
 					}
@@ -209,6 +213,8 @@ class SalesController extends \BaseController {
 
 		$input = \Input::all();
 
+
+
 		$rules = \Sale::$rules;
 		$input['encoded_by'] = \Confide::user()->id;
 
@@ -223,7 +229,7 @@ class SalesController extends \BaseController {
 
 				$errors = [];
 
-				\DB::transaction(function() use($input,$id, &$errors) {
+				\DB::transaction(function() use(&$input,$id, &$errors) {
 					
 
 					// Get user branch
@@ -280,12 +286,12 @@ class SalesController extends \BaseController {
 				if (count($errors) == 0) {
 					return \Redirect::route('admin_sales.index')->with('success', \Lang::get('agrivate.created'));
 				} else {
-					return \Redirect::back()->withErrors($errors)->withInput();
+					return \Redirect::back()->withErrors($errors)->withInput($input);
 				}
 
 				return \Redirect::back()->withErrors($sale->errors())->withInput();
 			} catch(\Exception $e) {
-				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
+				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput($input);
 			}
 		}
 	}

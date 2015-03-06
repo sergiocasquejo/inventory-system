@@ -104,7 +104,7 @@ class UsersController extends \BaseController {
 			$fileNameWithExtension = $fileName.$fileExtension;
 
 			$file = \Input::file('photo');
-			$uploadPath = public_path('/assets/uploads/'.$id.'/');
+			$uploadPath = public_path('assets/uploads/'.$id.'/');
 
 			$file->move($uploadPath, $fileNameWithExtension);	
 			
@@ -140,8 +140,10 @@ class UsersController extends \BaseController {
 			return \Redirect::back()->withErrors($validator->errors())->withInput();
 		} else {
 			try {
-				$user = \User::findOrFail($id);
 				
+				$user = \User::findOrFail($id);
+
+					
 				if ($user->doSave($user, $input)) {
 					
 					$this->upload($id);

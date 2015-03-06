@@ -66,7 +66,7 @@
                              <td>{{{ !$user->branch?'':$user->branch->name }}}</td>
                             <td>
                                 <span class="label label-{{{ $user->status ? 'success' : 'warning' }}} label-mini">
-                                    {{{ $user->user ? 'Active' : 'Inactive' }}}
+                                    {{{ $user->status ? 'Active' : 'Inactive' }}}
                                 </span>
                             </td>
                            
