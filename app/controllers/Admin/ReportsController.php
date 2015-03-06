@@ -51,10 +51,6 @@ class ReportsController extends \BaseController {
 	public function stocks() {
 		$input = \Input::all();
 
-
-
-		// $stocks = \DB::select(\DB::raw(''))
-
 		$stocks = \StockOnHand::filter($input)->orderBy('branch_id', 'asc')->get();
 
 		$newStocks = [];
@@ -77,10 +73,41 @@ class ReportsController extends \BaseController {
 			}
 
 
+			$total_stocks = $stocksStr = $stock->total_stocks.' '. $stock->uom;
+			$sackStr = 'N/A';
+
+			if ($stock->uom == 'kg') {
+				//1 Sack equivalent
+				$sackEqui = \Config::get('agrivate.equivalent_measure.sacks.per');
+
+				$sack = 0;
+				$quantity = (float)$stock->total_stocks / (float)$sackEqui;
+
+				
+
+				if ($stock->total_stocks  >= $sackEqui) {
+					$sack = floor( $quantity );
+					$total_stocks = $sackStr = $sack .' sacks';
+				}
+
+				
+				$kg = ($quantity - $sack) * $sackEqui; // results in 0.75
+
+				
+				if ($kg != 0) {
+					$stockStr = $kg . $stock->uom;
+					$total_stocks .= ' and '.$stockStr;
+				}
+
+				 
+			}
+
 			$newStocks[] = [
 				'branch' => $branch_name,
 				'product_name' => $prod_name,
-				'stocks' =>\Helper::nf($stock->total_stocks, 2, '.', ', ', false).' '.$stock->uom,
+				'other_stock' => $stockStr,
+				'sack_stock' => $sackStr,
+				'total_stocks' => $total_stocks,
 			];
 		}
 

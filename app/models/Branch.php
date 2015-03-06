@@ -10,7 +10,7 @@ class Branch extends Eloquent {
     
 	public static $rules = [
     	'name' 		=> 'required',
-    	'address'	=> 'required|unique:branches,name,NULL,id',
+    	'address'	=> 'required|unique:branches,address,NULL,id',
     	'city' 		=> 'required',
     	'post_code'	=> 'required',
     	'status'	=> 'required|in:0,1'

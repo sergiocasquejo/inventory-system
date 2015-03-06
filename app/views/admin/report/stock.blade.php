@@ -27,7 +27,9 @@
                         <tr>
                             <th>BRANCH</th>
                             <th>PRODUCT NAME</th>
-                            <th>STOCKS</th>
+                            <th>NO OF KILOS/BOTTLE/PCS/PACKS ON HAND</th>
+                            <th>NO OF SACK ON HAND</th>
+                            <th>TOTAL NO OF STOCKS</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -36,7 +38,9 @@
                           <tr>
                               <td>{{{ $stock['branch'] }}}</td>
                               <td>{{{ $stock['product_name'] }}}</td>
-                              <td>{{{ $stock['stocks'] }}}</td>
+                              <td>{{{ $stock['other_stock'] }}}</td>
+                              <td>{{{ $stock['sack_stock'] }}}</td>
+                              <td>{{{ $stock['total_stocks'] }}}</td>
                           </tr>
                           @endforeach
                        @endif

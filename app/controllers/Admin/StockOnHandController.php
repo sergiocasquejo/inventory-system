@@ -57,15 +57,19 @@ class StockOnHandController extends \BaseController {
 		$uomInput = array_get($input, 'uom');
 		if ($uomInput == 'sacks') {
 
-
 			$equi_config = \Config::get('agrivate.equivalent_measure.sacks');
 			$input['uom'] = $uom = $equi_config['to'];
 			
 			$total_stocks = array_get($input, 'total_stocks', 0) * $equi_config['per'];
 
-			$stock = \StockOnHand::whereRaw("branch_id = {$branch_id} AND product_id = {$product_id}  AND uom = '{$uom}'")->first();
+			$stockObj = \StockOnHand::whereRaw("branch_id = {$branch_id} AND product_id = {$product_id}  AND uom = '{$uom}'")->first();
 
-			$input['total_stocks'] = $stock->total_stocks + $total_stocks;
+			if ($stockObj) {
+				$stock = $stockObj;
+				$total_stocks = $stock->total_stocks + $total_stocks;
+			}
+
+			$input['total_stocks'] = $total_stocks;
 
 		}
 
@@ -152,6 +156,19 @@ class StockOnHandController extends \BaseController {
 			try {
 				$stock = \StockOnHand::findOrFail($stock_id);
 				
+				// Do conversion sacks to kilogram
+				$uomInput = array_get($input, 'uom');
+				if ($uomInput == 'sacks') {
+
+
+					$equi_config = \Config::get('agrivate.equivalent_measure.sacks');
+					$input['uom'] = $uom = $equi_config['to'];
+					
+					$input['total_stocks'] = array_get($input, 'total_stocks', 0) * $equi_config['per'];
+
+				}
+
+
 
 				if ($stock->doSave($stock, $input)) {
 					return \Response::json(['success' => \Lang::get('agrivate.updated')]);
