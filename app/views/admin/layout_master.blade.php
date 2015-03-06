@@ -39,6 +39,9 @@
         height: 25px;
         border-radius: 1px;
       }
+      .mr-10px {
+        margin-right:10px;
+      }
 
       .symbol strong {
         color: #FFF;

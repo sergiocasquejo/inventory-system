@@ -56,7 +56,7 @@
                           <tr>
                               <td>{{{ $product->branch_name  }}}</td>
                               <td>{{{ \Helper::drus($product->name) }}}</td>
-                              <td>{{{ str_replace(',', ' and ', $product->selling_price) }}}</td>
+                              <td><span class="label label-info label-mini mr-10px">{{ str_replace(',', '</span><span class="label label-info label-mini mr-10px">', $product->selling_price) }}</span></td>
                               <td>
                                   <span class="label label-{{{ $product->status ? 'success' : 'warning' }}} label-mini">
                                       {{{ $product->status ? 'Active' : 'Inactive' }}}
