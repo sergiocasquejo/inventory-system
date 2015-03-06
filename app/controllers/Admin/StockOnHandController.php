@@ -9,7 +9,70 @@ class StockOnHandController extends \BaseController {
 	 */
 	public function index()
 	{
-		//
+		$input = \Input::all();
+
+		$stocks = \StockOnHand::filter($input)
+			->select('stocks_on_hand.stock_on_hand_id', 'stocks_on_hand.uom', 
+				'stocks_on_hand.total_stocks',
+				'products.name as product_name', 
+				'branches.name as branch_name', 'branches.address')
+			->join('products', 'stocks_on_hand.product_id', '=', 'products.id')
+			->join('branches', 'branches.id', '=', 'stocks_on_hand.branch_id')
+			->orderBy('branch_id', 'asc')->get();
+
+		$newStocks = [];
+		foreach ($stocks as $stock) {
+			$prod_name = $stock->product_name;
+			$branch_name = $stock->branch_name.'('.$stock->address.')';
+
+			
+
+
+			$total_stocks = $stockStr = $stock->total_stocks.' '. $stock->uom;
+			$sackStr = 'N/A';
+
+			if ($stock->uom == 'kg') {
+				//1 Sack equivalent
+				$sackEqui = \Config::get('agrivate.equivalent_measure.sacks.per');
+
+				$sack = 0;
+				$quantity = (float)$stock->total_stocks / (float)$sackEqui;
+
+				$total_stocks = '';
+
+				if ($stock->total_stocks  >= $sackEqui) {
+					$sack = floor( $quantity );
+					$total_stocks = $sackStr = $sack .' sacks';
+				}
+
+				
+				$kg = ($quantity - $sack) * $sackEqui;
+
+
+				if ($kg != 0) {
+					$stockStr = $kg .' '. $stock->uom;
+					$total_stocks .= ($sack != 0) ? ' and '. $stockStr :$stockStr;
+				} else {
+					$stockStr = $kg .' '. $stock->uom;
+				}
+
+				 
+			}
+
+			$newStocks[] = [
+				'stock_id' => $stock->stock_on_hand_id,
+				'branch' => $branch_name,
+				'product_name' => $prod_name,
+				'other_stock' => $stockStr,
+				'sack_stock' => $sackStr,
+				'total_stocks' => $total_stocks,
+			];
+		}
+
+
+		return \View::make('admin.stock.index')
+			->with('branches', array_add(\Branch::dropdown()->lists('name', 'id'), '', 'Select Branch'))
+			->with('stocks', $newStocks);
 	}
 
 
@@ -20,7 +83,16 @@ class StockOnHandController extends \BaseController {
 	 */
 	public function create()
 	{
-		//
+
+		$measures = \UnitOfMeasure::all()->lists('label', 'name');
+
+
+		$products = array_add(\Product::all()->lists('name', 'id'), '', 'Select Product');
+		return \View::make('admin.stock.create')
+		->with('products', $products)
+		->with('branches', array_add(\Branch::dropdown()->lists('name', 'id'), '', 'Select Branch'))
+		->with('dd_measures', array_add($measures, '', 'Select Measure'))
+		->with('measures', \UnitOfMeasure::all()->lists('label', 'name'));
 	}
 
 
@@ -29,13 +101,20 @@ class StockOnHandController extends \BaseController {
 	 *
 	 * @return Response
 	 */
-	public function store($product_id)
+	public function store($product_id = false)
 	{
 		$input = \Input::all();
 
 		$stock = new \StockOnHand;
+		
 
-		$input['product_id'] = $product_id;
+		if (array_get($input, 'product_id', 0)) {
+
+			$input['product_id'] = $product_id = array_get($input, 'product_id');	
+		} else {
+			$input['product_id'] = $product_id;
+		}
+		
 		$branch_id = array_get($input, 'branch_id');
 		$uom = array_get($input, 'uom');
 
@@ -73,26 +152,12 @@ class StockOnHandController extends \BaseController {
 
 		}
 
-
-		
-
-
-
-
 		
 
 		$uom = array_get($input, 'uom');
 		
 		$rules = \StockOnHand::$rules;
 
-		
-
-
-
-		//$rules['branch_id'] = 'required|exists:branches,id|unique:stocks_on_hand,branch_id,NULL,stock_on_hand_id,product_id,'.$product_id.',uom,'.$uom;
-
-		// echo $rules['branch_id'];
-		// die;
 		$validator = \Validator::make($input, $rules);
 
 		if ($validator->fails()) {
@@ -101,15 +166,25 @@ class StockOnHandController extends \BaseController {
 			try {
 				
 				if ($stock->doSave($stock, $input)) {
-
-					return \Response::json(['success' => \Lang::get('agrivate.created')]);
-					//return \Redirect::route('admin_products.edit', $stock->id)->with('success', \Lang::get('agrivate.created'));
+					if (\Request::ajax()) {
+						return \Response::json(['success' => \Lang::get('agrivate.created')]);
+					} else {
+						return \Redirect::route('admin_stocks.index')->with('success', \Lang::get('agrivate.created'));
+					}
 				}
-				return \Response::json(['errors' => $stock->errors()]);
-				//return \Redirect::back()->withErrors($stock->errors())->withInput();
+				if (\Request::ajax()) {
+					return \Response::json(['errors' => $stock->errors()]);
+				} else {
+					return \Redirect::back()->withErrors($stock->errors())->withInput();	
+				}
 			} catch(\Exception $e) {
-				return \Response::json(['errors' => (array)$e->getMessage()]);
-				//return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
+
+				if (\Request::ajax()) {
+					return \Response::json(['errors' => (array)$e->getMessage()]);
+				} else {
+					return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
+				}
+
 			}
 		}
 	}
@@ -121,11 +196,27 @@ class StockOnHandController extends \BaseController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function edit($product_id, $stock_id)
+	public function edit($product_id = false, $stock_id = false)
 	{	
-		$stock = \StockOnHand::findOrFail($stock_id);
-		
-		return \Response::json($stock->toArray());
+
+		if (\Request::ajax()) {
+			$stock = \StockOnHand::findOrFail($stock_id);
+			
+			return \Response::json($stock->toArray());
+		} else {
+			$measures = \UnitOfMeasure::all()->lists('label', 'name');
+
+
+			$products = array_add(\Product::all()->lists('name', 'id'), '', 'Select Product');
+			$stock = \StockOnHand::findOrFail($product_id);
+
+			return \View::make('admin.stock.edit')
+			->with('products', $products)
+			->with('stock', $stock)
+			->with('branches', array_add(\Branch::dropdown()->lists('name', 'id'), '', 'Select Branch'))
+			->with('dd_measures', array_add($measures, '', 'Select Measure'))
+			->with('measures', \UnitOfMeasure::all()->lists('label', 'name'));
+		}
 	}
 
 
@@ -135,7 +226,7 @@ class StockOnHandController extends \BaseController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update($product_id, $stock_id)
+	public function update($product_id = false, $stock_id = false)
 	{
 
 		$input = \Input::all();
@@ -146,7 +237,12 @@ class StockOnHandController extends \BaseController {
 		
 		$rules['branch_id'] = 'required|exists:branches,id|unique:stocks_on_hand,branch_id,'.$stock_id.',stock_on_hand_id,product_id,'.$product_id.',uom,'.$uom;
 
-		$input['product_id'] = $product_id;
+		if (array_get($input, 'product_id', 0)) {
+
+			$input['product_id'] = $product_id = array_get($input, 'product_id');	
+		} else {
+			$input['product_id'] = $product_id;
+		}
 
 		$validator = \Validator::make($input, $rules);
 

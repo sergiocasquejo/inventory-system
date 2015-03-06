@@ -61,23 +61,11 @@ class ReportsController extends \BaseController {
 			->orderBy('branch_id', 'asc')->get();
 
 		$newStocks = [];
-		$oldname = '';
-		$oldbranch = '';
 		foreach ($stocks as $stock) {
 			$prod_name = $stock->product_name;
 			$branch_name = $stock->branch_name.'('.$stock->address.')';
 
-			if ($oldname == $prod_name) {
-				$prod_name = '.....';
-			} else {
-				$oldname = $prod_name;
-			}
 			
-			if ($oldbranch == $branch_name) {
-				$branch_name = '.....';
-			} else {
-				$oldbranch = $branch_name;
-			}
 
 
 			$total_stocks = $stockStr = $stock->total_stocks.' '. $stock->uom;
