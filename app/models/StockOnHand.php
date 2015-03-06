@@ -26,6 +26,7 @@ class StockOnHand extends Eloquent {
     public function scopeFilter($query, $input) {
 
 		$branch = array_get($input, 'branch');
+		$keyword = array_get($input, 's');
 
 
 	 	/* Check if current user is not admin
@@ -33,6 +34,10 @@ class StockOnHand extends Eloquent {
         */
         if ($branch != '') {
             $query->whereRaw('branch_id ='. (int) $branch);
+        }
+
+        if ($keyword != '') {
+        	$query->where('products.name', 'LIKE', "%$keyword%");	
         }
 
 

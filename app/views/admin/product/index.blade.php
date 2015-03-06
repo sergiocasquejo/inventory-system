@@ -6,7 +6,7 @@
     <div class="row">
       <div class="col-lg-12">
           <section class="panel">
-              <form action="{{ route('admin_products.index') }}"  class="form-horizontal tasi-form" method="GET">
+              <form action="{{ route('admin_products.index') }}"  class="form-inline tasi-form" method="GET">
               <input type="hidden" name="_token" value="{{ csrf_token() }}" />
               <header class="panel-heading">
                   Products <a class="btn btn-info btn-xs" href="{{ route('admin_products.create') }}">Add New</a> <a class="btn btn-warning btn-xs" href="{{ route('admin_products.index') }}" title="Reset"><i class=" icon-refresh"></i></a>
@@ -24,21 +24,20 @@
                   <div class="col-sm-6">
                   </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-1"></div>
-                    <div class="col-md-2">
-                      <input type="text" name="s"  value="{{ Input::get('s') }}" placeholder="Search" class="form-control">               
-                    </div>
-                    <div class="col-md-4">
+                
+
+                  <div class="col-md-12">
+                    <div class="form-group">
+                        <input type="text" name="s"  value="{{ Input::get('s') }}" placeholder="Search" class="form-control">
+                      </div>
+                    <div class="form-group">
                       {{ Form::select('branch', $branches, Input::get('branch', ''), ['class' => 'form-control', 'size' => '1']) }} 
                     </div>
-                    <div class="col-md-4">
+                    <div class="form-group">
                       {{ Form::select('category', $categories, Input::get('category', ''), ['class' => 'form-control', 'size' => '1']) }} 
                     </div>
-                    <div class="col-md-1">
-                      <button type="submit" class="btn btn-info">Filter</button>
-                    </div>
-                </div>
+                    <button type="submit" class="btn btn-info">Filter</button>
+                  </div>
                 <table class="table table-striped table-advance table-hover">
                     <thead>
                       <tr>
@@ -55,7 +54,7 @@
                           @foreach ($products as $product)
                           <tr>
                               <td>{{{ $product->branch_name  }}}</td>
-                              <td>{{{ \Helper::drus($product->name) }}}</td>
+                              <td>{{{ $product->name }}}</td>
                               <td><span class="label label-info label-mini mr-10px">{{ str_replace(',', '</span><span class="label label-info label-mini mr-10px">', $product->selling_price) }}</span></td>
                               <td>
                                   <span class="label label-{{{ $product->status ? 'success' : 'warning' }}} label-mini">

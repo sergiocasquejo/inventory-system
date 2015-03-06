@@ -79,7 +79,7 @@ class CreditsController extends \BaseController {
 	public function create()
 	{
 		return \View::make('admin.credit.create')
-			->with('branches', array_add(\Branch::dropdown(), '', 'Select Branch'))
+			->with('branches', array_add(\Branch::dropdown()->lists('name', 'id'), '', 'Select Branch'))
 		->with('products', array_add(\Product::all()->lists('name', 'id'), '0', 'Select Product'))
 		->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));
 	}
@@ -132,7 +132,7 @@ class CreditsController extends \BaseController {
 		$credit = \Credit::find($id);
 		
 		return \View::make('admin.credit.edit')->with('credit', $credit)
-		->with('branches', array_add(\Branch::dropdown(), '', 'Select Branch'))
+		->with('branches', array_add(\Branch::dropdown()->lists('name', 'id'), '', 'Select Branch'))
 		->with('products', array_add(\Product::all()->lists('name', 'id'), '0', 'Select Product'))
 		->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));
 	}
@@ -180,7 +180,7 @@ class CreditsController extends \BaseController {
 	 */
 	public function destroy($id)
 	{
-		$credit = \Credit::withTrashed()->where('id', $id)->first();
+		$credit = \Credit::withTrashed()->where('credit_id', $id)->first();
 		$message = \Lang::get('agrivate.trashed');
 		if ($credit->trashed()) {
             $credit->forceDelete();
@@ -199,7 +199,7 @@ class CreditsController extends \BaseController {
 	 * @return Response
 	 */
 	public function restore($id) {
-		$credit = \Credit::withTrashed()->where('id', $id)->first();
+		$credit = \Credit::withTrashed()->where('credit_id', $id)->first();
 		if (!$credit->restore()) {
 			return \Redirect::back()->withErrors($credit->errors());			
 		}

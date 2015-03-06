@@ -51,7 +51,7 @@
       
       <div class="col-lg-12">
           <section class="panel">
-            <form action="{{ route('admin_credits.index') }}"  class="form-horizontal tasi-form" method="GET">
+            <form action="{{ route('admin_credits.index') }}"  class="form-inline tasi-form" method="GET">
               <input type="hidden" name="_token" value="{{ csrf_token() }}" />
               <header class="panel-heading">
                   Credits <a class="btn btn-info btn-xs" href="{{ route('admin_credits.create') }}">Add New</a> <a class="btn btn-warning btn-xs" href="{{ route('admin_credits.index') }}" title="Reset"><i class=" icon-refresh"></i></a>
@@ -66,12 +66,12 @@
                       </label>
                     </div>
                   </div>
-                  <div class="col-sm-6">
-                    
-                    <div class="dataTables_filter">
-                        <label class="pull-left">Search: <input type="text" name="s" value="{{ Input::get('s') }}" class="form-control"> </label>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                      <input type="text" name="s"  value="{{ Input::get('s') }}" placeholder="Search" class="form-control">
                     </div>
-                  </div>
+                    <button type="submit" class="btn btn-info">Filter</button>
                 </div>
                 <table class="table table-striped table-advance table-hover">
                     <thead>
@@ -120,10 +120,13 @@
                               <td>{{{ \Helper::timeElapsedString(strtotime($credit->created_at)) }}}</td>
                               <td>{{{ \Helper::timeElapsedString(strtotime($credit->updated_at)) }}}</td>
                               <td>
+                                  @if ($credit->trashed())
+                                    <a href="{{{ route('admin_credits.restore', $credit->credit_id) }}}" data-method="RESTORE" class="btn btn-primary btn-xs" title="Restore"><i class="icon-rotate-left"></i></a>
+                                  @else
                                     <a href="{{{ route('admin_credits.edit', $credit->credit_id) }}}" class="btn btn-primary btn-xs" title="Edit"><i class="icon-pencil"></i></a>
-                               
-                                  <a href="{{{ route('admin_credits.destroy', $credit->credit_id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
-                                    <i class="icon-remove"></i>
+                                  @endif
+                                  <a href="{{{ route('admin_credits.destroy', $credit->credit_id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="{{{ $credit->trashed() ? 'Delete' : 'Trash' }}}" class="btn btn-danger btn-xs">
+                                    <i class="icon-{{{ $credit->trashed() ? 'remove' : 'trash' }}} "></i>
                                   </a>
                               </td>
                           </tr>

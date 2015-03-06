@@ -51,14 +51,21 @@ class ReportsController extends \BaseController {
 	public function stocks() {
 		$input = \Input::all();
 
-		$stocks = \StockOnHand::filter($input)->orderBy('branch_id', 'asc')->get();
+		$stocks = \StockOnHand::filter($input)
+			->select('stocks_on_hand.stock_on_hand_id', 'stocks_on_hand.uom', 
+				'stocks_on_hand.total_stocks',
+				'products.name as product_name', 
+				'branches.name as branch_name', 'branches.address')
+			->join('products', 'stocks_on_hand.product_id', '=', 'products.id')
+			->join('branches', 'branches.id', '=', 'stocks_on_hand.branch_id')
+			->orderBy('branch_id', 'asc')->get();
 
 		$newStocks = [];
 		$oldname = '';
 		$oldbranch = '';
 		foreach ($stocks as $stock) {
-			$prod_name = $stock->product->name;
-			$branch_name = $stock->branch->name.'('.$stock->branch->address.')';
+			$prod_name = $stock->product_name;
+			$branch_name = $stock->branch_name.'('.$stock->address.')';
 
 			if ($oldname == $prod_name) {
 				$prod_name = '.....';
@@ -115,7 +122,7 @@ class ReportsController extends \BaseController {
 
 
 		return \View::make('admin.report.stock')
-			->with('branches', array_add(\Branch::dropdown(), '', 'Select Branch'))
+			->with('branches', array_add(\Branch::dropdown()->lists('name', 'id'), '', 'Select Branch'))
 			->with('stocks', $newStocks);
 	}
 

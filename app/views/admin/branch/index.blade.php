@@ -6,7 +6,7 @@
     <div class="row">
       <div class="col-lg-12">
           <section class="panel">
-            <form action="{{ route('admin_branches.index') }}"  class="form-horizontal tasi-form" method="GET">
+            <form action="{{ route('admin_branches.index') }}"  class="form-inline tasi-form" method="GET">
               <input type="hidden" name="_token" value="{{ csrf_token() }}" />
               <header class="panel-heading">
                   Branches <a class="btn btn-info btn-xs" href="{{ route('admin_branches.create') }}">Add New</a> <a class="btn btn-warning btn-xs" href="{{ route('admin_branches.index') }}" title="Reset"><i class=" icon-refresh"></i></a>
@@ -22,11 +22,16 @@
                     </div>
                   </div>
                   <div class="col-sm-6">
-                    
-                    <div class="dataTables_filter">
-                        <label class="pull-left">Search: <input type="text" name="s" value="{{ Input::get('s') }}" class="form-control"> </label>
-                    </div>
                   </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                      <input type="text" name="s"  value="{{ Input::get('s') }}" placeholder="Search" class="form-control">
+                    </div>
+                    <button type="submit" class="btn btn-info">Filter</button>
+                </div>
+                
+                    
                 </div>
                 <table class="table table-striped table-advance table-hover">
                     <thead>

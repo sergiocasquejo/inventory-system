@@ -52,14 +52,14 @@
 		      	<div class="form-group">
 				  <label class="col-sm-2 control-label">Quantity</label>
 				  <div class="col-sm-10">
-				      <input type="number" name="quantity" value="{{ Input::old('quantity', $credit->quantity) }}" class="form-control">
+				      <input type="number"  step="any" name="quantity" value="{{ Input::old('quantity', $credit->quantity) }}" class="form-control">
 				  </div>
 				</div>
 
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Unit of measure</label>
 				  <div class="col-sm-10">
-				      {{ Form::select('uom', array_add(\Config::get('agrivate.unit_of_measure', $credit->uom), '', 'Select Measure'), Input::old('uom'), ['class' => 'form-control m-bot15']) }}
+				      {{ Form::select('uom', $measures, Input::old('uom', $credit->uom), ['class' => 'form-control m-bot15']) }}
 				  </div>
 				</div>
 

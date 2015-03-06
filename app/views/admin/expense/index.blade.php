@@ -51,7 +51,7 @@
       
       <div class="col-lg-12">
           <section class="panel">
-              <form action="{{ route('admin_expenses.index') }}"  class="form-horizontal tasi-form" method="GET">
+              <form action="{{ route('admin_expenses.index') }}"  class="form-inline tasi-form" method="GET">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}" />
                 <header class="panel-heading">
                     Expenses <a class="btn btn-info btn-xs" href="{{ route('admin_expenses.create') }}">Add New</a> <a class="btn btn-warning btn-xs" href="{{ route('admin_expenses.index') }}" title="Reset"><i class=" icon-refresh"></i></a>
@@ -66,18 +66,16 @@
                         </label>
                       </div>
                     </div>
-                    <div class="col-sm-6">
-                      
-                      <div class="dataTables_filter">
-                          <label class="pull-left">Search: <input type="text" name="s" value="{{ Input::get('s') }}" class="form-control"> </label>
-                      </div>
-                    </div>
                   </div>
                   <table class="table table-striped table-advance table-hover">
                     <thead>
                       <tr>
-                          <th>{{ Form::select('branch', $branches, Input::get('branch', ''), ['class' => 'form-control input-xs']) }}</th>
-                          <th>Name</th>
+                          <th>
+                            <div class="col-sm-12">
+                              {{ Form::select('branch', $branches, Input::get('branch', ''), ['class' => 'form-control input-xs']) }}
+                            </div>
+                          </th>
+                          <th><input type="text" name="s"  value="{{ Input::get('s') }}" placeholder="Name" class="form-control input-xs"></th>
                           <th>Quantity</th>
                           <th>{{ Form::select('total', $totals, Input::get('total', ''), ['class' => 'form-control input-xs']) }} </th>
                           <th>Unit of measure</th>

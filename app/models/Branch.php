@@ -62,7 +62,9 @@ class Branch extends Eloquent {
     public function scopeSearch($query, $input) {
     	
     	if (isset($input['s'])) {
-    		$query->whereRaw('name LIKE "%'. array_get($input, 's', '') .'%"');
+    		$query->whereRaw('name LIKE "%'. array_get($input, 's', '') .'%" 
+                OR address LIKE "%'. array_get($input, 's', '') .'%" 
+                OR city LIKE "%'. array_get($input, 's', '') .'%"');
     	}
 
     	return $query;
@@ -84,7 +86,7 @@ class Branch extends Eloquent {
     }
 
     public function scopeDropdown($query) {
-        return $query->select(\DB::raw('CONCAT(name," (",address,")") AS name'), 'id' )->lists('name', 'id');
+        return $query->select(\DB::raw('CONCAT(name," (",address,")") AS name'), 'id' );
     }
     
 
