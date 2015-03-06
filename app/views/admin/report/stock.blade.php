@@ -27,8 +27,8 @@
                         <tr>
                             <th>BRANCH</th>
                             <th>PRODUCT NAME</th>
-                            <th>NO OF KILOS/BOTTLE/PCS/PACKS ON HAND</th>
-                            <th>NO OF SACK ON HAND</th>
+                            <th>NO OF KILO/BTL/PCK/PCS ON HAND</th>
+                            <th>NO OF SACKS ON HAND</th>
                             <th>TOTAL NO OF STOCKS</th>
                         </tr>
                       </thead>

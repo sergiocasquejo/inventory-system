@@ -44,7 +44,8 @@
                       <tr>
                           <th>BRANCH</th>
                           <th>PRODUCT NAME</th>
-                          <th>SELLING PRICE PER KILO/BTL/PCK/PCS/SACKS</th>
+                          <th>SELLING PRICE PER KILO/BTL/PCK/PCS</th>
+                          <th>SELLING PRICE PER SACKS</th>
                           <th>STATUS</th>
                           <th></th>
                       </tr>
@@ -56,7 +57,8 @@
                           <tr>
                               <td>{{{ $product->branch_name  }}}</td>
                               <td>{{{ \Helper::drus($product->name) }}}</td>
-                              <td>{{{ \Helper::nf($product->selling_price).' '.$product->per_unit }}}</td>
+                              <td>{{{ $product->other }}}</td>
+                              <td>{{{ $product->sacks }}}</td>
                               <td>
                                   <span class="label label-{{{ $product->status ? 'success' : 'warning' }}} label-mini">
                                       {{{ $product->status ? 'Active' : 'Inactive' }}}

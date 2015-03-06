@@ -73,7 +73,7 @@ class ReportsController extends \BaseController {
 			}
 
 
-			$total_stocks = $stocksStr = $stock->total_stocks.' '. $stock->uom;
+			$total_stocks = $stockStr = $stock->total_stocks.' '. $stock->uom;
 			$sackStr = 'N/A';
 
 			if ($stock->uom == 'kg') {

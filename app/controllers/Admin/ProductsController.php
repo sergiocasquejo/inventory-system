@@ -12,14 +12,38 @@ class ProductsController extends \BaseController {
 
 		$input = \Input::all();
 
+		$px = \DB::getTablePrefix();
 
-		$products = \Product::withTrashed()
+		$products = \Product::withTrashed()->select(
+			"products.id", "products.status", "branches.name as branch_name", "products.name",
+			\DB::raw(
+				"CONCAT(SUM(IF({$px}product_pricing.per_unit ='sacks', {$px}product_pricing.selling_price, NULL  )), ' ', 'sacks') as sacks"
+			),
+			\DB::raw(
+				"CONCAT(IF({$px}product_pricing.per_unit = 'sacks', SUM({$px}product_pricing.selling_price) - SUM(IF({$px}product_pricing.per_unit ='sacks', {$px}product_pricing.selling_price, NULL  )), SUM({$px}product_pricing.selling_price)  ), ' ', {$px}product_pricing.per_unit) as other")
+			)
+			->filter($input)
+			->join('product_pricing', 'products.id', '=', 'product_pricing.product_id')
+			->join('branches', 'product_pricing.branch_id', '=', 'branches.id')
+			->groupBy('product_pricing.product_id')
+			->paginate(intval(array_get($input, 'records_per_page', 10)));
+
+
+// 		$products = \DB::select(\DB::raw("SELECT a.product_id, c.status, b.name as branch_name, c.name,
+// CONCAT(SUM(IF(a.per_unit ='sacks', a.selling_price, NULL  )), ' ', 'sacks') as sacks,
+// CONCAT(IF(a.per_unit = 'sacks', SUM(a.selling_price) - SUM(IF(a.per_unit ='sacks', a.selling_price, NULL  )), SUM(a.selling_price)  ), ' ', per_unit) as other
+// FROM `sales_product_pricing` a JOIN sales_branches b ON a.branch_id = b.id 
+// JOIN sales_products as c ON a.product_id = c.id
+// GROUP BY a.product_id"));//->paginate(intval(array_get($input, 'records_per_page', 10)));
+
+
+		/*$products = \Product::withTrashed()
 		->leftJoin('product_pricing', 'products.id', '=', 'product_pricing.product_id')
 		->leftJoin('branches', 'branches.id', '=', 'product_pricing.branch_id')
-		->select('products.id', 'products.status', \DB::raw('CONCAT(sales_branches.name, "(", sales_branches.address, ")") as branch_name'), 'products.name', 'product_pricing.selling_price', 'product_pricing.per_unit')
+		->select('products.id', 'products.status', \DB::raw('CONCAT(sales_branches.name, "(", sales_branches.address, ")") as branch_name'), 'products.name', '{$px}product_pricing.selling_price', '{$px}product_pricing.per_unit')
 		->filter($input)
 		->orderBy('product_id', 'desc')
-		->paginate(intval(array_get($input, 'records_per_page', 10)));
+		->paginate(intval(array_get($input, 'records_per_page', 10)));*/
 
 		$totalRows = \Product::withTrashed()->count();
 
@@ -215,7 +239,7 @@ class ProductsController extends \BaseController {
 		$branch = \Input::get('branch_id');
 
 		$uoms = \ProductPricing::whereRaw(\DB::raw('product_id = '.$id))
-			->join('unit_of_measures', 'product_pricing.per_unit', '=', 'unit_of_measures.name')
+			->join('unit_of_measures', '{$px}product_pricing.per_unit', '=', 'unit_of_measures.name')
 			->groupBy('unit_of_measures.uom_id')
 			->select('name', 'label');
 
