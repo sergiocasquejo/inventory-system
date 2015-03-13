@@ -7,7 +7,7 @@
 		 Edit Credit
 		</header>
 		<div class="panel-body">
-		  	<form action="{{ route('admin_credits.update', $credit->credit_id) }}"  class="form-horizontal tasi-form" method="POST">
+		  	<form action="{{ route('admin_credits.update', $credit->credit_id) }}" id="creditForm"   class="form-horizontal tasi-form" method="POST">
 		  		<input type="hidden" name="_token" value="{{ csrf_token() }}" />
 		  		<input type="hidden" name="_method" value="PUT" />
 		  		<div class="form-group">
@@ -44,7 +44,7 @@
 		      	<div class="form-group">
 					<label class="col-sm-2 control-label">Product</label>
 					<div class="col-sm-10">
-						{{ Form::select('product_id', $products, Input::old('product_id', $credit->product_id), ['class' => 'form-control m-bot15']) }}
+						{{ Form::select('product_id', $products, Input::old('product_id', $credit->product_id), ['class' => 'form-control m-bot15', 'data-selected' => Input::old('product_id', $credit->product_id)]) }}
 						<span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
 					</div>
 		      	</div>
@@ -52,21 +52,21 @@
 		      	<div class="form-group">
 				  <label class="col-sm-2 control-label">Quantity</label>
 				  <div class="col-sm-10">
-				      <input type="number"  step="any" name="quantity" value="{{ Input::old('quantity', $credit->quantity) }}" class="form-control">
+				      <input type="number"  step="any" name="quantity" value="{{ Input::old('quantity', $credit->quantity) }}" data-selected="{{ Input::old('quantity', $credit->quantity) }}" class="form-control">
 				  </div>
 				</div>
 
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Unit of measure</label>
 				  <div class="col-sm-10">
-				      {{ Form::select('uom', $measures, Input::old('uom', $credit->uom), ['class' => 'form-control m-bot15']) }}
+				      {{ Form::select('uom', $measures, Input::old('uom', $credit->uom), ['class' => 'form-control m-bot15', 'data-selected' => Input::old('uom', $credit->uom)]) }}
 				  </div>
 				</div>
 
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Total Amount</label>
 				  <div class="col-sm-10">
-				      <input type="number" name="total_amount" value="{{ Input::old('total_amount', $credit->total_amount) }}" class="form-control">
+				      <input type="number" name="total_amount" value="{{ Input::old('total_amount', $credit->total_amount) }}" class="form-control" data-selected="{{ Input::old('total_amount', $credit->total_amount) }}" readonly>
 				  </div>
 				</div>
 

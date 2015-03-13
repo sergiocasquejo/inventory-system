@@ -14,21 +14,21 @@ class SalesController extends \BaseController {
 
 		$sales = \Sale::withTrashed()
 				->filter($input)
-				->filterBranch()
+				->owned()
 				->orderBy('sale_id', 'desc')
 				->paginate(intval(array_get($input, 'records_per_page', 10)));
 		
-		$totalRows = \Sale::withTrashed()->filterBranch()->count();
+		$totalRows = \Sale::withTrashed()->owned()->count();
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
 		$countries = \Config::get('agrivate.countries');
 
 
-		$yearly = \Sale::filterBranch()->whereRaw('YEAR(date_of_sale) = YEAR(CURDATE())')->sum('total_amount');
-		$monthly = \Sale::filterBranch()->whereRaw('MONTH(date_of_sale) = MONTH(CURDATE())')->sum('total_amount');
-		$weekly = \Sale::filterBranch()->whereRaw('WEEK(date_of_sale) = WEEK(CURDATE())')->sum('total_amount');
-		$daily = \Sale::filterBranch()->whereRaw('DAY(date_of_sale) = DAY(CURDATE())')->sum('total_amount');
+		$yearly = \Sale::owned()->whereRaw('YEAR(date_of_sale) = YEAR(CURDATE())')->sum('total_amount');
+		$monthly = \Sale::owned()->whereRaw('MONTH(date_of_sale) = MONTH(CURDATE())')->sum('total_amount');
+		$weekly = \Sale::owned()->whereRaw('WEEK(date_of_sale) = WEEK(CURDATE())')->sum('total_amount');
+		$daily = \Sale::owned()->whereRaw('DAY(date_of_sale) = DAY(CURDATE())')->sum('total_amount');
 
 
 		$branches = \DB::table('sales')->join('branches', 'sales.branch_id', '=', 'branches.id')

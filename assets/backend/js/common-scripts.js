@@ -376,6 +376,78 @@ var Script = function () {
             
         }).trigger('keyup');
 
+
+
+        /**====================================================
+         * CREDITS
+         *====================================================*/
+
+        var creditForm = $('#creditForm'),
+            qtyField = creditForm.find(':input[name=quantity]'),
+            productField = creditForm.find(':input[name=product_id]'),
+            uomField = creditForm.find(':input[name=uom]'),
+            branchField = creditForm.find(':input[name=branch_id]');
+
+
+        qtyField.on('keyup', function() {
+
+            var slctdProduct = creditForm.find(':input[name=product_id]').val();
+            var slctdBranch = creditForm.find(':input[name=branch_id]').val();
+            var slctdUOM = creditForm.find(':input[name=uom]').val();
+            var quantity = $(this).val();
+
+
+            $.get(AJAX.baseUrl+'/admin/products/'+ slctdProduct +'/get', {branch_id: slctdBranch, uom:slctdUOM }, function(response) {
+                if (response.selling_price) {
+                    creditForm.find(':input[name=total_amount]').val(response.selling_price * quantity)
+                }  
+            });
+            
+        }).trigger('keyup');
+
+
+        productField.on('change', function() {
+            var self = $(this);
+            var slctdProduct = self.val();
+            var slctdBranch = creditForm.find(':input[name=branch_id]').val();
+
+            var slctUOM = creditForm.find(':input[name=uom]');
+            
+            slctUOM.html('');
+            // slctUOM.html($('<option>').val('').text('Select Measure'));
+
+            $.get(AJAX.baseUrl+'/admin/products/'+ slctdProduct +'/uom', {branch_id: slctdBranch }, function(response) {
+                $('span.alert-warning').remove();
+                if (response.length) {
+                    $.each(response, function(index, uom){
+                        var opt = $('<option>').val(uom.name).text(uom.label);
+                        if (uom.name == slctUOM.data('selected')) {
+                            opt.attr('selected', 'selected');
+                        }
+                        slctUOM.append(opt);
+                    });
+                    
+                } else {
+                    $("<span class='alert alert-warning'>")
+                        .html('<a href="'+ AJAX.baseUrl +'/admin/products/'+ slctdProduct +'/edit">Click here</a> to setup pricing for this branch')
+                        .insertAfter(self);
+                }
+            });
+
+        }).trigger('change');
+
+
+        // Trigger qty to change price
+        uomField.on('change', function () {
+            creditForm.find(':input[name=quantity]').trigger('keyup');
+        })
+        branchField.on('change', function() {
+            creditForm.find(':input[name=product_id]').trigger('change');
+            creditForm.find(':input[name=quantity]').trigger('keyup');
+
+        });
+
+
     });
 
 

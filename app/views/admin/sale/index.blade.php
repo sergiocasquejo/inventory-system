@@ -73,7 +73,11 @@
                     <tr>
                         <th>
                           <div class="col-sm-12">
+                            @if (\Confide::user()->isAdmin())
                             {{ Form::select('branch', $branches, Input::get('branch', ''), ['class' => 'form-control input-xs']) }}
+                            @else
+                              Branch
+                            @endif
                           </div>
                         </th>
                         <th>

@@ -7,7 +7,7 @@
 		 Create Credit
 		</header>
 		<div class="panel-body">
-		  	<form action="{{ route('admin_credits.store') }}"  class="form-horizontal tasi-form" method="POST">
+		  	<form action="{{ route('admin_credits.store') }}" id="creditForm"  class="form-horizontal tasi-form" method="POST">
 		  		<input type="hidden" name="_token" value="{{ csrf_token() }}" />
 		  		<div class="form-group">
 		          <label class="col-sm-2 control-label">Branch</label>
@@ -51,21 +51,21 @@
 		      	<div class="form-group">
 				  <label class="col-sm-2 control-label">Quantity</label>
 				  <div class="col-sm-10">
-				      <input type="number"  step="any" name="quantity" value="{{ Input::old('quantity') }}" class="form-control">
+				      <input type="number"  step="any" name="quantity"  data-selected="{{ Input::old('uom', $credit->uom) }}" value="{{ Input::old('quantity') }}" class="form-control">
 				  </div>
 				</div>
 
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Unit of measure</label>
 				  <div class="col-sm-10">
-				      {{ Form::select('uom', $measures, Input::old('uom'), ['class' => 'form-control m-bot15']) }}
+				      {{ Form::select('uom', $measures, Input::old('uom'), ['class' => 'form-control m-bot15', 'data-selected' => Input::old('uom')]) }}
 				  </div>
 				</div>
 
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Total Amount</label>
 				  <div class="col-sm-10">
-				      <input type="number" name="total_amount" value="{{ Input::old('total_amount') }}" class="form-control">
+				      <input type="number" name="total_amount" value="{{ Input::old('total_amount') }}" data-selected="{{ Input::old('total_amount') }}" class="form-control" readonly>
 				  </div>
 				</div>
 

@@ -20,8 +20,9 @@ class DashboardController extends \BaseController {
 		$data['weekly_sales'] = \Sale::select(\DB::raw('DAY(date_of_sale) as day_of_sale, TRUNCATE(SUM(total_amount - (supplier_price * quantity)), 2) as weekly_sale'))->groupBy('day_of_sale')->whereRaw('WEEK(date_of_sale) = WEEK(CURDATE())')->lists('weekly_sale');
 
 		$data['total_users']  = \User::count();
+		$data['total_credits']  = \Credit::sum('total_amount');
 		$data['total_expense']  = \Expense::sum('total_amount');
-		$data['total_sales'] = \Sale::select(\DB::raw('TRUNCATE(SUM(total_amount - (supplier_price * quantity)), 2) as total_sale'))->pluck('total_sale');
+		$data['total_sales'] = \Sale::sum('total_amount'); //select(\DB::raw('TRUNCATE(SUM(total_amount - (supplier_price * quantity)), 2) as total_sale'))->pluck('total_sale');
 
 		$data['earning'] = \Sale::select(\DB::raw('YEAR(date_of_sale) as the_year,
 TRUNCATE(SUM(total_amount - (supplier_price * quantity)), 2) as total_amount,

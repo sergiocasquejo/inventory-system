@@ -57,6 +57,14 @@ class Sale extends Eloquent {
 		return $query;
 	}
 
+	public function scopeOwned($query) {
+        if (!\Confide::user()->isAdmin()) {
+            $query->where('encoded_by', \Confide::user()->id);
+        }   
+        return $query;
+    }
+    
+
 	public function scopeFilter($query, $input) {
 
 		$branch = array_get($input, 'branch');

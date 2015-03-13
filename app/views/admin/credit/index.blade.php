@@ -76,7 +76,13 @@
                 <table class="table table-striped table-advance table-hover">
                     <thead>
                       <tr>
-                          <th>{{ Form::select('branch', $branches, Input::get('branch', ''), ['class' => 'form-control input-xs']) }}</th>
+                          <th>
+                            @if (\Confide::user()->isAdmin())
+                            {{ Form::select('branch', $branches, Input::get('branch', ''), ['class' => 'form-control input-xs']) }}
+                            @else
+                              Branch
+                            @endif
+                          </th>
                           <th>Cust. Name</th>
                           <th>Cust. Info</th>
                           <th>Quantity</th>

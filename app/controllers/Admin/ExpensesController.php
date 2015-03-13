@@ -15,22 +15,23 @@ class ExpensesController extends \BaseController {
 		$expenses = \Expense::withTrashed()
 		->filter($input)
 		->search($input)
+		->owned()
 		->orderBy('expense_id', 'desc')
 		->paginate(intval(array_get($input, 'records_per_page', 10)));
 		
 
 
-		$totalRows = \Expense::filterBranch()->withTrashed()->count();
+		$totalRows = \Expense::owned()->count();
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
 		$countries = \Config::get('agrivate.countries');
 
 
-		$yearly = \Expense::filterBranch()->whereRaw('YEAR(date_of_expense) = YEAR(CURDATE())')->sum('total_amount');
-		$monthly = \Expense::filterBranch()->whereRaw('MONTH(date_of_expense) = MONTH(CURDATE())')->sum('total_amount');
-		$weekly = \Expense::filterBranch()->whereRaw('WEEK(date_of_expense) = WEEK(CURDATE())')->sum('total_amount');
-		$daily = \Expense::filterBranch()->whereRaw('DAY(date_of_expense) = DAY(CURDATE())')->sum('total_amount');
+		$yearly = \Expense::owned()->whereRaw('YEAR(date_of_expense) = YEAR(CURDATE())')->sum('total_amount');
+		$monthly = \Expense::owned()->whereRaw('MONTH(date_of_expense) = MONTH(CURDATE())')->sum('total_amount');
+		$weekly = \Expense::owned()->whereRaw('WEEK(date_of_expense) = WEEK(CURDATE())')->sum('total_amount');
+		$daily = \Expense::owned()->whereRaw('DAY(date_of_expense) = DAY(CURDATE())')->sum('total_amount');
 
 
 		$branches = \DB::table('expenses')->join('branches', 'expenses.branch_id', '=', 'branches.id')

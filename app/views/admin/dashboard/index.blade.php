@@ -3,7 +3,7 @@
 @section('content')
 <!--state overview start-->
 <div class="row state-overview">
-    <div class="col-lg-3 col-sm-6">
+    <div class="col-lg-2 col-sm-5">
         <section class="panel">
             <div class="symbol terques">
                 <i class="icon-user"></i>
@@ -17,21 +17,32 @@
     <div class="col-lg-3 col-sm-6">
         <section class="panel">
             <div class="symbol red">
-                <i class="icon-tags"></i>
+                <i class="icon-bar-chart"></i>
             </div>
             <div class="value">
-                <h1>{{{ \Helper::nf($total_sales) }}}</h1>
+                <strong>{{{ \Helper::nf($total_sales) }}}</strong>
                 <p>Sales</p>
             </div>
         </section>
     </div>
-    <div class="col-lg-3 col-sm-6">
+    <div class="col-lg-2 col-sm-5">
         <section class="panel">
             <div class="symbol yellow">
-                <i class="icon-shopping-cart"></i>
+               <i class="icon-bar-chart"></i>
             </div>
             <div class="value">
-                <h1>{{{ \Helper::nf($total_expense) }}}</h1>
+                <strong>{{{ \Helper::nf($total_credits) }}}</strong>
+                <p>Credits</p>
+            </div>
+        </section>
+    </div>
+    <div class="col-lg-2 col-sm-5">
+        <section class="panel">
+            <div class="symbol terques">
+                <i class="icon-bar-chart"></i>
+            </div>
+            <div class="value">
+                <strong>{{{ \Helper::nf($total_expense) }}}</strong>
                 <p>Expense</p>
             </div>
         </section>
@@ -42,7 +53,7 @@
                 <i class="icon-bar-chart"></i>
             </div>
             <div class="value">
-                <h1>{{{ \Helper::nf(!$earning?0:$earning->total_amount - $total_expense) }}}</h1>
+                <strong>{{{ \Helper::nf(($total_sales + $total_credits) - $total_expense) }}}</strong>
                 <p>Total Profit</p>
             </div>
         </section>

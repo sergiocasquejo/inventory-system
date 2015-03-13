@@ -17,13 +17,13 @@ class CreditsController extends \BaseController {
 
 
 		$credits = \Credit::withTrashed()
-			->filterBranch()
 			->filter($input)
 			->search($input)
+			->owned()
 			->orderBy('credit_id', 'desc')
 			->paginate(intval(array_get($input, 'records_per_page', 10)));
 		
-		$totalRows = \Credit::withTrashed()->filterBranch()->count();
+		$totalRows = \Credit::withTrashed()->owned()->count();
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
@@ -31,10 +31,10 @@ class CreditsController extends \BaseController {
 
 
 
-		$yearly = \Credit::filterBranch()->whereRaw('YEAR(date_of_credit) = YEAR(CURDATE())')->sum('total_amount');
-		$monthly = \Credit::filterBranch()->whereRaw('MONTH(date_of_credit) = MONTH(CURDATE())')->sum('total_amount');
-		$weekly = \Credit::filterBranch()->whereRaw('WEEK(date_of_credit) = WEEK(CURDATE())')->sum('total_amount');
-		$daily = \Credit::filterBranch()->whereRaw('DAY(date_of_credit) = DAY(CURDATE())')->sum('total_amount');
+		$yearly = \Credit::owned()->whereRaw('YEAR(date_of_credit) = YEAR(CURDATE())')->sum('total_amount');
+		$monthly = \Credit::owned()->whereRaw('MONTH(date_of_credit) = MONTH(CURDATE())')->sum('total_amount');
+		$weekly = \Credit::owned()->whereRaw('WEEK(date_of_credit) = WEEK(CURDATE())')->sum('total_amount');
+		$daily = \Credit::owned()->whereRaw('DAY(date_of_credit) = DAY(CURDATE())')->sum('total_amount');
 
 		$branches = \DB::table('expenses')->join('branches', 'expenses.branch_id', '=', 'branches.id')
 					->select(\DB::raw('CONCAT(SUBSTRING('.\DB::getTablePrefix().'branches.name, 1, 20),"...") AS name, '.\DB::getTablePrefix().'branches.id'));
