@@ -142,7 +142,7 @@ class BranchesController extends \BaseController {
 	{
 		$branch = \Branch::withTrashed()->where('id', $id)->first();
 		$message = \Lang::get('agrivate.trashed');
-		if ($branch->trashed()) {
+		if ($branch->trashed() || \Input::get('remove') == 1) {
             $branch->forceDelete();
             $message = \Lang::get('agrivate.deleted');
         } else {

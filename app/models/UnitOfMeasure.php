@@ -29,7 +29,7 @@ class UnitOfMeasure extends Eloquent {
     public function doSave(UnitOfMeasure $instance, $input) {
 		$instance->name = array_get($input, 'name');
 		$instance->label = array_get($input, 'label');
-		
+		$instance->is_decimal = array_get($input, 'is_decimal');
 		$instance->save();
 		return $instance;
 	}
@@ -41,6 +41,11 @@ class UnitOfMeasure extends Eloquent {
     		$query->whereRaw('name LIKE "%'. array_get($input, 's', '') .'%" OR label LIKE "%'. array_get($input, 's', '') .'%"');
     	}
 
+    	return $query;
+    }
+
+    public function scopeByName($query, $uom_name) {
+    	$query->where('name', '=', $uom_name);
     	return $query;
     }
 

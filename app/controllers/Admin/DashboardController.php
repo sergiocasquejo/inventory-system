@@ -8,6 +8,11 @@ class DashboardController extends \BaseController {
 	 * @return Response
 	 */
 	public static function index() {
+
+		if (!\Confide::user()->isAdmin()) {
+			return \Redirect::route('admin_users.show', \Confide::user()->id);
+		}
+
 		$data = [];
 
 

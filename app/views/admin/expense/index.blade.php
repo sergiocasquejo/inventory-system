@@ -79,6 +79,7 @@
                           <th>Quantity</th>
                           <th>{{ Form::select('total', $totals, Input::get('total', ''), ['class' => 'form-control input-xs']) }} </th>
                           <th>Unit of measure</th>
+                          <th>EXPENSE TYPE</th>
                           <th>Comments</th>
                           <th>
                             <div class="form-group">
@@ -105,11 +106,18 @@
                       @if ($expenses)
                           @foreach ($expenses as $expense)
                           <tr>
-                              <td>{{{ $expense->branch->name }}}</td>
-                              <td>{{{ $expense->name }}}</td>
+                              <td>{{{ !$expense->branch?'':$expense->branch->address .' '.$expense->branch->city }}}</td>
+                              <td>
+                                @if ($expense->expense_type=='PRODUCT EXPENSES')
+                                  {{{ !$expense->product?'':$expense->product->name }}}
+                                @else
+                                  {{{ $expense->name }}}
+                                @endif
+                              </td>
                               <td>{{{ $expense->quantity }}}</td>
                               <td>{{{ \Helper::nf($expense->total_amount) }}}</td>
                               <td>{{{ $expense->uom }}}</td>
+                              <td>{{{ $expense->expense_type }}}</td>
                               <td><a class="badge bg-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="{{{ $expense->comments }}}">?</a></td>
                               <td>{{{ Helper::fd($expense->date_of_expense) }}}</td>
                               <td>{{{ $expense->user->username }}}</td>
@@ -119,14 +127,20 @@
                                   </span>
                               </td>
                                <td>
-                                  @if ($expense->trashed())
+                                   @if ($expense->deleted_at != null)
                                     <a href="{{{ route('admin_expenses.restore', $expense->expense_id) }}}" data-method="RESTORE" class="btn btn-primary btn-xs" title="Restore"><i class="icon-rotate-left"></i></a>
                                   @else
                                     <a href="{{{ route('admin_expenses.edit', $expense->expense_id) }}}" class="btn btn-primary btn-xs" title="Edit"><i class="icon-pencil"></i></a>
                                   @endif
-                                  <a href="{{{ route('admin_expenses.destroy', $expense->expense_id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="{{{ $expense->trashed() ? 'Delete' : 'Trash' }}}" class="btn btn-danger btn-xs">
-                                    <i class="icon-{{{ $expense->trashed() ? 'remove' : 'trash' }}} "></i>
+                                   @if ($expense->deleted_at == null)
+                                  <a href="{{{ route('admin_expenses.destroy', $expense->expense_id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Trash" class="btn btn-danger btn-xs">
+                                    <i class="icon-trash"></i>
                                   </a>
+                                  @endif
+                                  <a href="{{{ route('admin_expenses.destroy', ['id' => $expense->expense_id, 'remove' => 1]) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
+                                    <i class="icon-remove"></i>
+                                  </a>
+
                               </td>
                           </tr>
                           @endforeach

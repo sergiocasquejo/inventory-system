@@ -64,7 +64,7 @@ class CreditsController extends \BaseController {
 
 		return \View::make('admin.credit.index', $all)
 			->with('credits', $credits)
-			->with('branches', \Branch::filterBranch()->lists('name', 'id'))
+			->with('branches', \Branch::filterBranch()->select(\DB::raw('CONCAT(address, " ", city) as name'), 'id')->lists('name', 'id'))
 			->with('appends', $appends)
 			->with('totalRows', $totalRows);
 
@@ -79,7 +79,7 @@ class CreditsController extends \BaseController {
 	public function create()
 	{
 		return \View::make('admin.credit.create')
-			->with('branches', array_add(\Branch::dropdown()->lists('name', 'id'), '', 'Select Branch'))
+		->with('branches', \Branch::filterBranch()->dropdown()->lists('name', 'id'))
 		->with('products', array_add(\Product::all()->lists('name', 'id'), '0', 'Select Product'))
 		->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));
 	}
@@ -95,6 +95,10 @@ class CreditsController extends \BaseController {
 		$input = \Input::all();
 
 		$input['encoded_by'] = \Confide::user()->id;
+
+		if (!\Confide::user()->isAdmin()) {
+			$input['branch_id'] = \Confide::user()->branch_id;
+		}
 
 		$rules = \Credit::$rules;
 
@@ -132,7 +136,7 @@ class CreditsController extends \BaseController {
 		$credit = \Credit::find($id);
 		
 		return \View::make('admin.credit.edit')->with('credit', $credit)
-		->with('branches', array_add(\Branch::dropdown()->lists('name', 'id'), '', 'Select Branch'))
+		->with('branches', \Branch::filterBranch()->dropdown()->lists('name', 'id'))
 		->with('products', array_add(\Product::all()->lists('name', 'id'), '0', 'Select Product'))
 		->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));
 	}
@@ -148,6 +152,10 @@ class CreditsController extends \BaseController {
 	{
 		$input = \Input::all();
 
+		if (!\Confide::user()->isAdmin()) {
+			$input['branch_id'] = \Confide::user()->branch_id;
+		}
+		
 		$rules = array_except(\Credit::$rules, 'encoded_by');
 
 		$validator = \Validator::make($input, $rules);
@@ -182,7 +190,7 @@ class CreditsController extends \BaseController {
 	{
 		$credit = \Credit::withTrashed()->where('credit_id', $id)->first();
 		$message = \Lang::get('agrivate.trashed');
-		if ($credit->trashed()) {
+		if ($credit->trashed() || \Input::get('remove') == 1) {
             $credit->forceDelete();
             $message = \Lang::get('agrivate.deleted');
         } else {

@@ -2,6 +2,12 @@
 
 class UsersController extends \BaseController {
 
+	public function __construct() {
+
+        $this->beforeFilter('owner', array('only' => array('index', 'create', 'edit', 'update')));
+        $this->beforeFilter('profileOwner', array('only' => array('show')));
+    }
+
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -35,7 +41,7 @@ class UsersController extends \BaseController {
 	{
 
 		return \View::make('admin.user.create')
-			->with('branches', array_add(\Branch::all()->lists('name', 'id'), '0', 'Select Branch') );
+			->with('branches', array_add(\Branch::dropdown()->lists('name', 'id'), '', 'Select Branch'));
 	}
 
 
@@ -72,6 +78,10 @@ class UsersController extends \BaseController {
 	}
 
 
+	public function show($id) {
+		$user = \User::findOrFail($id);
+		return \View::make('admin.user.show')->with('user', $user);
+	}
 
 	/**
 	 * Show the form for editing the specified resource.
@@ -90,7 +100,7 @@ class UsersController extends \BaseController {
 
 		return \View::make('admin.user.edit')
 		->with('user', $user)
-		->with('branches', array_add(\Branch::all()->lists('name', 'id'), '0', 'Select Branch') );
+		->with('branches', array_add(\Branch::dropdown()->lists('name', 'id'), '', 'Select Branch'));
 	}
 
 	
@@ -147,8 +157,8 @@ class UsersController extends \BaseController {
 				if ($user->doSave($user, $input)) {
 					
 					$this->upload($id);
-					
-					return \Redirect::route('admin_users.index')->with('success', \Lang::get('agrivate.updated'));
+					//route('admin_users.index')
+					return \Redirect::back()->with('success', \Lang::get('agrivate.updated'));
 				}
 
 				return \Redirect::back()->withErrors($user->errors())->withInput();
@@ -177,7 +187,7 @@ class UsersController extends \BaseController {
 
 		$user = \User::withTrashed()->where('id', $id)->first();
 		$message = \Lang::get('agrivate.trashed');
-		if ($user->trashed()) {
+		if ($user->trashed() || \Input::get('remove') == 1) {
             $user->forceDelete();
             $message = \Lang::get('agrivate.deleted');
         } else {

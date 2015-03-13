@@ -24,9 +24,7 @@ Route::group(['before' => 'auth', 'prefix' => 'admin'], function() {
 		// branches routes
 		Route::post('branches/{id}/restore', ['uses' => 'Admin\BranchesController@restore', 'as' => 'admin_branches.restore']);
 		Route::resource('branches', 'Admin\BranchesController', ['names' => $prefixResourceNamespace('admin_branches'), 'except' => ['show']]);
-		// Users routes
-		Route::post('users/{id}/restore', ['uses' => 'Admin\UsersController@restore', 'as' => 'admin_users.restore']);
-		Route::resource('users', 'Admin\UsersController', ['names' => $prefixResourceNamespace('admin_users'), 'except' => ['show']]);
+		
 		// Categories routes
 		Route::group(['prefix' => 'products'], function() use($prefixResourceNamespace) {
 			Route::resource('categories', 'Admin\CategoriesController', ['names' => $prefixResourceNamespace('admin_products_categoriess'), 'except' => ['show']]);
@@ -36,6 +34,7 @@ Route::group(['before' => 'auth', 'prefix' => 'admin'], function() {
 			Route::resource('prices', 'Admin\PricesController', ['names' => $prefixResourceNamespace('admin_product_prices'), 'except' => ['show']] );
 		});
 		// Products routes
+		
 		Route::post('products/{id}/restore', ['uses' => 'Admin\ProductsController@restore', 'as' => 'admin_products.restore']);
 		Route::resource('products', 'Admin\ProductsController', ['names' => $prefixResourceNamespace('admin_products'), 'except' => ['show']]);
 		// Brands routes
@@ -43,10 +42,14 @@ Route::group(['before' => 'auth', 'prefix' => 'admin'], function() {
 		Route::resource('brands', 'Admin\BrandsController', ['names' => $prefixResourceNamespace('admin_brands'), 'except' => ['show']]);
 		// Categories routes
 		Route::resource('categories', 'Admin\CategoriesController', ['names' => $prefixResourceNamespace('admin_categories'), 'except' => ['show']]);
+		
 		Route::resource('uoms', 'Admin\UnitOfMeasuresController', ['names' => $prefixResourceNamespace('admin_uoms'), 'except' => ['show']]);
 	
 	});
+	Route::get('products/dropdown', ['uses' => 'Admin\ProductsController@dropdown', 'as' => 'admin_products.dropdown']);
+	Route::get('uoms/dropdown', ['uses' => 'Admin\UnitOfMeasuresController@dropdown', 'as' => 'admin_uoms.dropdown']);
 	
+	Route::get('products/{id}/measures', ['uses' => 'Admin\ProductsController@measures', 'as' => 'admin_products.measures']);
 	Route::get('products/{id}/uom', ['uses' => 'Admin\ProductsController@uom', 'as' => 'admin_products.uom']);
 	Route::get('products/{id}/get', ['uses' => 'Admin\ProductsController@get', 'as' => 'admin_products.get']);
 	// Credits routes
@@ -64,4 +67,8 @@ Route::group(['before' => 'auth', 'prefix' => 'admin'], function() {
 
 	Route::resource('stocks', 'Admin\StockOnHandController', ['names' => $prefixResourceNamespace('admin_stocks'), 'except' => ['show']]);
 
+
+	// Users routes
+	Route::post('users/{id}/restore', ['uses' => 'Admin\UsersController@restore', 'as' => 'admin_users.restore']);
+	Route::resource('users', 'Admin\UsersController', ['names' => $prefixResourceNamespace('admin_users')]);
 });

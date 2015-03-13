@@ -147,6 +147,12 @@ class UnitOfMeasuresController extends \BaseController {
 	}
 
 
+	public function dropdown() {
+		$measures = \UnitOfMeasure::all();
+
+		return \Response::json($measures);
+	}
+
 	
 
 

@@ -82,6 +82,9 @@ class Branch extends Eloquent {
            $query->whereRaw('id ='. (int) \Confide::user()->branch_id); 
         } 
 
+        $query->where('status', '=', 1)
+            ->whereNull('deleted_at');
+
         return $query;
     }
 

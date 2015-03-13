@@ -11,18 +11,15 @@
                 <header class="panel-heading">
                     Users <a class="btn btn-info btn-xs" href="{{ route('admin_users.create') }}">Add New</a> <a class="btn btn-warning btn-xs" href="{{ route('admin_users.index') }}" title="Reset"><i class=" icon-refresh"></i></a>
                 </header>
-                <div class="dataTables_wrapper form-inline">
-                  <div class="row">
-                    <div class="col-sm-6">
-                      <div id="sample_1_length" class="dataTables_length">
-                        <label>
-                          {{ Form::select('records_per_page', \Config::get('agrivate.records_per_page'), Input::get('records_per_page', 10), ['class' => 'form-control', 'size' => '1', 'onchange' => 'this.form.submit();']) }} 
-                          records per page
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-4">
+                <br />
+                <div class="col-sm-1">
+                    <label>
+                      {{ Form::select('records_per_page', \Config::get('agrivate.records_per_page'), Input::get('records_per_page', 10), ['class' => 'form-control', 'size' => '1', 'onchange' => 'this.form.submit();']) }} 
+                      per page
+                    </label>
+                </div>
+
+                <div class="col-md-4">
                     <div class="form-group">
                       <input type="text" name="s"  value="{{ Input::get('s') }}" placeholder="Search" class="form-control">
                     </div>
@@ -64,7 +61,7 @@
                                     {{{ $user->confirmed ? 'Yes' : 'No' }}}
                                 </span>
                             </td>
-                             <td>{{{ !$user->branch?'':$user->branch->name }}}</td>
+                             <td>{{{ !$user->branch?'':$user->branch->name.' ('.$user->branch->address.')' }}}</td>
                             <td>
                                 <span class="label label-{{{ $user->status ? 'success' : 'warning' }}} label-mini">
                                     {{{ $user->status ? 'Active' : 'Inactive' }}}
@@ -78,10 +75,17 @@
                                   <a href="{{{ route('admin_users.edit', $user->id) }}}" class="btn btn-primary btn-xs" title="Edit"><i class="icon-pencil"></i></a>
                                 @endif
                                 @if (!$user->is_admin)
-                                <a href="{{{ route('admin_users.destroy', $user->id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="{{{ $user->trashed() ? 'Delete' : 'Trash' }}}" class="btn btn-danger btn-xs">
-                                  <i class="icon-{{{ $user->trashed() ? 'remove' : 'trash' }}} "></i>
-                                </a>
+                                 @if (!$user->trashed())
+                                  <a href="{{{ route('admin_users.destroy', $user->id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Trash" class="btn btn-danger btn-xs">
+                                    <i class="icon-trash"></i>
+                                  </a>
+                                  @endif
+                                  <a href="{{{ route('admin_users.destroy', ['id' => $user->id, 'remove' => 1]) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
+                                    <i class="icon-remove"></i>
+                                  </a>
+
                                 @endif
+                                <a href="{{{ route('admin_users.show', $user->id) }}}" class="btn btn-primary btn-xs" title="View"><i class="icon-eye-open"></i></a>
                             </td>
                         </tr>
                         @endforeach

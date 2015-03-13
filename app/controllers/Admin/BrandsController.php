@@ -134,7 +134,7 @@ class BrandsController extends \BaseController {
 		try {
 			$brand = \Brand::findOrFail($id);
 			$message = \Lang::get('agrivate.trashed');
-			if (!$brand->delete()) {
+			if (!$brand->delete() || \Input::get('remove') == 1) {
 				return \Redirect::back()->withErrors($brand->errors());			
 	        }
 

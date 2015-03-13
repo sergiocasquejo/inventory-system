@@ -7,7 +7,7 @@
 		 Create Stock
 		</header>
 		<div class="panel-body">
-		  	<form action="{{ route('admin_stocks.store') }}"  class="form-horizontal tasi-form" method="POST">
+		  	<form action="{{ route('admin_stocks.store') }}" id="stockForm"   class="form-horizontal tasi-form" method="POST">
 		  		<input type="hidden" name="_token" value="{{ csrf_token() }}" />
 		       <div class="form-group">
 		          <label class="col-sm-2 control-label">Product</label>
@@ -25,7 +25,7 @@
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Unit of Measure</label>
 				  <div class="col-sm-10">
-				      {{ Form::select('uom', $dd_measures, Input::old('uom'), ['class' => 'form-control']) }}
+				      {{ Form::select('uom', $dd_measures, Input::old('uom'), ['class' => 'form-control', 'data-selected' => Input::old('uom')]) }}
 				  </div>
 				</div>
 				<div class="form-group">

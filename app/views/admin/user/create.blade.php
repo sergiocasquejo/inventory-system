@@ -2,13 +2,18 @@
 
 @section('content')
     @include ('admin._partials.breadcrumbs')
-    <section class="panel">
-		<header class="panel-heading">
-		 Create User
-		</header>
-		<div class="panel-body">
-		  	<form action="{{ route('admin_users.store') }}"  class="form-horizontal tasi-form" enctype="multipart/form-data" method="POST">
-		  		<input type="hidden" name="_token" value="{{ csrf_token() }}" />
+
+	<div class="row">
+
+      <aside class="profile-info col-lg-9">
+      		<form action="{{ route('admin_users.store') }}"  class="form-horizontal tasi-form" enctype="multipart/form-data" method="POST">
+         	 <section class="panel">
+              <div class="bio-graph-heading">
+                  <h1> Profile Info</h1>
+              </div>
+              <div class="panel-body bio-graph-info">
+                  
+			  		<input type="hidden" name="_token" value="{{ csrf_token() }}" />
 		       	<div class="form-group">
 					<label class="col-sm-2 control-label" required>Branch</label>
 					<div class="col-sm-10">
@@ -32,18 +37,29 @@
 				</div>
 
 				<div class="form-group">
-				  <label class="col-sm-2 control-label">Password</label>
-				  <div class="col-sm-10">
-				      <input type="password" id="password" name="password" value="{{ Input::old('password') }}" class="form-control" minlength="5" required>
+					<label class="col-sm-2 control-label">Contact No.</label>
+				 	<div class="col-sm-10">
+				      <input type="text" name="contact_no" value="{{ Input::old('contact_no') }}" class="form-control" minlength="5" required>
 				  </div>
 				</div>
 
 				<div class="form-group">
-				  <label class="col-sm-2 control-label">Confirm Password</label>
+				  <label class="col-sm-2 control-label">Address</label>
 				  <div class="col-sm-10">
-				      <input type="password" name="confirm_password" value="{{ Input::old('confirm_password') }}" class="form-control" minlength="5" required>
+				      <textarea name="address" class="form-control" minlength="5" required>{{ Input::old('address') }}</textarea>
 				  </div>
 				</div>
+
+				<div class="form-group">
+				  <label class="col-sm-2 control-label">Birth Day</label>
+				  <div class="col-sm-10">
+				      <input type="text" name="birthdate" value="{{ Input::old('birthdate') }}" class="form-control datepicker" minlength="5" required>
+				  </div>
+				</div>
+
+
+
+				
 
 
 				<div class="form-group">
@@ -94,9 +110,32 @@
 				      {{ Form::select('status',  \Config::get('agrivate.statuses'), Input::old('status'), ['class' => 'form-control m-bot15']) }}
 				  </div>
 				</div>
-				<button type="submit" class="btn btn-shadow btn-primary">Create</button>
-		  </form>
-		</div>
-	</section>
-	<!-- page end-->
+					
+			  
+              </div>
+          </section>
+          <section>
+              <div class="panel panel-primary">
+                  <div class="panel-heading"> Sets New Password &amp; Avatar</div>
+                  <div class="panel-body">
+                  	<div class="form-group">
+						  <label class="col-sm-2 control-label">Password</label>
+						  <div class="col-sm-10">
+						      <input type="password" id="password" name="password" value="{{ Input::old('password') }}" class="form-control" minlength="5" required>
+						  </div>
+						</div>
+
+						<div class="form-group">
+						  <label class="col-sm-2 control-label">Confirm Password</label>
+						  <div class="col-sm-10">
+						      <input type="password" name="confirm_password" value="{{ Input::old('confirm_password') }}" class="form-control" minlength="5" required>
+						  </div>
+						</div>
+					<button type="submit" class="btn btn-shadow btn-primary">Create</button>
+                  </div>
+              </div>
+          </section>
+          </form>
+      </aside>
+  </div>
 @stop

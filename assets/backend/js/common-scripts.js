@@ -230,7 +230,152 @@ var Script = function () {
             saleForm.find(':input[name=quantity]').trigger('keyup');
 
         });
+
         
+
+        var stockForm = $('#stockForm'),
+            productField = stockForm.find(':input[name=product_id]'),
+            uomField = stockForm.find(':input[name=uom]');
+
+        productField.on('change', function() {
+                var self = $(this);
+                var slctdProduct = self.val();
+
+                if (!slctdProduct || slctdProduct == '') return;
+                var slctUOM = stockForm.find(':input[name=uom]');
+                
+                slctUOM.html('');
+                // slctUOM.html($('<option>').val('').text('Select Measure'));
+
+                $.get(AJAX.baseUrl+'/admin/products/'+ slctdProduct +'/measures', function(response) {
+                    $('span.alert-warning').remove();
+                    if (response.length) {
+                        $.each(response, function(index, uom){
+                            var opt = $('<option>').val(uom.name).text(uom.label);
+                            if (uom.name == slctUOM.data('selected')) {
+                                opt.attr('selected', 'selected');
+                            }
+                            slctUOM.append(opt);
+                        });
+                        
+                    } else {
+                        $("<span class='alert alert-warning'>")
+                            .html('<a href="'+ AJAX.baseUrl +'/admin/products/'+ slctdProduct +'/edit">Click here</a> to setup stocks product')
+                            .insertAfter(self);
+                    }
+                });
+
+            }).trigger('change');
+
+
+         var expenseForm = $('#expenseForm'),
+            productField = expenseForm.find(':input[name=name]'),
+            uomField = expenseForm.find(':input[name=uom]');
+            qtyField = expenseForm.find(':input[name=quantity]');
+        expenseForm.find('select[name=expense_type]').on('change', function() {
+            var val = $(this).val();
+            var productSlctdValue = $(':input[name=name]').attr('data-selected');
+            var productInput = '';
+            if (val == 'PRODUCT EXPENSES') {
+                expenseForm.find(':input[name=uom]').removeAttr('disabled');
+                productInput = $('<select name="name" class="form-control" data-selected="'+ productSlctdValue +'" required>');
+                expenseForm.find(":input[name=total_amount]").attr('readonly', 'readonly');
+
+                $.get(AJAX.baseUrl+'/admin/products/dropdown', function(response) {
+
+                    if (response.length) {
+                        $.each(response, function(index, product){
+                            if (product.name != '') {
+                                var opt = $('<option>').val(product.id).text(product.name);
+                                if (product.id == productInput.data('selected')) {
+                                    opt.attr('selected', 'selected');
+                                }
+                                productInput.append(opt);
+                            }
+                        });
+                        
+                    } 
+                });
+
+
+            } else if (val == 'STORE EXPENSES') {
+                expenseForm.find(':input[name=uom]').attr('disabled','disabled');
+                expenseForm.find(':input[name=total_amount]').removeAttr('readonly');
+
+                productInput = $('<input type="text" name="name" data-selected="'+ productSlctdValue +'" value="'+ productSlctdValue +'" class="form-control" required>');
+                var slctUOM = expenseForm.find(':input[name=uom]');
+                 slctUOM.html('<option>Select Measure</option>');
+                $.get(AJAX.baseUrl+'/admin/uoms/dropdown', function(response) {
+
+                    if (response.length) {
+                        $.each(response, function(index, uom){
+                            var opt = $('<option>').val(uom.name).text(uom.label);
+                            if (uom.name == slctUOM.data('selected')) {
+                                opt.attr('selected', 'selected');
+                            }
+                            slctUOM.append(opt);
+                        });
+                        
+                    }
+                });
+            }
+
+            $(':input[name=name]').replaceWith(productInput)
+                .trigger('change');
+        }).trigger('change');
+
+        $('body').on('change', '#expenseForm :input[name=name]', function() {
+
+            if (expenseForm.find('select[name=expense_type]').val() == 'STORE EXPENSES') return;
+
+            console.log('test');
+            var self = $(this);
+            var slctdProduct = self.val();
+            
+
+            if (!slctdProduct && slctdProduct == '' &&  expenseForm.find('select[name=expense_type]').val() == 'PRODUCT EXPENSES') return;
+            var slctUOM = expenseForm.find(':input[name=uom]');
+            
+          
+            // slctUOM.html($('<option>').val('').text('Select Measure'));
+
+            $.get(AJAX.baseUrl+'/admin/products/'+ slctdProduct +'/measures', function(response) {
+
+                if (response.length) {
+                      slctUOM.html('');
+                    $.each(response, function(index, uom){
+                        var opt = $('<option>').val(uom.name).text(uom.label);
+                        if (uom.name == slctUOM.data('selected')) {
+                            opt.attr('selected', 'selected');
+                        }
+                        slctUOM.append(opt);
+                    });
+                    
+                }
+            });
+            qtyField.trigger('keyup');
+
+        }).trigger('change');
+
+
+        qtyField.on('keyup', function() {
+            if (expenseForm.find('select[name=expense_type]').val() == 'STORE EXPENSES') return;
+            
+            var slctdProduct = expenseForm.find(':input[name=name]').val();
+            var slctdBranch = expenseForm.find(':input[name=branch_id]').val();
+            var slctdUOM = expenseForm.find(':input[name=uom]').val();
+            var quantity = $(this).val();
+
+            if (typeof slctdProduct == 'undefined' || !slctdProduct) return;
+
+            $.get(AJAX.baseUrl+'/admin/products/'+ slctdProduct +'/get', {branch_id: slctdBranch, uom:slctdUOM }, function(response) {
+                if (response.selling_price != 0) {
+                    expenseForm.find(':input[name=total_amount]').val(response.selling_price * quantity)
+                }  
+            });
+            
+        }).trigger('keyup');
+
     });
 
 

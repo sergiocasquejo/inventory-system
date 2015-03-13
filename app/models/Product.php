@@ -47,6 +47,10 @@ class Product extends Eloquent {
         return $this->belongsTo('Category', 'category_id');
     }
 
+    public function expenses() {
+        return $this->hasMany('Expense');
+    }
+
 
     
     /**=================================================

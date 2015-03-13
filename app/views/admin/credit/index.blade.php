@@ -125,9 +125,15 @@
                                   @else
                                     <a href="{{{ route('admin_credits.edit', $credit->credit_id) }}}" class="btn btn-primary btn-xs" title="Edit"><i class="icon-pencil"></i></a>
                                   @endif
-                                  <a href="{{{ route('admin_credits.destroy', $credit->credit_id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="{{{ $credit->trashed() ? 'Delete' : 'Trash' }}}" class="btn btn-danger btn-xs">
-                                    <i class="icon-{{{ $credit->trashed() ? 'remove' : 'trash' }}} "></i>
+                                  @if (!$credit->trashed())
+                                  <a href="{{{ route('admin_credits.destroy', $credit->credit_id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Trash" class="btn btn-danger btn-xs">
+                                    <i class="icon-trash"></i>
                                   </a>
+                                  @endif
+                                  <a href="{{{ route('admin_credits.destroy', ['id' => $credit->credit_id, 'remove' => 1]) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
+                                    <i class="icon-remove"></i>
+                                  </a>
+
                               </td>
                           </tr>
                           @endforeach

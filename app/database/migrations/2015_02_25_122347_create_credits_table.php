@@ -20,7 +20,7 @@ class CreateCreditsTable extends Migration {
 			$table->string('address', 120);
 			$table->string('contact_number', 30);
 			$table->string('product', 255);
-			$table->float('quantity');
+			$table->decimal('quantity', 10, 2);
 			$table->string('uom', 120);
 			$table->decimal('total_amount', 10, 2);
 			$table->text('comments');

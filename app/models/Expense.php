@@ -10,8 +10,7 @@ class Expense extends Eloquent {
     	'branch_id'        => 'required|exists:branches,id',
     	'name'	           => 'required:min:5',
     	'total_amount' 	   => 'required|numeric',
-    	// 'quantity'		   => 'required|numeric',
-    	//'uom'	           => 'required',
+    	'uom'	           => 'required|whole_number:quantity',
         'date_of_expense'  => 'required|date',
     	'encoded_by' 	   => 'required|exists:users,id',
     	'status'	       => 'required|in:0,1'
@@ -28,6 +27,10 @@ class Expense extends Eloquent {
 
     public function branch() {
         return $this->belongsTo('Branch', 'branch_id');
+    }
+
+    public function product() {
+        return $this->belongsTo('Product', 'name');
     }
 
     /**=================================================
@@ -101,6 +104,7 @@ class Expense extends Eloquent {
 
 	public function doSave(Expense $instance, $input) {
 		$instance->branch_id = array_get($input, 'branch_id');
+        $instance->expense_type = array_get($input, 'expense_type');
 		$instance->name = array_get($input, 'name');
 		$instance->total_amount = array_get($input, 'total_amount');
 		$instance->quantity = array_get($input, 'quantity');

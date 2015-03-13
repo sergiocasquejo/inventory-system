@@ -12,24 +12,15 @@
                   Products <a class="btn btn-info btn-xs" href="{{ route('admin_products.create') }}">Add New</a> <a class="btn btn-warning btn-xs" href="{{ route('admin_products.index') }}" title="Reset"><i class=" icon-refresh"></i></a>
               </header>
               <div class="dataTables_wrapper form-inline">
-                <div class="row">
-                  <div class="col-sm-6">
-                    <div id="sample_1_length" class="dataTables_length">
-                      <label>
-                        {{ Form::select('records_per_page', \Config::get('agrivate.records_per_page'), Input::get('records_per_page', 10), ['class' => 'form-control', 'size' => '1', 'onchange' => 'this.form.submit();']) }} 
-                        records per page
-                      </label>
-                    </div>
-                  </div>
-                  <div class="col-sm-6">
-                  </div>
-                </div>
                 
-
+                  <br />
                   <div class="col-md-12">
                     <div class="form-group">
+                        {{ Form::select('records_per_page', \Config::get('agrivate.records_per_page'), Input::get('records_per_page', 10), ['class' => 'form-control', 'size' => '1', 'onchange' => 'this.form.submit();']) }} 
+                    </div>
+                    <div class="form-group">
                         <input type="text" name="s"  value="{{ Input::get('s') }}" placeholder="Search" class="form-control">
-                      </div>
+                    </div>
                     <div class="form-group">
                       {{ Form::select('branch', $branches, Input::get('branch', ''), ['class' => 'form-control', 'size' => '1']) }} 
                     </div>
@@ -53,7 +44,7 @@
                       @if ($products)
                           @foreach ($products as $product)
                           <tr>
-                              <td>{{{ $product->branch_name  }}}</td>
+                              <td>{{{ $product->address.' '.$product->city  }}}</td>
                               <td>{{{ $product->name }}}</td>
                               <td><span class="label label-info label-mini mr-10px">{{ str_replace(',', '</span><span class="label label-info label-mini mr-10px">', $product->selling_price) }}</span></td>
                               <td>
@@ -62,14 +53,21 @@
                                   </span>
                               </td>
                               <td>
-                                  @if ($product->trashed())
+                                  @if ($product->deleted_at != null)
                                     <a href="{{{ route('admin_products.restore', $product->id) }}}" data-method="RESTORE" class="btn btn-primary btn-xs" title="Restore"><i class="icon-rotate-left"></i></a>
                                   @else
                                     <a href="{{{ route('admin_products.edit', $product->id) }}}" class="btn btn-primary btn-xs" title="Edit"><i class="icon-pencil"></i></a>
                                   @endif
-                                  <a href="{{{ route('admin_products.destroy', $product->id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="{{{ $product->trashed() ? 'Delete' : 'Trash' }}}" class="btn btn-danger btn-xs">
-                                    <i class="icon-{{{ $product->trashed() ? 'remove' : 'trash' }}} "></i>
+                                  @if (!$product->deleted_at != null)
+                                  <a href="{{{ route('admin_products.destroy', $product->id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Trash" class="btn btn-danger btn-xs">
+                                    <i class="icon-trash"></i>
                                   </a>
+                                  @endif
+                                  <a href="{{{ route('admin_products.destroy', ['id' => $product->id, 'remove' => 1]) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
+                                    <i class="icon-remove"></i>
+                                  </a>
+
+
                               </td>
                           </tr>
                           @endforeach

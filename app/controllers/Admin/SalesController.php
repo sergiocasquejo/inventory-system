@@ -14,6 +14,7 @@ class SalesController extends \BaseController {
 
 		$sales = \Sale::withTrashed()
 				->filter($input)
+				->filterBranch()
 				->orderBy('sale_id', 'desc')
 				->paginate(intval(array_get($input, 'records_per_page', 10)));
 		
@@ -74,10 +75,11 @@ class SalesController extends \BaseController {
 	 * @return Response
 	 */
 	public function create()
-	{
+	{	
+
 
 		return \View::make('admin.sale.create')
-		->with('branches', \Branch::filterBranch()->dropdown())
+		->with('branches', \Branch::filterBranch()->dropdown()->lists('name', 'id'))
 		->with('products', \Product::active()->lists('name', 'id'))
 		->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));
 	}
@@ -94,6 +96,10 @@ class SalesController extends \BaseController {
 
 
 		$rules = \Sale::$rules;
+
+		if (!\Confide::user()->isAdmin()) {
+			$input['branch_id'] = \Confide::user()->branch_id;
+		}
 
 		$input['encoded_by'] = \Confide::user()->id;
 
@@ -116,7 +122,7 @@ class SalesController extends \BaseController {
 					$quantity = array_get($input, 'quantity');
 
 					// Convert sack to kg
-					if ($uom == 'sacks') {
+					if (strpos($uom,'sack') !== false) {
 						$oldMeasure = $input['uom'];
 						$input['quantity'] = $quantity * \Config::get('agrivate.equivalent_measure.sacks.per');
 						$input['uom'] = $uom = 'kg';
@@ -148,12 +154,12 @@ class SalesController extends \BaseController {
 								$stock->save();
 							}
 						} else {
-							if ($oldMeasure == 'sacks') $input['uom'] = $oldMeasure;
+							if (strpos($oldMeasure, 'sack') !== false) $input['uom'] = $oldMeasure;
 							$errors = [\Lang::get('agrivate.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
 						}
 
 					} else {
-						if ($oldMeasure == 'sacks') $input['uom'] = $oldMeasure;
+						if (strpos($oldMeasure,'sack') !== false) $input['uom'] = $oldMeasure;
 						$errors = [\Lang::get('agrivate.errors.out_of_stocks')];
 
 					}
@@ -214,7 +220,10 @@ class SalesController extends \BaseController {
 		$input = \Input::all();
 
 
-
+		if (!\Confide::user()->isAdmin()) {
+			$input['branch_id'] = \Confide::user()->branch_id;
+		}
+		
 		$rules = \Sale::$rules;
 		$input['encoded_by'] = \Confide::user()->id;
 
@@ -239,7 +248,7 @@ class SalesController extends \BaseController {
 					$quantity = array_get($input, 'quantity', 0);
 
 					// Convert sack to kg
-					if ($uom == 'sacks') {
+					if (strpos($uom,'sack') !== false) {
 						$oldMeasure = $input['uom'];
 						$input['quantity'] = $quantity * \Config::get('agrivate.equivalent_measure.sacks.per');
 						$input['uom'] = $uom = 'kg';
@@ -313,7 +322,7 @@ class SalesController extends \BaseController {
 	{
 		$sale = \Sale::withTrashed()->where('sale_id', $id)->first();
 		$message = \Lang::get('agrivate.trashed');
-		if ($sale->trashed()) {
+		if ($sale->trashed() || \Input::get('remove') == 1 ) {
             $sale->forceDelete();
             $message = \Lang::get('agrivate.deleted');
         } else {

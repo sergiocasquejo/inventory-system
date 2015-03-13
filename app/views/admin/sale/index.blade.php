@@ -66,6 +66,8 @@
                         </label>
                       </div>
                     </div>
+                  </div>
+
               <table class="table table-striped table-advance table-hover">
                   <thead>
                     <tr>
@@ -110,8 +112,8 @@
                     @if ($sales)
                         @foreach ($sales as $sale)
                         <tr>
-                            <td>{{{ $sale->branch->name }}}</td>
-                            <td>{{{ $sale->product->name }}}</td>
+                            <td>{{{ !$sale->branch?'':$sale->branch->name }}}</td>
+                            <td>{{{ !$sale->product?'':$sale->product->name }}}</td>
                             <td>{{{ $sale->quantity }}}</td>
                             <td>{{{ $sale->uom }}}</td>
                             <td>{{{ $sale->total_amount }}}</td>
@@ -132,8 +134,13 @@
                                 @else
                                   <a href="{{{ route('admin_sales.edit', $sale->sale_id) }}}" class="btn btn-primary btn-xs" title="Edit"><i class="icon-pencil"></i></a>
                                 @endif
-                                <a href="{{{ route('admin_sales.destroy', $sale->sale_id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="{{{ $sale->trashed() ? 'Delete' : 'Trash' }}}" class="btn btn-danger btn-xs">
-                                  <i class="icon-{{{ $sale->trashed() ? 'remove' : 'trash' }}} "></i>
+                                @if (!$sale->trashed())
+                                <a href="{{{ route('admin_sales.destroy', $sale->sale_id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Trash" class="btn btn-danger btn-xs">
+                                  <i class="icon-trash"></i>
+                                </a>
+                                @endif
+                                <a href="{{{ route('admin_sales.destroy', ['id' => $sale->sale_id, 'remove' => 1]) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
+                                  <i class="icon-remove"></i>
                                 </a>
                             </td>
                         </tr>
@@ -154,10 +161,8 @@
                       </tr>
                   </tfoot>
               </table>
-              <div class="row">
                   <div class="col-sm-6">
-                    <div class="dataTables_length">
-                      {{{ $totalRows }}} entries</div>
+                    <div class="dataTables_length">{{{ $totalRows }}} entries</div>
                   </div>
                   <div class="col-sm-6">
                     <div class="dataTables_filter pagination-sm">
@@ -165,7 +170,6 @@
                     </div>
                   </div>
                 </div>
-              </div>
           </section>
       </div>
   </div>

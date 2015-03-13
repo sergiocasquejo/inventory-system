@@ -7,7 +7,7 @@
 		 Create Stock
 		</header>
 		<div class="panel-body">
-		  	<form action="{{ route('admin_stocks.update') }}"  class="form-horizontal tasi-form" method="POST">
+		  	<form action="{{ route('admin_stocks.update', $stock->stock_on_hand_id) }}" id="stockForm"   class="form-horizontal tasi-form" method="POST">
 		  		<input type="hidden" name="_token" value="{{ csrf_token() }}" />
 		  		<input type="hidden" name="_method" value="PUT" />
 		       <div class="form-group">
@@ -26,7 +26,7 @@
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Unit of Measure</label>
 				  <div class="col-sm-10">
-				      {{ Form::select('uom', $dd_measures, Input::old('uom', $stock->uom), ['class' => 'form-control']) }}
+				      {{ Form::select('uom', $dd_measures, Input::old('uom', $stock->uom), ['class' => 'form-control', 'data-selected' =>Input::old('uom', $stock->uom)]) }}
 				  </div>
 				</div>
 				<div class="form-group">
@@ -35,7 +35,7 @@
 				     	{{ Form::select('branch_id', $branches, Input::old('branch_id', $stock->branch_id), ['class' => 'form-control m-bot15']) }}
 				  </div>
 				</div>
-				<button type="submit" class="btn btn-shadow btn-primary">Create</button>
+				<button type="submit" class="btn btn-shadow btn-primary">Update</button>
 		  </form>
 		</div>
 	</section>

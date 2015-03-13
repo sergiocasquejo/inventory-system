@@ -91,6 +91,17 @@ Route::filter('owner', function()
 });
 
 
+Route::filter('profileOwner', function()
+{	
+
+	$id = Request::segment(3);
+	if (!Confide::user())
+		return Redirect::to('admin/login')->with('error', \Lang::get('agrivate.errors.permission'));
+	elseif(Confide::user()->id != $id && !Confide::user()->isAdmin())
+		return Redirect::to('/admin/dashboard')->with('error', \Lang::get('agrivate.errors.permission'));
+});
+
+
 
 
 /*

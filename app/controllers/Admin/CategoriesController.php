@@ -148,7 +148,7 @@ class CategoriesController extends \BaseController {
 		try {
 			$category = \Category::findOrFail($id);
 			$message = \Lang::get('agrivate.trashed');
-			if (!$category->delete()) {
+			if (!$category->delete() || \Input::get('remove') == 1) {
 				return \Redirect::back()->withErrors($category->errors());			
 	        }
 

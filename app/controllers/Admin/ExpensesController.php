@@ -34,7 +34,7 @@ class ExpensesController extends \BaseController {
 
 
 		$branches = \DB::table('expenses')->join('branches', 'expenses.branch_id', '=', 'branches.id')
-					->select(\DB::raw('CONCAT(SUBSTRING('.\DB::getTablePrefix().'branches.name, 1, 20),"...") AS name, '.\DB::getTablePrefix().'branches.id'));
+					->select(\DB::raw('CONCAT('.\DB::getTablePrefix().'branches.address," ", '.\DB::getTablePrefix().'branches.city) AS name, '.\DB::getTablePrefix().'branches.id'));
 
 
 					
@@ -74,7 +74,7 @@ class ExpensesController extends \BaseController {
 	{
 
 		return \View::make('admin.expense.create')
-			->with('branches', \Branch::dropdown()->lists('name', 'id'))
+			->with('branches', \Branch::filterBranch()->dropdown()->lists('name', 'id'))
 			->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));
 	}
 
@@ -89,6 +89,14 @@ class ExpensesController extends \BaseController {
 		$input = \Input::all();
 
 		$rules = \Expense::$rules;
+		if (!\Confide::user()->isAdmin()) {
+			$input['branch_id'] = \Confide::user()->branch_id;
+		}
+
+		if (array_get($input, 'expense_type') == 'STORE EXPENSES') {
+			$rules['uom'] = 'whole_number:quantity';
+		}
+
 		$input['encoded_by'] = \Confide::user()->id;
 
 		$validator = \Validator::make($input, $rules);
@@ -129,7 +137,7 @@ class ExpensesController extends \BaseController {
 
 		return \View::make('admin.expense.edit')
 			->with('expense', $expense)
-			->with('branches', \Branch::dropdown()->lists('name', 'id'))
+			->with('branches', \Branch::filterBranch()->dropdown()->lists('name', 'id'))
 			->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));
 	}
 
@@ -147,6 +155,14 @@ class ExpensesController extends \BaseController {
 
 
 		$input = \Input::all();
+
+		if (!\Confide::user()->isAdmin()) {
+			$input['branch_id'] = \Confide::user()->branch_id;
+		}
+
+		if (array_get($input, 'expense_type') == 'STORE EXPENSES') {
+			$rules['uom'] = 'whole_number:quantity';
+		}
 
 		$rules = \Expense::$rules;
 
@@ -182,7 +198,7 @@ class ExpensesController extends \BaseController {
 	{
 		$expense = \Expense::withTrashed()->where('expense_id', $id)->first();
 		$message = \Lang::get('agrivate.trashed');
-		if ($expense->trashed()) {
+		if ($expense->trashed() || \Input::get('remove') == 1) {
             $expense->forceDelete();
             $message = \Lang::get('agrivate.deleted');
         } else {

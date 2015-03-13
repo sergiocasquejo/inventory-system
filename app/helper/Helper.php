@@ -137,4 +137,9 @@ class Helper {
 			return static::$str;
 		}
 	}
+
+	public static function is_decimal( $val )
+	{
+	    return is_numeric( $val ) && floor( $val ) != $val;
+	}
 }

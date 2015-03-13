@@ -20,7 +20,7 @@ class CreateSalesTable extends Migration {
             $table->bigInteger('product_id')->unsigned()->nullable();
             $table->decimal('supplier_price', 10, 2);
             $table->decimal('selling_price', 10, 2);
-            $table->float('quantity');
+            $table->decimal('quantity', 10, 2);
             $table->string('uom', 120);
             $table->decimal('total_amount', 10, 2);
             $table->text('comments');

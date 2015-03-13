@@ -17,15 +17,10 @@ class ProductsController extends \BaseController {
 
 		
 		$products = \Product::withTrashed()->select(
-					"products.id", "products.status", "branches.name as branch_name", "products.name",
+					"products.id", "products.deleted_at", "products.status", "branches.address", "branches.city", "products.name",
 					\DB::raw("GROUP_CONCAT('P', selling_price, '/', per_unit) as selling_price")
 				)
-				/*\DB::raw(
-					"CONCAT(TRUNCATE(SUM(IF({$px}product_pricing.per_unit ='sacks', {$px}product_pricing.selling_price, NULL  )), 0), ' ', 'sacks') as sacks"
-				),
-				\DB::raw(
-					"CONCAT(IF({$px}product_pricing.per_unit = 'sacks', SUM({$px}product_pricing.selling_price) - SUM(IF({$px}product_pricing.per_unit ='sacks', {$px}product_pricing.selling_price, NULL  )), SUM({$px}product_pricing.selling_price)  ), ' ', IF ({$px}product_pricing.per_unit = 'sacks', 'kg', {$px}product_pricing.per_unit )) as other")
-				)*/
+
 				->filter($input)
 				->leftJoin('product_pricing', 'products.id', '=', 'product_pricing.product_id')
 				->leftJoin('branches', 'product_pricing.branch_id', '=', 'branches.id')
@@ -172,7 +167,7 @@ class ProductsController extends \BaseController {
 	{
 		$product = \Product::withTrashed()->where('id', $id)->first();
 		$message = \Lang::get('agrivate.trashed');
-		if ($product->trashed()) {
+		if ($product->trashed() || \Input::get('remove') == 1) {
             $product->forceDelete();
             $message = \Lang::get('agrivate.deleted');
         } else {
@@ -241,5 +236,34 @@ class ProductsController extends \BaseController {
 
 
 		return \Response::json($uoms->get());
+	}
+
+
+	/**
+	 * Show the form for editing the specified resource.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function measures($id)
+	{	
+		$branch = \Input::get('branch_id');
+
+		$product = \Product::findOrFail($id);
+		$measures = [];
+
+		if ($product) {
+			$uoms = implode("','", json_decode($product->uom));
+			$measures = \UnitOfMeasure::whereRaw("name IN ('". $uoms ."') ")->select('label', 'name');
+		}
+
+		
+
+		return \Response::json($measures->get());
+	}
+
+	public function dropdown() {
+		$products = \Product::all();
+		return \Response::json($products);
 	}
 }	
