@@ -4,6 +4,7 @@
     @include ('admin._partials.breadcrumbs')
 
     <div class="row">
+      @if (\Confide::user()->isAdmin())
       <div class="col-lg-12">
           <div class="row state-overview">
             <div class="col-lg-3 col-sm-6">
@@ -48,7 +49,7 @@
             </div>
           </div>
       </div>
-      
+      @endif
       <div class="col-lg-12">
           <section class="panel">
             <form action="{{ route('admin_credits.index') }}"  class="form-inline tasi-form" method="GET">
