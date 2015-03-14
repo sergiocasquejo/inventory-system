@@ -53,13 +53,18 @@ Route::group(['before' => 'auth', 'prefix' => 'admin'], function() {
 	Route::get('products/{id}/uom', ['uses' => 'Admin\ProductsController@uom', 'as' => 'admin_products.uom']);
 	Route::get('products/{id}/get', ['uses' => 'Admin\ProductsController@get', 'as' => 'admin_products.get']);
 	// Credits routes
+	Route::post('credits/save-review', ['uses' => 'Admin\CreditsController@saveReview', 'as' => 'admin_credits.saveReview']);
+	Route::get('credits/{id}/delete-review', ['uses' => 'Admin\CreditsController@deleteReview', 'as' => 'admin_credits.deleteReview']);
 	Route::post('credits/{id}/restore', ['uses' => 'Admin\CreditsController@restore', 'as' => 'admin_credits.restore']);
 	Route::resource('credits', 'Admin\CreditsController', ['names' => $prefixResourceNamespace('admin_credits'), 'except' => ['show']]);
 	// Expenses routes
+	Route::post('expenses/save-review', ['uses' => 'Admin\ExpensesController@saveReview', 'as' => 'admin_expenses.saveReview']);
+	Route::get('expenses/{id}/delete-review', ['uses' => 'Admin\ExpensesController@deleteReview', 'as' => 'admin_expenses.deleteReview']);
 	Route::post('expenses/{id}/restore', ['uses' => 'Admin\ExpensesController@restore', 'as' => 'admin_expenses.restore']);
 	Route::resource('expenses', 'Admin\ExpensesController', ['names' => $prefixResourceNamespace('admin_expenses'), 'except' => ['show']]);
 	// Sales routes
-	Route::post('sales/{id}/add-to-review', ['uses' => 'Admin\SalesController@addToReview', 'as' => 'admin_sales.addToReview']);
+	Route::post('sales/save-review', ['uses' => 'Admin\SalesController@saveReview', 'as' => 'admin_sales.saveReview']);
+	Route::get('sales/{id}/delete-review', ['uses' => 'Admin\SalesController@deleteReview', 'as' => 'admin_sales.deleteReview']);
 	Route::post('sales/{id}/restore', ['uses' => 'Admin\SalesController@restore', 'as' => 'admin_sales.restore']);
 	Route::resource('sales', 'Admin\SalesController', ['names' => $prefixResourceNamespace('admin_sales'), 'except' => ['show']]);
 

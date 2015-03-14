@@ -413,6 +413,8 @@ var Script = function () {
 
             var slctUOM = creditForm.find(':input[name=uom]');
             
+            qtyField.trigger('keyup');
+            
             slctUOM.html('');
             // slctUOM.html($('<option>').val('').text('Select Measure'));
 
@@ -434,6 +436,8 @@ var Script = function () {
                 }
             });
 
+
+
         }).trigger('change');
 
 
@@ -445,6 +449,76 @@ var Script = function () {
             creditForm.find(':input[name=product_id]').trigger('change');
             creditForm.find(':input[name=quantity]').trigger('keyup');
 
+        });
+
+
+        $(".edit-sales-review").on('click', function(e) {
+            e.preventDefault();
+            var _self = $(this),
+                trEl = _self.closest('tr'),
+                branch = trEl.find('td[data-branch]').data('branch'),
+                product = trEl.find('td[data-product]').data('product'),
+                uom = trEl.find('td[data-uom]').data('uom')
+                quantity = trEl.find('td[data-quantity]').data('quantity')
+                total_amount = trEl.find('td[data-total_amount]').data('total_amount')
+                comments = trEl.find('td[data-comments]').data('comments')
+                date_of_sale = trEl.find('td[data-date_of_sale]').data('date_of_sale'),
+                status = trEl.find('td[data-status]').data('status'),
+                hiddenInput = $('<input type="hidden" name="review_id">');
+            $(':input[name=review_id]').remove();
+            $(':input[name=branch_id]').val(branch);
+            $(':input[name=product_id]').val(product);
+            $(':input[name=uom]').val(uom);
+            $(':input[name=quantity]').val(quantity);
+            $(':input[name=total_amount]').val(total_amount);
+            $(':input[name=comments]').val(comments);
+            $(':input[name=date_of_sale]').val(date_of_sale);
+            $(':input[name=status]').val(status);
+            $(':input[name=action][value=review]').text('Update Review');
+
+            var input = hiddenInput.val(_self.data('review-id'));
+
+            $('#saleForm').append(input);
+
+            return false;
+        });
+
+
+        $(".edit-credits-review").on('click', function(e) {
+            e.preventDefault();
+            var _self = $(this),
+                trEl = _self.closest('tr'),
+                branch = trEl.find('td[data-branch]').data('branch'),
+                product = trEl.find('td[data-product]').data('product'),
+                uom = trEl.find('td[data-uom]').data('uom')
+                quantity = trEl.find('td[data-quantity]').data('quantity')
+                total_amount = trEl.find('td[data-total_amount]').data('total_amount')
+                comments = trEl.find('td[data-comments]').data('comments')
+                date_of_sale = trEl.find('td[data-date_of_sale]').data('date_of_sale'),
+                status = trEl.find('td[data-status]').data('status'),
+                address = trEl.find('td[data-address]').data('address'),
+                customer_name = trEl.find('td[data-customer_name]').data('customer_name'),
+                contact_number = trEl.find('td[data-contact_number]').data('contact_number'),
+                hiddenInput = $('<input type="hidden" name="review_id">');
+            $(':input[name=review_id]').remove();
+            $(':input[name=branch_id]').val(branch);
+            $(':input[name=customer_name]').val(customer_name);
+            $(':input[name=address]').val(address);
+            $(':input[name=contact_number]').val(contact_number);
+            $(':input[name=product_id]').val(product).trigger('change');
+            $(':input[name=uom]').val(uom);
+            $(':input[name=quantity]').val(quantity);
+            $(':input[name=total_amount]').val(total_amount);
+            $(':input[name=comments]').val(comments);
+            $(':input[name=date_of_sale]').val(date_of_sale);
+            $(':input[name=status]').val(status);
+            $(':input[name=action][value=review]').text('Update Review');
+
+            var input = hiddenInput.val(_self.data('review-id'));
+
+            $('#creditForm').append(input);
+
+            return false;
         });
 
 

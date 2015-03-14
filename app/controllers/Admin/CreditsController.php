@@ -79,6 +79,7 @@ class CreditsController extends \BaseController {
 	public function create()
 	{
 		return \View::make('admin.credit.create')
+		->with('reviews', \Session::get('creditsReview'))
 		->with('branches', \Branch::filterBranch()->dropdown()->lists('name', 'id'))
 		->with('products', array_add(\Product::all()->lists('name', 'id'), '0', 'Select Product'))
 		->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));
@@ -93,6 +94,15 @@ class CreditsController extends \BaseController {
 	public function store()
 	{
 		$input = \Input::all();
+
+		if (array_get($input, 'action') == 'review') {
+			$reviewId = false;
+			if (array_get($input, 'review_id')) {
+				$reviewId = array_get($input, 'review_id');
+			}
+			return $this->review($reviewId);
+		}
+
 
 		$input['encoded_by'] = \Confide::user()->id;
 
@@ -214,6 +224,89 @@ class CreditsController extends \BaseController {
 		}
 
 		return \Redirect::back()->with('success', \Lang::get('agrivate.restored'));
+	}
+
+	public function review($reviewId = false) {
+		$input = \Input::all();
+
+
+		$rules = \Sale::$rules;
+
+		if (!\Confide::user()->isAdmin()) {
+			$input['branch_id'] = \Confide::user()->branch_id;
+		}
+		$input['status'] = 0;
+		$input['encoded_by'] = \Confide::user()->id;
+
+		$validator = \Validator::make($input, $rules);
+
+		if ($validator->fails()) {
+			return \Redirect::back()->withErrors($validator->errors())->withInput();
+		} else {
+			try {
+
+				$review = [];
+
+				if (\Session::has('creditsReview')) {
+					$review = \Session::get('creditsReview');	
+				}
+				
+				if (!$reviewId) {
+					$reviewId = time();
+				}
+
+				$review[$reviewId] = array_add($input, 'branch_id', $input['branch_id']);
+
+
+				\Session::put('creditsReview', $review);
+				
+
+				return \Redirect::route('admin_credits.create')->with('success', \Lang::get('agrivate.add_to_review'));
+
+			} catch(\Exception $e) {
+				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput($input);
+			}
+		}
+	}
+
+	public function deleteReview($reviewId) {
+		\Session::forget("creditsReview.$reviewId");
+
+		return \Redirect::route('admin_credits.create')->with('success', \Lang::get('agrivate.deleted'));
+	}
+
+	public function saveReview() {
+		try {
+			$reviews = \Session::get('creditsReview');
+			$errors = [];
+
+			foreach ($reviews as $key => $input) {
+				$input['encoded_by'] = \Confide::user()->id;
+				$input['is_paid'] = 0;
+
+				$credit = new \Credit;
+
+
+				if ($credit->doSave($credit, $input)) {
+					\Session::forget("creditsReview.$key");
+				} else {
+					$errors[] = $credit->errors();
+				}
+
+			}
+				
+
+			if (count($errors) == 0) {
+				return \Redirect::route('admin_credits.create')->with('success', \Lang::get('agrivate.created'));
+			} else {
+
+				return \Redirect::route('admin_credits.create')->withErrors($errors);
+			}
+
+
+		} catch (\Exception $e) {
+			return \Redirect::route('admin_credits.create')->withErrors((array)$e->getMessage());
+		}
 	}
 
 

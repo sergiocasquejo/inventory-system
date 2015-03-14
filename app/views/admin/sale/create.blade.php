@@ -10,7 +10,7 @@
 				</header>
 			</div>
 			<div class="panel-body" style="padding:0;">
-				@if ($reviews)
+				<form action="{{ route('admin_sales.saveReview') }}" method="POST" />
 					<table class="table table-striped table-advance table-hover">
 						<tr>
 							<th>Product</th>
@@ -22,29 +22,33 @@
 							<th>Cmnts</th>
 							<th></th>
 						</tr>
-						@foreach ($reviews as $key => $review)
-						<tr>
-							<td><strong>{{{ \Product::find($review['product_id'])->name }}}</strong></td>
-							<td>{{ \Branch::find($review['branch_id'])->address }}</td>
-							<td>{{ $review['quantity'] .' '.$review['uom'] }}</td>
-							<td>{{ $review['total_amount'] }}</td>
-							<td>{{ $review['date_of_sale'] }}</td>
-							<td>{{ $review['status'] ? 'Active' : 'Inactive' }}</td>
-							<td><a class="badge bg-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="{{{ $review['comments'] }}}">?</a></td>
-							<td>
-								<a data-review-id="{{{ $key }}}" href="#" class="btn btn-primary btn-xs" title="Edit"><i class="icon-pencil"></i></a>
-								<a data-review-id="{{{ $key }}}" href="#" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
-                                  <i class="icon-remove"></i>
-                                </a>
-							</td>
+						@if ($reviews)
+							@foreach ($reviews as $key => $review)
+							<tr>
+								<td data-product="{{{ $review['product_id'] }}}"><strong>{{{ \Product::find($review['product_id'])->name }}}</strong></td>
+								<td data-branch="{{{ $review['branch_id'] }}}">{{ \Branch::find($review['branch_id'])->address }}</td>
+								<td data-quantity="{{{ $review['quantity'] }}}" data-uom="{{{ $review['uom'] }}}">{{ \Helper::nf($review['quantity']) .' '.$review['uom'] }}</td>
+								<td data-total_amount="{{{ $review['total_amount'] }}}">{{ $review['total_amount'] }}</td>
+								<td data-date_of_sale="{{{ $review['date_of_sale'] }}}">{{ $review['date_of_sale'] }}</td>
+								<td data-status="{{{ $review['status'] }}}">{{ $review['status'] ? 'Active' : 'Inactive' }}</td>
+								<td data-comments="{{{ $review['comments'] }}}"><a class="badge bg-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="{{{ $review['comments'] }}}">?</a></td>
+								<td>
+									<a data-review-id="{{{ $key }}}" href="#" class="btn btn-primary btn-xs edit-sales-review" title="Edit"><i class="icon-pencil"></i></a>
+									<a data-review-id="{{{ $key }}}" href="{{ route('admin_sales.deleteReview', $key) }}" title="Delete" class="btn btn-danger btn-xs delete-sales-review">
+	                                  <i class="icon-remove"></i>
+	                                </a>
+								</td>
 
-						</tr>
-						@endforeach
+							</tr>
+							@endforeach
+						@endif
 					</table>
 					@if (count($reviews) != 0)
 					<button type="submit" name="action" value="save" class="btn btn-shadow btn-primary pull-right">Save</button>
 					@endif
-				@endif
+					<input type="hidden" name="_token" value="{{ csrf_token() }}" />
+				</form>
+				
 			</div>
     	</div>
     	<div class="col-md-7 panel">
@@ -117,7 +121,8 @@
 					  </div>
 					</div>
 					<button type="submit" name="action" value="review" class="btn btn-shadow btn-info">Add to Review</button>
-					<button type="submit" name="action" value="save" class="btn btn-shadow btn-primary pull-right">Save</button>
+					<button type="submit" name="action" value="save" class="btn btn-shadow btn-primary">Save</button>
+					<a href="{{ route('admin_sales.create') }}" class="btn btn-shadow btn-warning">Cancel</a>
 			  </form>
 			</div>
 		</div>
