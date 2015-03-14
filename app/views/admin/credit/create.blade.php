@@ -37,7 +37,7 @@
 								<td data-branch="{{{ $review['branch_id'] }}}">{{ \Branch::find($review['branch_id'])->address }}</td>
 								<td data-quantity="{{{ $review['quantity'] }}}" data-uom="{{{ $review['uom'] }}}">{{ \Helper::nf($review['quantity']) .' '.$review['uom'] }}</td>
 								<td data-total_amount="{{{ $review['total_amount'] }}}">{{ $review['total_amount'] }}</td>
-								<td data-date_of_credit="{{{ $review['date_of_credit'] }}}">{{ $review['date_of_credit'] }}</td>
+								<td data-date_of_sale="{{{ $review['date_of_sale'] }}}">{{ $review['date_of_sale'] }}</td>
 								<td data-comments="{{{ $review['comments'] }}}"><a class="badge bg-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="{{{ $review['comments'] }}}">?</a></td>
 								<td>
 									<a data-review-id="{{{ $key }}}" href="#" class="btn btn-primary btn-xs edit-credits-review" title="Edit"><i class="icon-pencil"></i></a>
@@ -136,7 +136,7 @@
 					<div class="form-group">
 					  <label class="col-sm-2 control-label">Date of credit</label>
 					  <div class="col-sm-10">
-					      <input type="text" name="date_of_credit" value="{{ Input::old('date_of_credit', date('Y-m-d')) }}" class="form-control datepicker">
+					      <input type="text" name="date_of_sale" value="{{ Input::old('date_of_sale', date('Y-m-d')) }}" class="form-control datepicker">
 					  </div>
 					</div>
 					

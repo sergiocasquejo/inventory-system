@@ -25,10 +25,10 @@ class SalesController extends \BaseController {
 		$countries = \Config::get('agrivate.countries');
 
 
-		$yearly = \Sale::owned()->whereRaw('YEAR(date_of_sale) = YEAR(CURDATE())')->sum('total_amount');
-		$monthly = \Sale::owned()->whereRaw('MONTH(date_of_sale) = MONTH(CURDATE())')->sum('total_amount');
-		$weekly = \Sale::owned()->whereRaw('WEEK(date_of_sale) = WEEK(CURDATE())')->sum('total_amount');
-		$daily = \Sale::owned()->whereRaw('DAY(date_of_sale) = DAY(CURDATE())')->sum('total_amount');
+		$yearly = \Sale::owned()->whereRaw('sale_type="SALE" AND YEAR(date_of_sale) = YEAR(CURDATE())')->sum('total_amount');
+		$monthly = \Sale::owned()->whereRaw('sale_type="SALE" AND MONTH(date_of_sale) = MONTH(CURDATE())')->sum('total_amount');
+		$weekly = \Sale::owned()->whereRaw('sale_type="SALE" AND WEEK(date_of_sale) = WEEK(CURDATE())')->sum('total_amount');
+		$daily = \Sale::owned()->whereRaw('sale_type="SALE" AND DAY(date_of_sale) = DAY(CURDATE())')->sum('total_amount');
 
 
 		$branches = \DB::table('sales')->join('branches', 'sales.branch_id', '=', 'branches.id')

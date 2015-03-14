@@ -322,13 +322,17 @@ var Script = function () {
 
             $(':input[name=name]').replaceWith(productInput)
                 .trigger('change');
+
+            qtyField.trigger('keyup');
+
         }).trigger('change');
 
-        $('body').on('change', '#expenseForm :input[name=name]', function() {
+        $('body').on('change', ':input[name=name]', function() {
 
+            expenseForm.find(':input[name=quantity]').trigger('keyup');
             if (expenseForm.find('select[name=expense_type]').val() == 'STORE EXPENSES') return;
+            
 
-            console.log('test');
             var self = $(this);
             var slctdProduct = self.val();
             
@@ -353,12 +357,13 @@ var Script = function () {
                     
                 }
             });
-            qtyField.trigger('keyup');
+            
 
         }).trigger('change');
 
 
         qtyField.on('keyup', function() {
+          
             if (expenseForm.find('select[name=expense_type]').val() == 'STORE EXPENSES') return;
             
             var slctdProduct = expenseForm.find(':input[name=name]').val();
@@ -520,8 +525,42 @@ var Script = function () {
 
             return false;
         });
+        
 
+        $(".edit-expense-review").on('click', function(e) {
+            e.preventDefault();
+            var _self = $(this),
+                trEl = _self.closest('tr'),
+                branch = trEl.find('td[data-branch]').data('branch'),
+                name = trEl.find('td[data-name]').data('name'),
+                expense_type = trEl.find('td[data-expense_type]').data('expense_type');
+                uom = trEl.find('td[data-uom]').data('uom')
+                quantity = trEl.find('td[data-quantity]').data('quantity')
+                total_amount = trEl.find('td[data-total_amount]').data('total_amount')
+                comments = trEl.find('td[data-comments]').data('comments')
+                date_of_sale = trEl.find('td[data-date_of_sale]').data('date_of_sale'),
+                status = trEl.find('td[data-status]').data('status'),
+                hiddenInput = $('<input type="hidden" name="review_id">');
+            $(':input[name=review_id]').remove();
+            $(':input[name=branch_id]').val(branch);
+            $(':input[name=expense_type]').val(expense_type).trigger('change');
+            $(':input[name=name]').val(name).trigger('change');
+            $(':input[name=uom]').val(uom);
+            $(':input[name=quantity]').val(quantity);
+            $(':input[name=total_amount]').val(total_amount);
+            $(':input[name=comments]').val(comments);
+            $(':input[name=date_of_sale]').val(date_of_sale);
+            $(':input[name=status]').val(status);
+            $(':input[name=action][value=review]').text('Update Review');
 
+            var input = hiddenInput.val(_self.data('review-id'));
+
+            $('#expenseForm').append(input);
+
+            return false;
+        });
+
+        
     });
 
 

@@ -116,14 +116,14 @@
                               <td>{{{ !$credit->branch?'':$credit->branch->name }}}</td>
                               <td>{{{ $credit->customer_name }}}</td>
                               <td><a class="badge bg-primary" data-html="true" data-container="body" data-toggle="popover" data-placement="top" data-content="{{ '<p> Addres: '.$credit->address.'</p>'.'<p> Contact #: '.$credit->contact_number.'</p>' }}">?</a></td>
-                              <td>{{{ $credit->quantity }}}</td>
-                              <td>{{{ \Helper::nf($credit->total_amount) }}}</td>
+                              <td>{{{ !$credit->sale?'':$credit->sale->quantity }}}</td>
+                              <td>{{{ !$credit->sale?'':\Helper::nf($credit->sale->total_amount) }}}</td>
                               <td><a class="badge bg-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="{{{ $credit->comments }}}">?</a></td>
-                              <td>{{{ $credit->date_of_credit }}}</td>
+                              <td>{{{ !$credit->sale?'':$credit->sale->date_of_sale }}}</td>
                               <td> <span class="label label-{{{ $credit->is_paid ? 'success' : 'warning' }}} label-mini">
                                       {{{ $credit->is_paid ? 'Paid' : 'Not Paid' }}}
                                   </span></td>
-                              <td>{{{ $credit->user->username }}}</td>
+                              <td>{{{ !$credit->sale || !$credit->sale->user?'': $credit->sale->user->username }}}</td>
                               <td>{{{ \Helper::timeElapsedString(strtotime($credit->created_at)) }}}</td>
                               <td>{{{ \Helper::timeElapsedString(strtotime($credit->updated_at)) }}}</td>
                               <td>

@@ -13,7 +13,7 @@
 		  		<div class="form-group">
 		          <label class="col-sm-2 control-label">Branch</label>
 		          <div class="col-sm-10">
-		              {{ Form::select('branch_id', $branches, Input::old('branch_id', $credit->branch_id), ['class' => 'form-control m-bot15', (!\Confide::user()->isAdmin() ? 'disabled="disabled"' : '')]) }}
+		              {{ Form::select('branch_id', $branches, Input::old('branch_id', $credit->sale->branch_id), ['class' => 'form-control m-bot15', (!\Confide::user()->isAdmin() ? 'disabled="disabled"' : '')]) }}
 		              <span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
 		          </div>
 		      	</div>
@@ -44,7 +44,7 @@
 		      	<div class="form-group">
 					<label class="col-sm-2 control-label">Product</label>
 					<div class="col-sm-10">
-						{{ Form::select('product_id', $products, Input::old('product_id', $credit->product_id), ['class' => 'form-control m-bot15', 'data-selected' => Input::old('product_id', $credit->product_id)]) }}
+						{{ Form::select('product_id', $products, Input::old('product_id', $credit->sale->product_id), ['class' => 'form-control m-bot15', 'data-selected' => Input::old('product_id', $credit->sale->product_id)]) }}
 						<span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
 					</div>
 		      	</div>
@@ -52,21 +52,21 @@
 		      	<div class="form-group">
 				  <label class="col-sm-2 control-label">Quantity</label>
 				  <div class="col-sm-10">
-				      <input type="number"  step="any" name="quantity" value="{{ Input::old('quantity', $credit->quantity) }}" data-selected="{{ Input::old('quantity', $credit->quantity) }}" class="form-control">
+				      <input type="number"  step="any" name="quantity" value="{{ Input::old('quantity', $credit->sale->quantity) }}" data-selected="{{ Input::old('quantity', $credit->sale->quantity) }}" class="form-control">
 				  </div>
 				</div>
 
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Unit of measure</label>
 				  <div class="col-sm-10">
-				      {{ Form::select('uom', $measures, Input::old('uom', $credit->uom), ['class' => 'form-control m-bot15', 'data-selected' => Input::old('uom', $credit->uom)]) }}
+				      {{ Form::select('uom', $measures, Input::old('uom', $credit->sale->uom), ['class' => 'form-control m-bot15', 'data-selected' => Input::old('uom',$credit->sale->uom)]) }}
 				  </div>
 				</div>
 
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Total Amount</label>
 				  <div class="col-sm-10">
-				      <input type="number" name="total_amount" value="{{ Input::old('total_amount', $credit->total_amount) }}" class="form-control" data-selected="{{ Input::old('total_amount', $credit->total_amount) }}" readonly>
+				      <input type="number" name="total_amount" value="{{ Input::old('total_amount', $credit->sale->total_amount) }}" class="form-control" data-selected="{{ Input::old('total_amount', $credit->sale->total_amount) }}" readonly>
 				  </div>
 				</div>
 
@@ -74,14 +74,14 @@
 				<div class="form-group">
 					<label class="col-sm-2 control-label">Comments</label>
 					<div class="col-sm-10">
-						<textarea name="comments" class="form-control">{{ Input::old('comments', $credit->comments) }}</textarea>
+						<textarea name="comments" class="form-control">{{ Input::old('comments', $credit->sale->comments) }}</textarea>
 					</div>
 				</div>
 
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Date of credit</label>
 				  <div class="col-sm-10">
-				      <input type="text" name="date_of_credit" value="{{ Input::old('date_of_credit', $credit->date_of_credit) }}" class="form-control datepicker">
+				      <input type="text" name="date_of_sale" value="{{ Input::old('date_of_sale', $credit->sale->date_of_sale) }}" class="form-control datepicker">
 				  </div>
 				</div>
 				

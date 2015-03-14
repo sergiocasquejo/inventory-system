@@ -242,10 +242,15 @@ class ExpensesController extends \BaseController {
 		$input = \Input::all();
 
 
-		$rules = \Sale::$rules;
+		$rules = \Expense::$rules;
 
 		if (!\Confide::user()->isAdmin()) {
 			$input['branch_id'] = \Confide::user()->branch_id;
+		}
+
+		if (array_get($input, 'expense_type') == 'STORE EXPENSES') {
+			$input['uom'] = '';
+			$rules['uom'] = 'whole_number:quantity';
 		}
 
 		$input['encoded_by'] = \Confide::user()->id;
@@ -258,30 +263,21 @@ class ExpensesController extends \BaseController {
 			try {
 
 				$review = [];
-
-				if (\Session::has('salesReview')) {
-					$review = \Session::get('salesReview');	
+				if (\Session::has('expensesReview')) {
+					$review = \Session::get('expensesReview');	
 				}
 				
 				if (!$reviewId) {
 					$reviewId = time();
 				}
 
-				$review[$reviewId] = array_add(\Input::only(
-						'branch_id', 
-						'product_id', 
-						'uom', 
-						'quantity', 
-						'total_amount', 
-						'comments',
-						'date_of_sale',
-						'status'), 'branch_id', $input['branch_id']);
+				$review[$reviewId] = array_add($input, 'branch_id', $input['branch_id']);
 
 
-				\Session::put('salesReview', $review);
+				\Session::put('expensesReview', $review);
 				
 
-				return \Redirect::route('admin_sales.create')->with('success', \Lang::get('agrivate.add_to_review'));
+				return \Redirect::route('admin_expenses.create')->with('success', \Lang::get('agrivate.add_to_review'));
 
 			} catch(\Exception $e) {
 				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput($input);
@@ -290,82 +286,30 @@ class ExpensesController extends \BaseController {
 	}
 
 	public function deleteReview($reviewId) {
-		\Session::forget("salesReview.$reviewId");
+		\Session::forget("expensesReview.$reviewId");
 
-		return \Redirect::route('admin_sales.create')->with('success', \Lang::get('agrivate.deleted'));
+		return \Redirect::route('admin_expenses.create')->with('success', \Lang::get('agrivate.deleted'));
 	}
 
 	public function saveReview() {
 		try {
-			$reviews = \Session::get('salesReview');
+			$reviews = \Session::get('expensesReview');
 
 			foreach ($reviews as $key => $input) {
 				$errors = [];
 				$input['encoded_by'] = \Confide::user()->id;
-				\DB::transaction(function() use(&$input, &$errors) {
-					
-
-					// Get user branch
-					$branch_id = array_get($input, 'branch_id');
-					$uom = array_get($input, 'uom');
-					$product = array_get($input, 'product_id');
-					$quantity = array_get($input, 'quantity');
-					$oldMeasure = '';
-
-					$p = \Product::find($product);
-
-					// Convert sack to kg
-					if (strpos($uom,'sack') !== false) {
-						$oldMeasure = $input['uom'];
-						$input['quantity'] = $quantity * \Config::get('agrivate.equivalent_measure.sacks.per');
-						$input['uom'] = $uom = 'kg';
-					}
-
-					$stock = \StockOnHand::where('product_id', $product)
-									->where('branch_id', $branch_id)
-									->where('uom', $uom)
-									->first();
-
-		
-					if ($stock && $stock->total_stocks > 0) {
-
-						if ($stock->total_stocks >= array_get($input, 'quantity', 0)) {
-							$branch = \ProductPricing::whereRaw("branch_id = {$branch_id} AND product_id = {$product}  AND per_unit = '{$uom}'")->first();
-
-							$input['supplier_price'] = 	$branch->supplier_price;
-							$input['selling_price'] = 	$branch->selling_price;
-							$input['total_amount'] = 	$branch->selling_price * $input['quantity'];
-
-
-							$sale = new \Sale;
-
-							if (!$sale->doSave($sale, $input)) {			
-								$errors[] = $sale->errors();
-							} else {
-								$stock->total_stocks = $stock->total_stocks - array_get($input, 'quantity');
-								$stock->save();
-							}
-						} else {
-							if (strpos($oldMeasure, 'sack') !== false) $input['uom'] = $oldMeasure;
-							$errors[] = [$p->name.' '.\Lang::get('agrivate.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
-						}
-
-					} else {
-						if (strpos($oldMeasure,'sack') !== false) $input['uom'] = $oldMeasure;
-						$errors[] = [$p->name.' '.\Lang::get('agrivate.errors.out_of_stocks')];
-
-					}
-				});
 				
-				if (count($errors) == 0) {
-					\Session::forget("salesReview.$key");
+				$expense = new \Expense;
+
+				if ($expense->doSave($expense, $input)) {
+					\Session::forget("expensesReview.$key");
 				}
 
 			}
 				
 
 			if (count($errors) == 0) {
-				return \Redirect::route('admin_sales.create')->with('success', \Lang::get('agrivate.created'));
+				return \Redirect::route('admin_expenses.create')->with('success', \Lang::get('agrivate.created'));
 			} else {
 
 				return \Redirect::back()->withErrors($errors);

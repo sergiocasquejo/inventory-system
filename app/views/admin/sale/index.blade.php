@@ -128,7 +128,7 @@
                               <a class="badge bg-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="{{{ $sale->comments }}}">?</a>
 
                             </td>
-                            <td>{{{ $sale->user->username }}}</td>
+                            <td>{{{ !$sale->user?'':$sale->user->username }}}</td>
                             <td>
                                 <span class="label label-{{{ $sale->status ? 'success' : 'warning' }}} label-mini">
                                     {{{ $sale->status ? 'Active' : 'Inactive' }}}

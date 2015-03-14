@@ -28,6 +28,10 @@ class Sale extends Eloquent {
 	}
 
 
+	public function credit() {
+        return $this->hasOne('Credit');
+    }
+
 	public function product() {
 		return $this->belongsTo('Product', 'product_id');
 	}
@@ -75,7 +79,7 @@ class Sale extends Eloquent {
 		$month = $month = array_get($input, 'month');
 		$day = $day = array_get($input, 'day');
 
-
+		$query->whereRaw('sale_type = "SALE"');
 	 	/* Check if current user is not admin
         * filter only his branch
         */
@@ -119,6 +123,7 @@ class Sale extends Eloquent {
 
 	public function doSave(Sale $instance, $input) {
 		$instance->branch_id = array_get($input, 'branch_id');
+		$instance->sale_type = array_get($input, 'sale_type', 'SALE');
 		$instance->product_id = array_get($input, 'product_id');
 		$instance->supplier_price = array_get($input, 'supplier_price');
 		$instance->selling_price = array_get($input, 'selling_price');
