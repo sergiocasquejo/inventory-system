@@ -343,10 +343,10 @@ class CreditsController extends \BaseController {
 		$credit = \Credit::withTrashed()->where('credit_id', $id)->first();
 		$message = \Lang::get('agrivate.trashed');
 		if ($credit->trashed() || \Input::get('remove') == 1) {
-            $credit->forceDelete();
+            $credit->sale->forceDelete();
             $message = \Lang::get('agrivate.deleted');
         } else {
-            $credit->delete();
+            $credit->sale->delete();
         }
 
         return \Redirect::route('admin_credits.index')->with('success', $message);
