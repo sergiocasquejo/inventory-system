@@ -99,6 +99,7 @@ class CreditsController extends \BaseController {
 		if (!\Confide::user()->isAdmin()) {
 			$input['branch_id'] = \Confide::user()->branch_id;
 		}
+		$input['is_paid'] = 0;
 
 		$rules = \Credit::$rules;
 

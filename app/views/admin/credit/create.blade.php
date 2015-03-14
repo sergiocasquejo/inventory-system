@@ -51,7 +51,7 @@
 		      	<div class="form-group">
 				  <label class="col-sm-2 control-label">Quantity</label>
 				  <div class="col-sm-10">
-				      <input type="number"  step="any" name="quantity"  data-selected="{{ Input::old('uom', $credit->uom) }}" value="{{ Input::old('quantity') }}" class="form-control">
+				      <input type="number"  step="any" name="quantity"  data-selected="{{ Input::old('uom') }}" value="{{ Input::old('quantity') }}" class="form-control">
 				  </div>
 				</div>
 
@@ -87,7 +87,7 @@
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Is Paid</label>
 				  <div class="col-sm-10">
-				      {{ Form::select('is_paid', \Config::get('agrivate.credit_statuses'), Input::old('is_paid', 0), ['class' => 'form-control m-bot15']) }}
+				      {{ Form::select('is_paid', \Config::get('agrivate.credit_statuses'), Input::old('is_paid', 0), ['class' => 'form-control m-bot15', 'disabled' => 'disabled']) }}
 				  </div>
 				</div>
 

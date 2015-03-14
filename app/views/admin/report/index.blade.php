@@ -15,7 +15,7 @@
                 <div class="dataTables_wrapper">
                   <br />
                   <div class="col-md-12">
-                      <div class="pull-right">
+                      <div class="pull-left">
                         <div class="form-group">
                             {{ Form::select('branch', $branches, Input::get('branch', ''), ['class' => 'form-control']) }}
                         </div>

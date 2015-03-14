@@ -114,7 +114,7 @@
                           <tr>
                               <td>{{{ !$credit->branch?'':$credit->branch->name }}}</td>
                               <td>{{{ $credit->customer_name }}}</td>
-                              <td><a class="badge bg-primary" data-html="true" data-container="body" data-toggle="popover" data-placement="top" data-content="{{ '<p> Addres: '.$credit->customer.'</p>'.'<p> Contact #: '.$credit->contact_number.'</p>' }}">?</a></td>
+                              <td><a class="badge bg-primary" data-html="true" data-container="body" data-toggle="popover" data-placement="top" data-content="{{ '<p> Addres: '.$credit->address.'</p>'.'<p> Contact #: '.$credit->contact_number.'</p>' }}">?</a></td>
                               <td>{{{ $credit->quantity }}}</td>
                               <td>{{{ \Helper::nf($credit->total_amount) }}}</td>
                               <td><a class="badge bg-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="{{{ $credit->comments }}}">?</a></td>
