@@ -7,6 +7,7 @@ return [
 	'deleted' => 'Successfully deleted',
 	'trashed' => 'Successfully trashed',
 	'restored' => 'Successfully restored',
+	'add_to_review' => 'Added to review',
 
 	// Table localizations
 	'empty'	=> 'Empty %s',

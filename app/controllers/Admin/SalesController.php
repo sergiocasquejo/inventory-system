@@ -78,13 +78,15 @@ class SalesController extends \BaseController {
 	{	
 
 
+
 		return \View::make('admin.sale.create')
+		->with('reviews', \Session::get('salesReview'))
 		->with('branches', \Branch::filterBranch()->dropdown()->lists('name', 'id'))
 		->with('products', \Product::active()->lists('name', 'id'))
 		->with('measures', array_add(\UnitOfMeasure::all()->lists('label', 'name'), '', 'Select Measure'));
 	}
 
-
+	
 	/**
 	 * Store a newly created resource in storage.
 	 *
@@ -92,6 +94,10 @@ class SalesController extends \BaseController {
 	 */
 	public function store()
 	{
+		if (\Input::get('action') == 'review') {
+			return $this->addToReview();
+		}
+
 		$input = \Input::all();
 
 
@@ -350,5 +356,53 @@ class SalesController extends \BaseController {
 		return \Redirect::back()->with('success', \Lang::get('agrivate.restored'));
 	}
 
+
+	public function addToReview($reviewId = false) {
+		$input = \Input::all();
+
+
+		$rules = \Sale::$rules;
+
+		if (!\Confide::user()->isAdmin()) {
+			$input['branch_id'] = \Confide::user()->branch_id;
+		}
+
+		$input['encoded_by'] = \Confide::user()->id;
+
+		$validator = \Validator::make($input, $rules);
+
+		if ($validator->fails()) {
+			return \Redirect::back()->withErrors($validator->errors())->withInput();
+		} else {
+			try {
+
+				$review = [];
+
+				if (\Session::has('salesReview')) {
+					$review = \Session::get('salesReview');	
+				}
+				
+
+				$review[time()] = array_add(\Input::only(
+						'branch_id', 
+						'product_id', 
+						'uom', 
+						'quantity', 
+						'total_amount', 
+						'comments',
+						'date_of_sale',
+						'status'), 'branch_id', $input['branch_id']);
+
+
+				\Session::put('salesReview', $review);
+				
+
+				return \Redirect::route('admin_sales.create')->with('success', \Lang::get('agrivate.add_to_review'));
+
+			} catch(\Exception $e) {
+				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput($input);
+			}
+		}
+	}
 
 }

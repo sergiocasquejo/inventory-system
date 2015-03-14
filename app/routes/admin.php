@@ -59,6 +59,7 @@ Route::group(['before' => 'auth', 'prefix' => 'admin'], function() {
 	Route::post('expenses/{id}/restore', ['uses' => 'Admin\ExpensesController@restore', 'as' => 'admin_expenses.restore']);
 	Route::resource('expenses', 'Admin\ExpensesController', ['names' => $prefixResourceNamespace('admin_expenses'), 'except' => ['show']]);
 	// Sales routes
+	Route::post('sales/{id}/add-to-review', ['uses' => 'Admin\SalesController@addToReview', 'as' => 'admin_sales.addToReview']);
 	Route::post('sales/{id}/restore', ['uses' => 'Admin\SalesController@restore', 'as' => 'admin_sales.restore']);
 	Route::resource('sales', 'Admin\SalesController', ['names' => $prefixResourceNamespace('admin_sales'), 'except' => ['show']]);
 
