@@ -16,6 +16,7 @@ class CreateSalesTable extends Migration {
         Schema::create('sales', function ($table) {
             $table->engine ='InnoDB';
             $table->bigIncrements('sale_id')->unsigned();
+            $table->enum('sale_type',  array('SALE', 'CREDIT'))->default('SALE');
             $table->integer('branch_id')->unsigned();
             $table->bigInteger('product_id')->unsigned()->nullable();
             $table->decimal('supplier_price', 10, 2);

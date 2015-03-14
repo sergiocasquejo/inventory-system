@@ -16,16 +16,10 @@ class CreateCreditsTable extends Migration {
 			$table->bigIncrements('credit_id')->unsigned();
 			$table->engine ='InnoDB';
 			$table->integer('branch_id')->unsigned();
+			$table->bigInteger('sale_id')->unsigned();
 			$table->string('customer_name', 120);
 			$table->string('address', 120);
 			$table->string('contact_number', 30);
-			$table->string('product', 255);
-			$table->decimal('quantity', 10, 2);
-			$table->string('uom', 120);
-			$table->decimal('total_amount', 10, 2);
-			$table->text('comments');
-			$table->date('date_of_credit');
-			$table->integer('encoded_by')->unsigned()->nullable();
 			$table->tinyInteger('is_paid');
 			$table->timestamps();
 			$table->softDeletes();
@@ -33,6 +27,10 @@ class CreateCreditsTable extends Migration {
 			$table->foreign('encoded_by')
      			->references('id')->on('users')
      			->onDelete('set null');
+
+     		$table->foreign('sale_id')
+     			->references('sale_id')->on('sales')
+     			->onDelete('cascade');
 		});
 	}
 
