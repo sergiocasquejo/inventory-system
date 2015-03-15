@@ -13,7 +13,6 @@ class Expense extends Eloquent {
     	'uom'	           => 'required|whole_number:quantity',
         'date_of_expense'  => 'required|date',
     	'encoded_by' 	   => 'required|exists:users,id',
-    	'status'	       => 'required|in:0,1'
     ];
 
     /**=================================================
@@ -37,13 +36,13 @@ class Expense extends Eloquent {
      * SCOPE QUERY
      *==================================================*/
 
-    public function scopeActive($query) {
-        return $query->where('status', 1);
-    }
-
-    public function scopeInActive($query) {
-        return $query->where('status', 0);
-    }
+//    public function scopeActive($query) {
+//        return $query->where('status', 1);
+//    }
+//
+//    public function scopeInActive($query) {
+//        return $query->where('status', 0);
+//    }
 
     public function scopeSearch($query, $input) {
         
@@ -73,7 +72,6 @@ class Expense extends Eloquent {
     public function scopeFilter($query, $input) {
 
         $branch = array_get($input, 'branch');
-        $status = array_get($input, 'status');
         $total = array_get($input, 'total');
         $year = $year = array_get($input, 'year');
         $month = $month = array_get($input, 'month');
@@ -101,9 +99,9 @@ class Expense extends Eloquent {
         if ($day != '') {
             $query->whereRaw('DAY(date_of_expense) = '. (int)$day);
         }
-        if ($status != '') {
-            $query->whereRaw('status = '. (int)$status);
-        }
+//        if ($status != '') {
+//            $query->whereRaw('status = '. (int)$status);
+//        }
 
 
         return $query;
@@ -119,7 +117,7 @@ class Expense extends Eloquent {
 		$instance->quantity = array_get($input, 'quantity');
 		$instance->uom = array_get($input, 'uom');
 		$instance->comments = array_get($input, 'comments');
-		$instance->status = array_get($input, 'status');
+//		$instance->status = array_get($input, 'status');
         $instance->encoded_by = array_get($input, 'encoded_by');
         $instance->date_of_expense = date('Y-m-d', strtotime(array_get($input, 'date_of_expense')));
 		

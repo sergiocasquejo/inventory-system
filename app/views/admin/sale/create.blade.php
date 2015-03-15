@@ -14,23 +14,25 @@
 					<table class="table table-striped table-advance table-hover">
 						<tr>
 							<th>Product</th>
+                            @if (\Confide::user()->isAdmin())
 							<th>Branch</th>
+                            @endif
 							<th>Qty</th>
 							<th>Total</th>
 							<th>Date</th>
-							<th>Status</th>
 							<th>Cmnts</th>
 							<th></th>
 						</tr>
 						@if ($reviews)
 							@foreach ($reviews as $key => $review)
 							<tr>
-								<td data-product="{{{ $review['product_id'] }}}"><strong>{{{ \Product::find($review['product_id'])->name }}}</strong></td>
-								<td data-branch="{{{ $review['branch_id'] }}}">{{ \Branch::find($review['branch_id'])->address }}</td>
+								<td data-branch="{{{ $review['branch_id'] }}}" data-product="{{{ $review['product_id'] }}}"><strong>{{{ \Product::find($review['product_id'])->name }}}</strong></td>
+                                @if (\Confide::user()->isAdmin())
+								<td>{{ \Branch::find($review['branch_id'])->address }}</td>
+                                @endif
 								<td data-quantity="{{{ $review['quantity'] }}}" data-uom="{{{ $review['uom'] }}}">{{ \Helper::nf($review['quantity']) .' '.$review['uom'] }}</td>
 								<td data-total_amount="{{{ $review['total_amount'] }}}">{{ $review['total_amount'] }}</td>
 								<td data-date_of_sale="{{{ $review['date_of_sale'] }}}">{{ $review['date_of_sale'] }}</td>
-								<td data-status="{{{ $review['status'] }}}">{{ $review['status'] ? 'Active' : 'Inactive' }}</td>
 								<td data-comments="{{{ $review['comments'] }}}"><a class="badge bg-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="{{{ $review['comments'] }}}">?</a></td>
 								<td>
 									<a data-review-id="{{{ $key }}}" href="#" class="btn btn-primary btn-xs edit-sales-review" title="Edit"><i class="icon-pencil"></i></a>
@@ -113,13 +115,7 @@
 					      <input type="text" name="date_of_sale" value="{{ Input::old('date_of_sale', date('Y-m-d')) }}" class="form-control datepicker">
 					  </div>
 					</div>
-					
-					<div class="form-group">
-					  <label class="col-sm-2 control-label">Status</label>
-					  <div class="col-sm-10">
-					      {{ Form::select('status', \Config::get('agrivate.statuses'), Input::old('status'), ['class' => 'form-control m-bot15']) }}
-					  </div>
-					</div>
+
 					<button type="submit" name="action" value="review" class="btn btn-shadow btn-info">Add to Review</button>
 					<button type="submit" name="action" value="save" class="btn btn-shadow btn-primary">Save</button>
 					<a href="{{ route('admin_sales.create') }}" class="btn btn-shadow btn-warning">Cancel</a>

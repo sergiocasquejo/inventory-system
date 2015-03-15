@@ -55,7 +55,6 @@ class ExpensesController extends \BaseController {
 			'days' => array_add(\Expense::filterBranch()->select(\DB::raw('DAY(date_of_expense) as day'))->lists('day', 'day'), '', 'Day'),
 			'months' => array_add(\Expense::filterBranch()->select(\DB::raw('DATE_FORMAT(date_of_expense, "%b") as month, MONTH(date_of_expense) as month_no'))->lists('month', 'month_no'), '', 'Month'),
 			'years' => array_add(\Expense::filterBranch()->select(\DB::raw('YEAR(date_of_expense) as year'))->lists('year', 'year'), '', 'Year'),
-			'statuses' => array_add(\Expense::filterBranch()->select(\DB::raw('status, IF (status = 1, \'Active\', \'Inactive\') as name'))->lists('name', 'status'), '', 'Status'),
 		];
 
 

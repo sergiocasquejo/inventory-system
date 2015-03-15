@@ -106,9 +106,6 @@
                         <th>Comments</th>
                         <th>Encoded By</th>
                         <th>
-                          {{ Form::select('status', $statuses, Input::get('status', ''), ['class' => 'form-control input-xs']) }} 
-                        </th>
-                        <th>
                             <button type="submit" class="btn btn-info btn-xs">Filter</button>
                         </th>
                     </tr>
@@ -118,7 +115,7 @@
                     @if ($sales)
                         @foreach ($sales as $sale)
                         <tr>
-                            <td>{{{ !$sale->branch?'':$sale->branch->name }}}</td>
+                            <td>{{{ !$sale->branch?'':$sale->branch->name.' '.$sale->address }}}</td>
                             <td>{{{ !$sale->product?'':$sale->product->name }}}</td>
                             <td>{{{ $sale->quantity }}}</td>
                             <td>{{{ $sale->uom }}}</td>
@@ -129,11 +126,6 @@
 
                             </td>
                             <td>{{{ !$sale->user?'':$sale->user->username }}}</td>
-                            <td>
-                                <span class="label label-{{{ $sale->status ? 'success' : 'warning' }}} label-mini">
-                                    {{{ $sale->status ? 'Active' : 'Inactive' }}}
-                                </span>
-                            </td>
                             <td>
                                 @if ($sale->trashed())
                                   <a href="{{{ route('admin_sales.restore', $sale->sale_id) }}}" data-method="RESTORE" class="btn btn-primary btn-xs" title="Restore"><i class="icon-rotate-left"></i></a>

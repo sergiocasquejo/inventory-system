@@ -101,7 +101,6 @@
                            </div>
                           </th>
                           <th>Encoded By</th>
-                          <th>{{ Form::select('status', $statuses, Input::get('status', ''), ['class' => 'form-control input-xs']) }} </th>
                           <th>
                             <button type="submit" class="btn btn-info btn-xs">Filter</button>
                           </th>
@@ -127,11 +126,6 @@
                               <td><a class="badge bg-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="{{{ $expense->comments }}}">?</a></td>
                               <td>{{{ Helper::fd($expense->date_of_expense) }}}</td>
                               <td>{{{ $expense->user->username }}}</td>
-                              <td>
-                                     <span class="label label-{{{ $expense->status ? 'success' : 'warning' }}} label-mini">
-                                      {{{ $expense->status ? 'Active' : 'Inactive' }}}
-                                  </span>
-                              </td>
                                <td>
                                    @if ($expense->deleted_at != null)
                                     <a href="{{{ route('admin_expenses.restore', $expense->expense_id) }}}" data-method="RESTORE" class="btn btn-primary btn-xs" title="Restore"><i class="icon-rotate-left"></i></a>

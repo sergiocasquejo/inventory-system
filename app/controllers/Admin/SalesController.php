@@ -56,8 +56,7 @@ class SalesController extends \BaseController {
 			'totals' => array_add(\Sale::filterBranch()->lists('total_amount', 'total_amount'), '', 'Amount'),
 			'days' => array_add(\Sale::filterBranch()->select(\DB::raw('DAY(date_of_sale) as day'))->lists('day', 'day'), '', 'Day'),
 			'months' => array_add(\Sale::filterBranch()->select(\DB::raw('DATE_FORMAT(date_of_sale, "%b") as month, MONTH(date_of_sale) as month_no'))->lists('month', 'month_no'), '', 'Month'),
-			'years' => array_add(\Sale::filterBranch()->select(\DB::raw('YEAR(date_of_sale) as year'))->lists('year', 'year'), '', 'Year'),
-			'statuses' => array_add(\Sale::filterBranch()->select(\DB::raw('status, IF (status = 1, \'Active\', \'Inactive\') as name'))->lists('name', 'status'), '', 'Status'),
+			'years' => array_add(\Sale::filterBranch()->select(\DB::raw('YEAR(date_of_sale) as year'))->lists('year', 'year'), '', 'Year')
 		];
 
 		
@@ -399,8 +398,7 @@ class SalesController extends \BaseController {
 						'quantity', 
 						'total_amount', 
 						'comments',
-						'date_of_sale',
-						'status'), 'branch_id', $input['branch_id']);
+						'date_of_sale'), 'branch_id', $input['branch_id']);
 
 
 				\Session::put('salesReview', $review);

@@ -15,7 +15,9 @@
 						<tr>
 							<th>Customer</th>
 							<th>Product</th>
+                            @if (\Confide::user()->isAdmin())
 							<th>Branch</th>
+                            @endif
 							<th>Qty</th>
 							<th>Total</th>
 							<th>Date</th>
@@ -33,8 +35,10 @@
 										'Address: '. $review['address'] .'<br />'.
 										'Contact #: '.$review['contact_number'] }}">?</a>
 								</td>
-								<td data-product="{{{ $review['product_id'] }}}"><strong>{{{ \Product::find($review['product_id'])->name }}}</strong></td>
-								<td data-branch="{{{ $review['branch_id'] }}}">{{ \Branch::find($review['branch_id'])->address }}</td>
+								<td data-branch="{{{ $review['branch_id'] }}}" data-product="{{{ $review['product_id'] }}}"><strong>{{{ \Product::find($review['product_id'])->name }}}</strong></td>
+                                @if (\Confide::user()->isAdmin())
+								<td>{{ \Branch::find($review['branch_id'])->address }}</td>
+                                @endif
 								<td data-quantity="{{{ $review['quantity'] }}}" data-uom="{{{ $review['uom'] }}}">{{ \Helper::nf($review['quantity']) .' '.$review['uom'] }}</td>
 								<td data-total_amount="{{{ $review['total_amount'] }}}">{{ $review['total_amount'] }}</td>
 								<td data-date_of_sale="{{{ $review['date_of_sale'] }}}">{{ $review['date_of_sale'] }}</td>

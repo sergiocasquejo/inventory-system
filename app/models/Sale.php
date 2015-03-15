@@ -46,13 +46,13 @@ class Sale extends Eloquent {
      * SCOPE QUERY
      *==================================================*/
 
-	public function scopeActive($query) {
-		return $query->where('status', 1);
-	}
-
-	public function scopeInActive($query) {
-		return $query->where('status', 0);
-	}
+//	public function scopeActive($query) {
+//		return $query->where('status', 1);
+//	}
+//
+//	public function scopeInActive($query) {
+//		return $query->where('status', 0);
+//	}
 
 	public function scopeFilterBranch($query) {
 		if (!\Confide::user()->isAdmin()) {
@@ -72,7 +72,7 @@ class Sale extends Eloquent {
 	public function scopeFilter($query, $input) {
 
 		$branch = array_get($input, 'branch');
-		$status = array_get($input, 'status');
+		//$status = array_get($input, 'status');
 		$product = array_get($input, 'product');
 		$total = array_get($input, 'total');
 		$year = $year = array_get($input, 'year');
@@ -105,9 +105,9 @@ class Sale extends Eloquent {
 		if ($day != '') {
 			$query->whereRaw('DAY(date_of_sale) = '. (int)$day);
 		}
-		if ($status != '') {
-			$query->whereRaw('status = '. (int)$status);
-		}
+//		if ($status != '') {
+//			$query->whereRaw('status = '. (int)$status);
+//		}
 
 
 		return $query;
@@ -133,7 +133,7 @@ class Sale extends Eloquent {
 		$instance->comments = array_get($input, 'comments');
 		$instance->date_of_sale = date('Y-m-d', strtotime(array_get($input, 'date_of_sale')));
 		$instance->encoded_by = array_get($input, 'encoded_by');
-		$instance->status = array_get($input, 'status');
+		//$instance->status = array_get($input, 'status');
 		
 		$instance->save();
 		return $instance;

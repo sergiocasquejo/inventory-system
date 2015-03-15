@@ -13,21 +13,25 @@
 				<form action="{{ route('admin_expenses.saveReview') }}" method="POST" />
 					<table class="table table-striped table-advance table-hover">
 						<tr>
+                            @if (\Confide::user()->isAdmin())
 							<th>Branch</th>
+                            @endif
 							<th>Type</th>
 							<th>Name</th>
 							<th>Qty.</th>
 							<th>Total</th>
 							<th>Date</th>
-							<th>Status</th>
 							<th>Cmnts</th>
 							<th></th>
 						</tr>
 						@if ($reviews)
 							@foreach ($reviews as $key => $review)
 							<tr>
-								<td data-branch="{{{ $review['branch_id'] }}}">{{ \Branch::find($review['branch_id'])->address }}</td>
-								<td data-expense_type="{{{ $review['expense_type'] }}}">{{{ $review['expense_type'] }}}</td>
+                                @if (\Confide::user()->isAdmin())
+								<td>{{ \Branch::find($review['branch_id'])->address }}</td>
+                                @endif
+
+								<td data-branch="{{{ $review['branch_id'] }}}" data-expense_type="{{{ $review['expense_type'] }}}">{{{ $review['expense_type'] }}}</td>
 								<td data-name="{{{ $review['name'] }}}">
 									<strong>{{{ is_numeric($review['name']) ? \Product::find($review['name'])->name : $review['name']  }}}</strong>
 
@@ -35,7 +39,6 @@
 								<td data-quantity="{{{ $review['quantity'] }}}" data-uom="{{{ $review['uom'] }}}">{{ \Helper::nf($review['quantity']) .' '.$review['uom'] }}</td>
 								<td data-total_amount="{{{ $review['total_amount'] }}}">{{ $review['total_amount'] }}</td>
 								<td data-date_of_expense="{{{ $review['date_of_expense'] }}}">{{ $review['date_of_expense'] }}</td>
-								<td data-status="{{{ $review['status'] }}}">{{ $review['status'] ? 'Active' : 'Inactive' }}</td>
 								<td data-comments="{{{ $review['comments'] }}}"><a class="badge bg-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="{{{ $review['comments'] }}}">?</a></td>
 								<td>
 									<a data-review-id="{{{ $key }}}" href="#" class="btn btn-primary btn-xs edit-expense-review" title="Edit"><i class="icon-pencil"></i></a>
@@ -119,12 +122,6 @@
 					  </div>
 					</div>
 
-					<div class="form-group">
-					  <label class="col-sm-2 control-label">Status</label>
-					  <div class="col-sm-10">
-					      {{ Form::select('status', \Config::get('agrivate.statuses'), Input::old('status'), ['class' => 'form-control m-bot15']) }}
-					  </div>
-					</div>
 
 					<div class="form-group">
 					  <label class="col-sm-2 control-label">Date of expense</label>
