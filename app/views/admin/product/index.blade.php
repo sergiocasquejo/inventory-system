@@ -16,7 +16,7 @@
                   <br />
                   <div class="col-md-12">
                     <div class="form-group">
-                        {{ Form::select('records_per_page', \Config::get('agrivate.records_per_page'), Input::get('records_per_page', 10), ['class' => 'form-control', 'size' => '1', 'onchange' => 'this.form.submit();']) }} 
+                        {{ Form::select('records_per_page', \Config::get('agrivet.records_per_page'), Input::get('records_per_page', 10), ['class' => 'form-control', 'size' => '1', 'onchange' => 'this.form.submit();']) }}
                     </div>
                     <div class="form-group">
                         <input type="text" name="s"  value="{{ Input::get('s') }}" placeholder="Search" class="form-control">
@@ -73,7 +73,7 @@
                           @endforeach
                       @else
                           <tr>
-                            <td colspan="10">{{{ \Lang::get('agrivate.empty', 'Products') }}}</td>
+                            <td colspan="10">{{{ \Lang::get('agrivet.empty', 'Products') }}}</td>
                           </tr>
                       @endif
                     </tbody>

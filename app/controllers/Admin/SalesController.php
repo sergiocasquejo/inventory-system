@@ -22,7 +22,7 @@ class SalesController extends \BaseController {
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
-		$countries = \Config::get('agrivate.countries');
+		$countries = \Config::get('agrivet.countries');
 
 
 		$yearly = \Sale::owned()->whereRaw('sale_type="SALE" AND YEAR(date_of_sale) = YEAR(CURDATE())')->sum('total_amount');
@@ -135,7 +135,7 @@ class SalesController extends \BaseController {
 					// Convert sack to kg
 					if (strpos($uom,'sack') !== false) {
 						$oldMeasure = $input['uom'];
-						$input['quantity'] = $quantity * \Config::get('agrivate.equivalent_measure.sacks.per');
+						$input['quantity'] = $quantity * \Config::get('agrivet.equivalent_measure.sacks.per');
 						$input['uom'] = $uom = 'kg';
 					}
 
@@ -166,19 +166,19 @@ class SalesController extends \BaseController {
 							}
 						} else {
 							if (strpos($oldMeasure, 'sack') !== false) $input['uom'] = $oldMeasure;
-							$errors = [\Lang::get('agrivate.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
+							$errors = [\Lang::get('agrivet.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
 						}
 
 					} else {
 						if (strpos($oldMeasure,'sack') !== false) $input['uom'] = $oldMeasure;
-						$errors = [\Lang::get('agrivate.errors.out_of_stocks')];
+						$errors = [\Lang::get('agrivet.errors.out_of_stocks')];
 
 					}
 				});
 				
 
 				if (count($errors) == 0) {
-					return \Redirect::route('admin_sales.index')->with('success', \Lang::get('agrivate.created'));
+					return \Redirect::route('admin_sales.index')->with('success', \Lang::get('agrivet.created'));
 				} else {
 					return \Redirect::back()->withErrors($errors)->withInput($input);
 				}
@@ -205,7 +205,7 @@ class SalesController extends \BaseController {
 		try {
 			$sale = \Sale::findOrFail($id);
 		} catch(\Exception $e) {
-			return \Redirect::back()->with('info', \Lang::get('agrivate.errors.restore'));
+			return \Redirect::back()->with('info', \Lang::get('agrivet.errors.restore'));
 		}
 
 		return \View::make('admin.sale.edit')
@@ -261,7 +261,7 @@ class SalesController extends \BaseController {
 					// Convert sack to kg
 					if (strpos($uom,'sack') !== false) {
 						$oldMeasure = $input['uom'];
-						$input['quantity'] = $quantity * \Config::get('agrivate.equivalent_measure.sacks.per');
+						$input['quantity'] = $quantity * \Config::get('agrivet.equivalent_measure.sacks.per');
 						$input['uom'] = $uom = 'kg';
 					}
 
@@ -288,7 +288,7 @@ class SalesController extends \BaseController {
 
 						// Check if stock is insufficient
 						if ($total < 0) {
-							$errors = [\Lang::get('agrivate.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
+							$errors = [\Lang::get('agrivet.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
 							return;
 						}
 
@@ -310,7 +310,7 @@ class SalesController extends \BaseController {
 				
 
 				if (count($errors) == 0) {
-					return \Redirect::route('admin_sales.index')->with('success', \Lang::get('agrivate.created'));
+					return \Redirect::route('admin_sales.index')->with('success', \Lang::get('agrivet.created'));
 				} else {
 					return \Redirect::back()->withErrors($errors)->withInput($input);
 				}
@@ -332,10 +332,10 @@ class SalesController extends \BaseController {
 	public function destroy($id)
 	{
 		$sale = \Sale::withTrashed()->where('sale_id', $id)->first();
-		$message = \Lang::get('agrivate.trashed');
+		$message = \Lang::get('agrivet.trashed');
 		if ($sale->trashed() || \Input::get('remove') == 1 ) {
             $sale->forceDelete();
-            $message = \Lang::get('agrivate.deleted');
+            $message = \Lang::get('agrivet.deleted');
         } else {
             $sale->delete();
         }
@@ -358,7 +358,7 @@ class SalesController extends \BaseController {
 			return \Redirect::back()->withErrors($sale->errors());			
 		}
 
-		return \Redirect::back()->with('success', \Lang::get('agrivate.restored'));
+		return \Redirect::back()->with('success', \Lang::get('agrivet.restored'));
 	}
 
 
@@ -404,7 +404,7 @@ class SalesController extends \BaseController {
 				\Session::put('salesReview', $review);
 				
 
-				return \Redirect::route('admin_sales.create')->with('success', \Lang::get('agrivate.add_to_review'));
+				return \Redirect::route('admin_sales.create')->with('success', \Lang::get('agrivet.add_to_review'));
 
 			} catch(\Exception $e) {
 				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput($input);
@@ -415,7 +415,7 @@ class SalesController extends \BaseController {
 	public function deleteReview($reviewId) {
 		\Session::forget("salesReview.$reviewId");
 
-		return \Redirect::route('admin_sales.create')->with('success', \Lang::get('agrivate.deleted'));
+		return \Redirect::route('admin_sales.create')->with('success', \Lang::get('agrivet.deleted'));
 	}
 
 	public function saveReview() {
@@ -440,7 +440,7 @@ class SalesController extends \BaseController {
 					// Convert sack to kg
 					if (strpos($uom,'sack') !== false) {
 						$oldMeasure = $input['uom'];
-						$input['quantity'] = $quantity * \Config::get('agrivate.equivalent_measure.sacks.per');
+						$input['quantity'] = $quantity * \Config::get('agrivet.equivalent_measure.sacks.per');
 						$input['uom'] = $uom = 'kg';
 					}
 
@@ -470,12 +470,12 @@ class SalesController extends \BaseController {
 							}
 						} else {
 							if (strpos($oldMeasure, 'sack') !== false) $input['uom'] = $oldMeasure;
-							$errors[] = [$p->name.' '.\Lang::get('agrivate.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
+							$errors[] = [$p->name.' '.\Lang::get('agrivet.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
 						}
 
 					} else {
 						if (strpos($oldMeasure,'sack') !== false) $input['uom'] = $oldMeasure;
-						$errors[] = [$p->name.' '.\Lang::get('agrivate.errors.out_of_stocks')];
+						$errors[] = [$p->name.' '.\Lang::get('agrivet.errors.out_of_stocks')];
 
 					}
 				});
@@ -488,7 +488,7 @@ class SalesController extends \BaseController {
 				
 
 			if (count($errors) == 0) {
-				return \Redirect::route('admin_sales.create')->with('success', \Lang::get('agrivate.created'));
+				return \Redirect::route('admin_sales.create')->with('success', \Lang::get('agrivet.created'));
 			} else {
 
 				return \Redirect::back()->withErrors($errors);

@@ -62,7 +62,7 @@
                   <div class="col-sm-6">
                     <div id="sample_1_length" class="dataTables_length">
                       <label>
-                        {{ Form::select('records_per_page', \Config::get('agrivate.records_per_page'), Input::get('records_per_page', 10), ['class' => 'form-control', 'size' => '1', 'onchange' => 'this.form.submit();']) }} 
+                        {{ Form::select('records_per_page', \Config::get('agrivet.records_per_page'), Input::get('records_per_page', 10), ['class' => 'form-control', 'size' => '1', 'onchange' => 'this.form.submit();']) }}
                         records per page
                       </label>
                     </div>
@@ -146,7 +146,7 @@
                           @endforeach
                       @else
                           <tr>
-                            <td colspan="8">{{{ \Lang::get('agrivate.empty', 'Credits') }}}</td>
+                            <td colspan="8">{{{ \Lang::get('agrivet.empty', 'Credits') }}}</td>
                           </tr>
                       @endif
                     </tbody>

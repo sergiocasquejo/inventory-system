@@ -74,7 +74,7 @@ class ReportsController extends \BaseController {
 
 	// 		if ($stock->uom == 'kg') {
 	// 			//1 Sack equivalent
-	// 			$sackEqui = \Config::get('agrivate.equivalent_measure.sacks.per');
+	// 			$sackEqui = \Config::get('agrivet.equivalent_measure.sacks.per');
 
 	// 			$sack = 0;
 	// 			$quantity = (float)$stock->total_stocks / (float)$sackEqui;

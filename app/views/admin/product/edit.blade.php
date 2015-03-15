@@ -73,7 +73,7 @@
 						<div class="form-group">
 						  <label class="col-sm-2 control-label">Status</label>
 						  <div class="col-sm-10">
-						      {{ Form::select('status', \Config::get('agrivate.statuses'), Input::old('status', $product->status), ['class' => 'form-control m-bot15']) }}
+						      {{ Form::select('status', \Config::get('agrivet.statuses'), Input::old('status', $product->status), ['class' => 'form-control m-bot15']) }}
 						  </div>
 						</div>
 						<button type="submit" class="btn btn-shadow btn-primary">Update</button>
@@ -139,7 +139,7 @@
 				              @endforeach
 				          @else
 				              <tr>
-				                <td colspan="4">{{{ \Lang::get('agrivate.empty', 'Prices') }}}</td>
+				                <td colspan="4">{{{ \Lang::get('agrivet.empty', 'Prices') }}}</td>
 				              </tr>
 				          @endif
 				        </tbody>

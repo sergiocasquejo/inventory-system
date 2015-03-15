@@ -25,7 +25,7 @@ class ExpensesController extends \BaseController {
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
-		$countries = \Config::get('agrivate.countries');
+		$countries = \Config::get('agrivet.countries');
 
 
 		$yearly = \Expense::owned()->whereRaw('YEAR(date_of_expense) = YEAR(CURDATE())')->sum('total_amount');
@@ -118,7 +118,7 @@ class ExpensesController extends \BaseController {
 				$expense = new \Expense;
 
 				if ($expense->doSave($expense, $input)) {
-					return \Redirect::route('admin_expenses.index')->with('success', \Lang::get('agrivate.created'));
+					return \Redirect::route('admin_expenses.index')->with('success', \Lang::get('agrivet.created'));
 				}
 
 				return \Redirect::back()->withErrors($expense->errors())->withInput();
@@ -142,7 +142,7 @@ class ExpensesController extends \BaseController {
 		try {
 			$expense = \Expense::findOrFail($id);
 		} catch(\Exception $e) {
-			return \Redirect::back()->with('info', \Lang::get('agrivate.errors.restore'));
+			return \Redirect::back()->with('info', \Lang::get('agrivet.errors.restore'));
 		}
 
 		return \View::make('admin.expense.edit')
@@ -187,7 +187,7 @@ class ExpensesController extends \BaseController {
 				$expense = \Expense::findOrFail($id);
 				
 				if ($expense->doSave($expense, $input)) {
-					return \Redirect::route('admin_expenses.index')->with('success', \Lang::get('agrivate.updated'));
+					return \Redirect::route('admin_expenses.index')->with('success', \Lang::get('agrivet.updated'));
 				}
 
 				return \Redirect::back()->withErrors($expense->errors())->withInput();
@@ -207,10 +207,10 @@ class ExpensesController extends \BaseController {
 	public function destroy($id)
 	{
 		$expense = \Expense::withTrashed()->where('expense_id', $id)->first();
-		$message = \Lang::get('agrivate.trashed');
+		$message = \Lang::get('agrivet.trashed');
 		if ($expense->trashed() || \Input::get('remove') == 1) {
             $expense->forceDelete();
-            $message = \Lang::get('agrivate.deleted');
+            $message = \Lang::get('agrivet.deleted');
         } else {
             $expense->delete();
         }
@@ -233,7 +233,7 @@ class ExpensesController extends \BaseController {
 			return \Redirect::back()->withErrors($expense->errors());			
 		}
 
-		return \Redirect::back()->with('success', \Lang::get('agrivate.restored'));
+		return \Redirect::back()->with('success', \Lang::get('agrivet.restored'));
 	}
 
 
@@ -276,7 +276,7 @@ class ExpensesController extends \BaseController {
 				\Session::put('expensesReview', $review);
 				
 
-				return \Redirect::route('admin_expenses.create')->with('success', \Lang::get('agrivate.add_to_review'));
+				return \Redirect::route('admin_expenses.create')->with('success', \Lang::get('agrivet.add_to_review'));
 
 			} catch(\Exception $e) {
 				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput($input);
@@ -287,7 +287,7 @@ class ExpensesController extends \BaseController {
 	public function deleteReview($reviewId) {
 		\Session::forget("expensesReview.$reviewId");
 
-		return \Redirect::route('admin_expenses.create')->with('success', \Lang::get('agrivate.deleted'));
+		return \Redirect::route('admin_expenses.create')->with('success', \Lang::get('agrivet.deleted'));
 	}
 
 	public function saveReview() {
@@ -308,7 +308,7 @@ class ExpensesController extends \BaseController {
 				
 
 			if (count($errors) == 0) {
-				return \Redirect::route('admin_expenses.create')->with('success', \Lang::get('agrivate.created'));
+				return \Redirect::route('admin_expenses.create')->with('success', \Lang::get('agrivet.created'));
 			} else {
 
 				return \Redirect::back()->withErrors($errors);

@@ -31,7 +31,7 @@ class ProductsController extends \BaseController {
 
 			$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
-			$countries = \Config::get('agrivate.countries');
+			$countries = \Config::get('agrivet.countries');
 
 		return \View::make('admin.product.index')
 			->with('products', $products)
@@ -82,7 +82,7 @@ class ProductsController extends \BaseController {
 
 
 				if ($product->doSave($product, $input)) {
-					return \Redirect::route('admin_products.edit', $product->id)->with('success', \Lang::get('agrivate.created'));
+					return \Redirect::route('admin_products.edit', $product->id)->with('success', \Lang::get('agrivet.created'));
 				}
 
 				return \Redirect::back()->withErrors($product->errors())->withInput();
@@ -145,7 +145,7 @@ class ProductsController extends \BaseController {
 				
 				$input['encoded_by'] = $product->encoded_by;
 				if ($product->doSave($product, $input)) {
-					return \Redirect::route('admin_products.index')->with('success', \Lang::get('agrivate.updated'));
+					return \Redirect::route('admin_products.index')->with('success', \Lang::get('agrivet.updated'));
 				}
 
 				return \Redirect::back()->withErrors($product->errors())->withInput();
@@ -166,10 +166,10 @@ class ProductsController extends \BaseController {
 	public function destroy($id)
 	{
 		$product = \Product::withTrashed()->where('id', $id)->first();
-		$message = \Lang::get('agrivate.trashed');
+		$message = \Lang::get('agrivet.trashed');
 		if ($product->trashed() || \Input::get('remove') == 1) {
             $product->forceDelete();
-            $message = \Lang::get('agrivate.deleted');
+            $message = \Lang::get('agrivet.deleted');
         } else {
             $product->delete();
         }
@@ -189,7 +189,7 @@ class ProductsController extends \BaseController {
 			return \Redirect::back()->withErrors($product->errors());			
 		}
 
-		return \Redirect::back()->with('success', \Lang::get('agrivate.restored'));
+		return \Redirect::back()->with('success', \Lang::get('agrivet.restored'));
 	}
 
 	/**

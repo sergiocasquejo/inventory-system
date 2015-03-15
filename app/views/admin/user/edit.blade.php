@@ -113,7 +113,7 @@
 					<div class="form-group">
 					  <label class="col-sm-2 control-label">Status</label>
 					  <div class="col-sm-10">
-					      {{ Form::select('status',  \Config::get('agrivate.statuses'), Input::old('status', $user->status), ['class' => 'form-control m-bot15']) }}
+					      {{ Form::select('status',  \Config::get('agrivet.statuses'), Input::old('status', $user->status), ['class' => 'form-control m-bot15']) }}
 					  </div>
 					</div>
 					

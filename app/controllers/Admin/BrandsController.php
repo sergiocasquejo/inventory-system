@@ -19,7 +19,7 @@ class BrandsController extends \BaseController {
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
-		$countries = \Config::get('agrivate.countries');
+		$countries = \Config::get('agrivet.countries');
 		return \View::make('admin.brand.index')
 			->with('brands', $brands)
 			->with('appends', $appends)
@@ -61,7 +61,7 @@ class BrandsController extends \BaseController {
 
 
 				if ($brand->doSave($brand, $input)) {
-					return \Redirect::route('admin_brands.edit', $brand->brand_id)->with('success', \Lang::get('agrivate.created'));
+					return \Redirect::route('admin_brands.edit', $brand->brand_id)->with('success', \Lang::get('agrivet.created'));
 				}
 
 				return \Redirect::back()->withErrors($brand->errors())->withInput();
@@ -111,7 +111,7 @@ class BrandsController extends \BaseController {
 				$brand = \Brand::findOrFail($id);
 				
 				if ($brand->doSave($brand, $input)) {
-					return \Redirect::route('admin_brands.index')->with('success', \Lang::get('agrivate.updated'));
+					return \Redirect::route('admin_brands.index')->with('success', \Lang::get('agrivet.updated'));
 				}
 
 				return \Redirect::back()->withErrors($brand->errors())->withInput();
@@ -133,7 +133,7 @@ class BrandsController extends \BaseController {
 	{
 		try {
 			$brand = \Brand::findOrFail($id);
-			$message = \Lang::get('agrivate.trashed');
+			$message = \Lang::get('agrivet.trashed');
 			if (!$brand->delete() || \Input::get('remove') == 1) {
 				return \Redirect::back()->withErrors($brand->errors());			
 	        }

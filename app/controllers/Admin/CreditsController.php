@@ -27,7 +27,7 @@ class CreditsController extends \BaseController {
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
-		// $countries = \Config::get('agrivate.countries');
+		// $countries = \Config::get('agrivet.countries');
 
 
 
@@ -134,7 +134,7 @@ class CreditsController extends \BaseController {
 					// Convert sack to kg
 					if (strpos($uom,'sack') !== false) {
 						$oldMeasure = $input['uom'];
-						$input['quantity'] = $quantity * \Config::get('agrivate.equivalent_measure.sacks.per');
+						$input['quantity'] = $quantity * \Config::get('agrivet.equivalent_measure.sacks.per');
 						$input['uom'] = $uom = 'kg';
 					}
 
@@ -171,19 +171,19 @@ class CreditsController extends \BaseController {
 							}
 						} else {
 							if (strpos($oldMeasure, 'sack') !== false) $input['uom'] = $oldMeasure;
-							$errors = [\Lang::get('agrivate.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
+							$errors = [\Lang::get('agrivet.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
 						}
 
 					} else {
 						if (strpos($oldMeasure,'sack') !== false) $input['uom'] = $oldMeasure;
-						$errors = [\Lang::get('agrivate.errors.out_of_stocks')];
+						$errors = [\Lang::get('agrivet.errors.out_of_stocks')];
 
 					}
 				});
 				
 
 				if (count($errors) == 0) {
-					return \Redirect::route('admin_credits.index')->with('success', \Lang::get('agrivate.created'));
+					return \Redirect::route('admin_credits.index')->with('success', \Lang::get('agrivet.created'));
 				} else {
 					return \Redirect::back()->withErrors($errors)->withInput($input);
 				}
@@ -256,7 +256,7 @@ class CreditsController extends \BaseController {
 					// Convert sack to kg
 					if (strpos($uom,'sack') !== false) {
 						$oldMeasure = $input['uom'];
-						$input['quantity'] = $quantity * \Config::get('agrivate.equivalent_measure.sacks.per');
+						$input['quantity'] = $quantity * \Config::get('agrivet.equivalent_measure.sacks.per');
 						$input['uom'] = $uom = 'kg';
 					}
 
@@ -291,7 +291,7 @@ class CreditsController extends \BaseController {
 
 						// Check if stock is insufficient
 						if ($total < 0) {
-							$errors = [\Lang::get('agrivate.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
+							$errors = [\Lang::get('agrivet.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
 							return;
 						}
 
@@ -318,7 +318,7 @@ class CreditsController extends \BaseController {
 
 
 				if (count($errors) == 0) {
-					return \Redirect::route('admin_credits.index')->with('success', \Lang::get('agrivate.updated'));
+					return \Redirect::route('admin_credits.index')->with('success', \Lang::get('agrivet.updated'));
 				} else {
 					return \Redirect::back()->withErrors($credit->errors())->withInput();
 				}
@@ -341,10 +341,10 @@ class CreditsController extends \BaseController {
 	public function destroy($id)
 	{
 		$credit = \Credit::withTrashed()->where('credit_id', $id)->first();
-		$message = \Lang::get('agrivate.trashed');
+		$message = \Lang::get('agrivet.trashed');
 		if ($credit->trashed() || \Input::get('remove') == 1) {
             $credit->sale->forceDelete();
-            $message = \Lang::get('agrivate.deleted');
+            $message = \Lang::get('agrivet.deleted');
         } else {
             $credit->sale->delete();
         }
@@ -364,7 +364,7 @@ class CreditsController extends \BaseController {
 			return \Redirect::back()->withErrors($credit->errors());			
 		}
 
-		return \Redirect::back()->with('success', \Lang::get('agrivate.restored'));
+		return \Redirect::back()->with('success', \Lang::get('agrivet.restored'));
 	}
 
 	public function review($reviewId = false) {
@@ -402,7 +402,7 @@ class CreditsController extends \BaseController {
 				\Session::put('creditsReview', $review);
 				
 
-				return \Redirect::route('admin_credits.create')->with('success', \Lang::get('agrivate.add_to_review'));
+				return \Redirect::route('admin_credits.create')->with('success', \Lang::get('agrivet.add_to_review'));
 
 			} catch(\Exception $e) {
 				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput($input);
@@ -413,7 +413,7 @@ class CreditsController extends \BaseController {
 	public function deleteReview($reviewId) {
 		\Session::forget("creditsReview.$reviewId");
 
-		return \Redirect::route('admin_credits.create')->with('success', \Lang::get('agrivate.deleted'));
+		return \Redirect::route('admin_credits.create')->with('success', \Lang::get('agrivet.deleted'));
 	}
 
 	public function saveReview() {
@@ -439,7 +439,7 @@ class CreditsController extends \BaseController {
 					// Convert sack to kg
 					if (strpos($uom,'sack') !== false) {
 						$oldMeasure = $input['uom'];
-						$input['quantity'] = $quantity * \Config::get('agrivate.equivalent_measure.sacks.per');
+						$input['quantity'] = $quantity * \Config::get('agrivet.equivalent_measure.sacks.per');
 						$input['uom'] = $uom = 'kg';
 					}
 
@@ -476,12 +476,12 @@ class CreditsController extends \BaseController {
 							}
 						} else {
 							if (strpos($oldMeasure, 'sack') !== false) $input['uom'] = $oldMeasure;
-							$errors = [\Lang::get('agrivate.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
+							$errors = [\Lang::get('agrivet.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
 						}
 
 					} else {
 						if (strpos($oldMeasure,'sack') !== false) $input['uom'] = $oldMeasure;
-						$errors = [\Lang::get('agrivate.errors.out_of_stocks')];
+						$errors = [\Lang::get('agrivet.errors.out_of_stocks')];
 
 					}
 				});
@@ -498,7 +498,7 @@ class CreditsController extends \BaseController {
 				
 
 			if (count($errors) == 0) {
-				return \Redirect::route('admin_credits.create')->with('success', \Lang::get('agrivate.created'));
+				return \Redirect::route('admin_credits.create')->with('success', \Lang::get('agrivet.created'));
 			} else {
 
 				return \Redirect::route('admin_credits.create')->withErrors($errors);

@@ -15,7 +15,7 @@
                 <br />
                 <div class="col-sm-1">
                     <label>
-                      {{ Form::select('records_per_page', \Config::get('agrivate.records_per_page'), Input::get('records_per_page', 10), ['class' => 'form-control', 'size' => '1', 'onchange' => 'this.form.submit();']) }} 
+                      {{ Form::select('records_per_page', \Config::get('agrivet.records_per_page'), Input::get('records_per_page', 10), ['class' => 'form-control', 'size' => '1', 'onchange' => 'this.form.submit();']) }}
                       per page
                     </label>
                 </div>
@@ -72,7 +72,7 @@
                           @endforeach
                       @else
                           <tr>
-                            <td colspan="8">{{{ \Lang::get('agrivate.empty', 'Branch') }}}</td>
+                            <td colspan="8">{{{ \Lang::get('agrivet.empty', 'Branch') }}}</td>
                           </tr>
                       @endif
                     </tbody>

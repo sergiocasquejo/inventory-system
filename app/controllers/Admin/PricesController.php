@@ -63,7 +63,7 @@ class PricesController extends \BaseController {
 					}
 				});
 				if (count($errors) == 0) {
-					return \Response::json(['success' => \Lang::get('agrivate.created')]);
+					return \Response::json(['success' => \Lang::get('agrivet.created')]);
 				} else {
 					return \Response::json(['errors' => $price->errors()]);
 				}
@@ -129,7 +129,7 @@ class PricesController extends \BaseController {
 					}
 				});
 				if (count($errors) == 0) {
-					return \Response::json(['success' => \Lang::get('agrivate.updated')]);
+					return \Response::json(['success' => \Lang::get('agrivet.updated')]);
 				} else {
 					return \Response::json(['errors' => $price->errors()]);
 				}
@@ -152,8 +152,8 @@ class PricesController extends \BaseController {
 		try {
 			$stock = \ProductPricing::findOrFail($price_id)->delete();
 			if ($stock) {
-				return \Redirect::back()->with('success', \Lang::get('agrivate.deleted'));
-				// return \Response::json(['success' => \Lang::get('agrivate.deleted')]);
+				return \Redirect::back()->with('success', \Lang::get('agrivet.deleted'));
+				// return \Response::json(['success' => \Lang::get('agrivet.deleted')]);
 			} 
 			return \Redirect::back()->withErrors($stock->errors());
 			// return \Response::json($stock->errors());

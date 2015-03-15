@@ -24,7 +24,7 @@ class UsersController extends \BaseController {
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
-		$countries = \Config::get('agrivate.countries');
+		$countries = \Config::get('agrivet.countries');
 		return \View::make('admin.user.index')
 			->with('users', $users)
 			->with('appends', $appends)
@@ -67,7 +67,7 @@ class UsersController extends \BaseController {
 				if ($user->doSave($user, $input)) {
 					$this->upload($user->id);
 					
-					return \Redirect::route('admin_users.index')->with('success', \Lang::get('agrivate.created'));
+					return \Redirect::route('admin_users.index')->with('success', \Lang::get('agrivet.created'));
 				}
 
 				return \Redirect::back()->withErrors($user->errors())->withInput();
@@ -95,7 +95,7 @@ class UsersController extends \BaseController {
 		try {
 			$user = \User::findOrFail($id);
 		} catch(\Exception $e) {
-			return \Redirect::back()->with('info', \Lang::get('agrivate.errors.restore'));
+			return \Redirect::back()->with('info', \Lang::get('agrivet.errors.restore'));
 		}
 
 		return \View::make('admin.user.edit')
@@ -107,7 +107,7 @@ class UsersController extends \BaseController {
 
 	public function upload($id) {
 		if (\Input::hasFile('photo')) {
-			$avatar = \Config::get('agrivate.avatar');
+			$avatar = \Config::get('agrivet.avatar');
 			$fileName = $avatar['filename'];
 			$fileExtension = $avatar['extension'];
 
@@ -158,7 +158,7 @@ class UsersController extends \BaseController {
 					
 					$this->upload($id);
 					//route('admin_users.index')
-					return \Redirect::back()->with('success', \Lang::get('agrivate.updated'));
+					return \Redirect::back()->with('success', \Lang::get('agrivet.updated'));
 				}
 
 				return \Redirect::back()->withErrors($user->errors())->withInput();
@@ -181,15 +181,15 @@ class UsersController extends \BaseController {
 	public function destroy($id)
 	{
 		if (\User::withTrashed()->where('id', $id)->first()->is_admin == 1) {
-			return \Redirect::back()->with('warning', \Lang::get('agrivate.errors.delete_owner_permission'));
+			return \Redirect::back()->with('warning', \Lang::get('agrivet.errors.delete_owner_permission'));
 		}
 
 
 		$user = \User::withTrashed()->where('id', $id)->first();
-		$message = \Lang::get('agrivate.trashed');
+		$message = \Lang::get('agrivet.trashed');
 		if ($user->trashed() || \Input::get('remove') == 1) {
             $user->forceDelete();
-            $message = \Lang::get('agrivate.deleted');
+            $message = \Lang::get('agrivet.deleted');
         } else {
             $user->delete();
         }
@@ -216,7 +216,7 @@ class UsersController extends \BaseController {
 			return \Redirect::back()->withErrors($user->errors());			
 		}
 
-		return \Redirect::back()->with('success', \Lang::get('agrivate.restored'));
+		return \Redirect::back()->with('success', \Lang::get('agrivet.restored'));
 	}
 
 

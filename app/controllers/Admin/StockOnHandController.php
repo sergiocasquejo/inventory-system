@@ -33,7 +33,7 @@ class StockOnHandController extends \BaseController {
 
 			if ($stock->uom == 'kg') {
 				//1 Sack equivalent
-				$sackEqui = \Config::get('agrivate.equivalent_measure.sacks.per');
+				$sackEqui = \Config::get('agrivet.equivalent_measure.sacks.per');
 
 				$sack = 0;
 				$quantity = (float)$stock->total_stocks / (float)$sackEqui;
@@ -142,7 +142,7 @@ class StockOnHandController extends \BaseController {
 				$uomInput = array_get($input, 'uom');
 				if (strpos($uomInput, 'sack') !== false) {
 
-					$equi_config = \Config::get('agrivate.equivalent_measure.sacks');
+					$equi_config = \Config::get('agrivet.equivalent_measure.sacks');
 					$input['uom'] = $uom = $equi_config['to'];
 					
 					$total_stocks = array_get($input, 'total_stocks', 0) * $equi_config['per'];
@@ -165,9 +165,9 @@ class StockOnHandController extends \BaseController {
 
 				if ($stock->doSave($stock, $input)) {
 					if (\Request::ajax()) {
-						return \Response::json(['success' => \Lang::get('agrivate.created')]);
+						return \Response::json(['success' => \Lang::get('agrivet.created')]);
 					} else {
-						return \Redirect::route('admin_stocks.index')->with('success', \Lang::get('agrivate.created'));
+						return \Redirect::route('admin_stocks.index')->with('success', \Lang::get('agrivet.created'));
 					}
 				}
 				if (\Request::ajax()) {
@@ -267,7 +267,7 @@ class StockOnHandController extends \BaseController {
 				if (strpos($uomInput, 'sack')  !== false) {
 
 
-					$equi_config = \Config::get('agrivate.equivalent_measure.sacks');
+					$equi_config = \Config::get('agrivet.equivalent_measure.sacks');
 					$input['uom'] = $uom = $equi_config['to'];
 					
 					$input['total_stocks'] = array_get($input, 'total_stocks', 0) * $equi_config['per'];
@@ -278,9 +278,9 @@ class StockOnHandController extends \BaseController {
 
 				if ($stock->doSave($stock, $input)) {
 					if (\Request::ajax()) {
-						return \Response::json(['success' => \Lang::get('agrivate.updated')]);
+						return \Response::json(['success' => \Lang::get('agrivet.updated')]);
 					} else {
-						return \Redirect::route('admin_stocks.index')->with('success', \Lang::get('agrivate.created'));
+						return \Redirect::route('admin_stocks.index')->with('success', \Lang::get('agrivet.created'));
 					}
 				}
 
@@ -313,8 +313,8 @@ class StockOnHandController extends \BaseController {
 
 		$stock = \StockOnHand::find($stock_id)->delete();
 		if ($stock) {
-			return \Redirect::back()->with('success', \Lang::get('agrivate.deleted'));
-			// return \Response::json(['success' => \Lang::get('agrivate.deleted')]);
+			return \Redirect::back()->with('success', \Lang::get('agrivet.deleted'));
+			// return \Response::json(['success' => \Lang::get('agrivet.deleted')]);
 		} 
 		return \Redirect::back()->withErrors($stock->errors());
 		// return \Response::json($stock->errors());

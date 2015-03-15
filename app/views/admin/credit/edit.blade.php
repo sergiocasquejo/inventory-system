@@ -88,7 +88,7 @@
 				<div class="form-group">
 				  <label class="col-sm-2 control-label">Is Paid</label>
 				  <div class="col-sm-10">
-				      {{ Form::select('is_paid', \Config::get('agrivate.credit_statuses'), Input::old('is_paid' , $credit->is_paid), ['class' => 'form-control m-bot15']) }}
+				      {{ Form::select('is_paid', \Config::get('agrivet.credit_statuses'), Input::old('is_paid' , $credit->is_paid), ['class' => 'form-control m-bot15']) }}
 				  </div>
 				</div>
 

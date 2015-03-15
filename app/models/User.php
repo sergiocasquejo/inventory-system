@@ -126,7 +126,7 @@ class User extends Eloquent implements ConfideUserInterface {
 
 
         $avatars = array();
-        $avatar = \Config::get('agrivate.avatar');
+        $avatar = \Config::get('agrivet.avatar');
         $fileName = $avatar['filename'];
         $fileExtension = $avatar['extension'];
         

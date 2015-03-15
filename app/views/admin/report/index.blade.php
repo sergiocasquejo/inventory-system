@@ -32,7 +32,7 @@
                   <table class="table table-striped table-advance table-hover">
                       <thead>
                         <tr>
-                            <th>KM AGRIVATE BRANCHES</th>
+                            <th>KM agrivet BRANCHES</th>
                             <th>TOTAL AMOUNT OF EXPENSE</th>
                             <th>TOTAL AMOUNT OF CREDITS</th>
                             <th>TOTAL AMOUNT OF INCOME</th>

@@ -55,7 +55,7 @@ return array(
 		'mysql' => array(
 			'driver'    => 'mysql',
 			'host'      => 'localhost',
-			'database'  => 'ianquija_agrivate',
+			'database'  => 'ianquija_agrivet',
 			'username'  => 'ianquija_agri',
 			'password'  => 'yB#yp3xC!A2K',
 			'charset'   => 'utf8',
