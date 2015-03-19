@@ -113,7 +113,7 @@
                       @if ($credits)
                           @foreach ($credits as $credit)
                           <tr>
-                              <td>{{{ !$credit->branch?'':$credit->branch->name }}}</td>
+                              <td>{{{ !$credit->sale || !$credit->sale->branch ?'':$credit->sale->branch->name.' '.$credit->sale->branch->address }}}</td>
                               <td>{{{ $credit->customer_name }}}</td>
                               <td><a class="badge bg-primary" data-html="true" data-container="body" data-toggle="popover" data-placement="top" data-content="{{ '<p> Addres: '.$credit->address.'</p>'.'<p> Contact #: '.$credit->contact_number.'</p>' }}">?</a></td>
                               <td>{{{ !$credit->sale?'':$credit->sale->quantity }}}</td>

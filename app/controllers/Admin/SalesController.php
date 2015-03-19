@@ -11,7 +11,6 @@ class SalesController extends \BaseController {
 	{
 		$input = \Input::all();
 
-
 		$sales = \Sale::withTrashed()
 				->filter($input)
 				->owned()
@@ -44,8 +43,6 @@ class SalesController extends \BaseController {
 			$products = $products->where('sales.branch_id', \Confide::user()->branch_id);
 		}
 
-
-
 		$all = [
 			'daily' => $daily,
 			'weekly' => $weekly,
@@ -74,10 +71,7 @@ class SalesController extends \BaseController {
 	 * @return Response
 	 */
 	public function create()
-	{	
-
-
-
+	{
 		return \View::make('admin.sale.create')
 		->with('reviews', \Session::get('salesReview'))
 		->with('branches', \Branch::filterBranch()->dropdown()->lists('name', 'id'))
@@ -236,7 +230,7 @@ class SalesController extends \BaseController {
 		}
 		
 		$rules = \Sale::$rules;
-		$input['encoded_by'] = \Confide::user()->id;
+        $rules['encoded_by'] = '';
 
 		$validator = \Validator::make($input, $rules);
 
@@ -277,6 +271,7 @@ class SalesController extends \BaseController {
 
 
 					$sale = \Sale::findOrFail($id);
+                    $input['encoded_by'] = $sale->encoded_by;
 
 					if ($sale->quantity > $quantity) {
 							$stock->total_stocks = $stock->total_stocks +  ($sale->quantity - array_get($input, 'quantity'));

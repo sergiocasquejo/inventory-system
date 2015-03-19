@@ -111,7 +111,7 @@
                       @if ($expenses)
                           @foreach ($expenses as $expense)
                           <tr>
-                              <td>{{{ !$expense->branch?'':$expense->branch->address .' '.$expense->branch->city }}}</td>
+                              <td>{{{ !$expense->branch ?'':$expense->branch->name.' '.$expense->branch->address }}}</td>
                               <td>
                                 @if ($expense->expense_type=='PRODUCT EXPENSES')
                                   {{{ !$expense->product?'':$expense->product->name }}}

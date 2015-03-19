@@ -38,7 +38,7 @@
 
 
 
-				<button type="submit" class="btn btn-shadow btn-primary">Create</button>
+				<button type="submit" class="btn btn-shadow btn-primary">Update</button>
 		  </form>
 		</div>
 	</section>

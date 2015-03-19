@@ -8,7 +8,8 @@ class Credit extends Eloquent {
 	protected $primaryKey = 'credit_id';
 
 	public static $rules = [
-		'customer_name'	=> 'required'
+		'customer_name'	=> 'required',
+
     ];
 
      /**=================================================

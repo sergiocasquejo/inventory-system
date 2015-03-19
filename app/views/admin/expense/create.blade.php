@@ -30,11 +30,9 @@
                                 @if (\Confide::user()->isAdmin())
 								<td>{{ \Branch::find($review['branch_id'])->address }}</td>
                                 @endif
-
 								<td data-branch="{{{ $review['branch_id'] }}}" data-expense_type="{{{ $review['expense_type'] }}}">{{{ $review['expense_type'] }}}</td>
 								<td data-name="{{{ $review['name'] }}}">
 									<strong>{{{ is_numeric($review['name']) ? \Product::find($review['name'])->name : $review['name']  }}}</strong>
-
 								</td>
 								<td data-quantity="{{{ $review['quantity'] }}}" data-uom="{{{ $review['uom'] }}}">{{ \Helper::nf($review['quantity']) .' '.$review['uom'] }}</td>
 								<td data-total_amount="{{{ $review['total_amount'] }}}">{{ $review['total_amount'] }}</td>
@@ -46,7 +44,6 @@
 	                                  <i class="icon-remove"></i>
 	                                </a>
 								</td>
-
 							</tr>
 							@endforeach
 						@endif
@@ -102,8 +99,6 @@
 					  </div>
 					</div>
 
-
-
 					<div class="form-group">
 					  <label class="col-sm-2 control-label">Total Amount</label>
 					  <div class="col-sm-10">
@@ -111,17 +106,12 @@
 					  </div>
 					</div>
 
-					
-
-					
-
 					<div class="form-group">
 					  <label class="col-sm-2 control-label">Comments</label>
 					  <div class="col-sm-10">
 					      <textarea name="comments" class="form-control">{{{ Input::old('quantity') }}}</textarea>
 					  </div>
 					</div>
-
 
 					<div class="form-group">
 					  <label class="col-sm-2 control-label">Date of expense</label>

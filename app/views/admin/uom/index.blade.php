@@ -43,11 +43,11 @@
                               <td>{{{ $uom->name }}}</td>
                               <td>{{{ $uom->label }}}</td>
                               <td>
-                                    <a href="{{{ route('admin_uoms.edit', $uom->uom_id) }}}" class="btn btn-primary btn-xs" title="Edit"><i class="icon-pencil"></i></a>
+                                 <!--   <a href="{{{ route('admin_uoms.edit', $uom->uom_id) }}}" class="btn btn-primary btn-xs" title="Edit"><i class="icon-pencil"></i></a>
                                
                                   <a href="{{{ route('admin_uoms.destroy', $uom->uom_id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
                                     <i class="icon-remove"></i>
-                                  </a>
+                                  </a>-->
                               </td>
                           </tr>
                           @endforeach

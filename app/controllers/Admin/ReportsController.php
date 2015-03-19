@@ -11,26 +11,47 @@ class ReportsController extends \BaseController {
 	{
 		$input = \Input::all();
 
+        $branch = array_get($input, 'branch');
 		$from = array_get($input, 'date_from');
 		$to = array_get($input, 'date_to');
 
-		$sales_where = $credits_where = $expense_where = '';
+		$branch_where = $sales_where = $credits_where = $expense_where = '';
+
+        if ($branch) {
+            $branch_where = " AND a.id = $branch";
+        }
 
 		if ($from && $to) {
 			$from = date('Y-m-d', strtotime($from));
 			$to = date('Y-m -d', strtotime($to));
 
 			$sales_where = "AND (date_of_sale >= '{$from}' AND date_of_sale <= '{$to}')";
-			$credits_where = "AND date_of_credit >=  '{$from}'  AND date_of_credit <=  '{$to}'";
+			$credits_where = "AND (date_of_sale >= '{$from}' AND date_of_sale <= '{$to}')";
 			$expense_where = "AND date_of_expense >= '{$from}'  AND date_of_expense <=  '{$to}'";
 		}
 
+
+
+
+
 		$prefix = \DB::getTablePrefix();
+
+
+        /*
+         * $reports = \DB::select(\DB::raw("SELECT a.id, CONCAT(a.name, '(', a.address,')') as name,
+					(SELECT SUM(total_amount) FROM {$prefix}expenses WHERE branch_id = a.id $expense_where ) AS expenses,
+					(SELECT SUM(total_amount - (supplier_price * quantity)) FROM {$prefix}sales WHERE sale_type= 'CREDIT' AND branch_id = a.id $credits_where ) AS credits,
+					(SELECT SUM(total_amount - (supplier_price * quantity)) FROM {$prefix}sales WHERE sale_type= 'SALE' AND branch_id = a.id $sales_where ) AS sales
+					FROM {$prefix}branches as a WHERE a.deleted_at IS NULL AND a.status = 1 $branch_where group by a.id"));
+         */
+
+
+
 		$reports = \DB::select(\DB::raw("SELECT a.id, CONCAT(a.name, '(', a.address,')') as name,
 					(SELECT SUM(total_amount) FROM {$prefix}expenses WHERE branch_id = a.id $expense_where ) AS expenses,
-					(SELECT SUM(total_amount) FROM {$prefix}credits WHERE branch_id = a.id $credits_where ) AS credits,
-					(SELECT SUM(total_amount - (supplier_price * quantity)) FROM {$prefix}sales WHERE branch_id = a.id $sales_where ) AS sales
-					FROM {$prefix}branches as a WHERE a.deleted_at IS NULL AND a.status = 1 group by a.id"));
+					(SELECT SUM(total_amount) FROM {$prefix}sales WHERE sale_type= 'CREDIT' AND branch_id = a.id $credits_where ) AS credits,
+					(SELECT SUM(total_amount) FROM {$prefix}sales WHERE sale_type= 'SALE' AND branch_id = a.id $sales_where ) AS sales
+					FROM {$prefix}branches as a WHERE a.deleted_at IS NULL AND a.status = 1 $branch_where  group by a.id"));
 
 		$total_sales = $total_credits = $total_expenses = 0;
 
@@ -44,7 +65,7 @@ class ReportsController extends \BaseController {
 			->with('total_sales', $total_sales)
 			->with('total_credits', $total_credits)
 			->with('total_expenses', $total_expenses)
-			->with('branches', array_add(\Branch::filterBranch()->select(\DB::raw('CONCAT(address, " ", city) as name'), 'id')->lists('name', 'id'), '', 'Select Branch'))
+			->with('branches', array_add(\Branch::filterBranch()->select(\DB::raw('CONCAT(name, " ", address) as name'), 'id')->lists('name', 'id'), '', 'Select Branch'))
 			->with('reports', $reports);
 	}
 

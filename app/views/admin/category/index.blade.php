@@ -41,7 +41,7 @@
                           @foreach ($categories as $category)
                           <tr>
                               <td>{{{ $category->name }}}</td>
-                              <td>{{{ implode(', ', $category->brands->lists('name')) }}}</td>
+                              <td>{{{ !$category->brands?'':implode(', ', $category->brands->lists('name')) }}}</td>
                               <td>{{{ $category->description }}}</td>
                               <td>
                                     <a href="{{{ route('admin_categories.edit', $category->category_id) }}}" class="btn btn-primary btn-xs" title="Edit"><i class="icon-pencil"></i></a>

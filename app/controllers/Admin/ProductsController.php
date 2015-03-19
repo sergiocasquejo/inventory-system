@@ -11,35 +11,36 @@ class ProductsController extends \BaseController {
 	{
 
 		try {
-		$input = \Input::all();
+            $input = \Input::all();
 
-		$px = \DB::getTablePrefix();
+            $px = \DB::getTablePrefix();
 
-		
-		$products = \Product::withTrashed()->select(
-					"products.id", "products.deleted_at", "products.status", "branches.address", "branches.city", "products.name",
-					\DB::raw("GROUP_CONCAT('P', selling_price, '/', per_unit) as selling_price")
-				)
 
-				->filter($input)
-				->leftJoin('product_pricing', 'products.id', '=', 'product_pricing.product_id')
-				->leftJoin('branches', 'product_pricing.branch_id', '=', 'branches.id')
-				->groupBy('products.id')
-				->paginate(intval(array_get($input, 'records_per_page', 10)));
+            $products = \Product::withTrashed()->select(
+                        "products.id", "products.deleted_at", "products.status", "branches.address", "branches.city", "products.name",
+                        \DB::raw("GROUP_CONCAT('P', selling_price, '/', per_unit) as selling_price")
+                    )
 
-			$totalRows = \Product::withTrashed()->count();
+                    ->filter($input)
+                    ->leftJoin('product_pricing', 'products.id', '=', 'product_pricing.product_id')
+                    ->leftJoin('branches', 'product_pricing.branch_id', '=', 'branches.id')
+                    ->groupBy('products.id')
+                    ->paginate(intval(array_get($input, 'records_per_page', 10)));
 
-			$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
+                $totalRows = \Product::withTrashed()->count();
 
-			$countries = \Config::get('agrivet.countries');
+                $appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
-		return \View::make('admin.product.index')
-			->with('products', $products)
-			->with('categories', array_add(\Category::all()->lists('name', 'category_id'), '', 'Select Category'))
-			->with('branches', array_add(\Branch::dropdown()->lists('name', 'id'), '', 'Select Branch'))
-			->with('appends', $appends)
-			->with('totalRows', $totalRows);
+                $countries = \Config::get('agrivet.countries');
+
+            return \View::make('admin.product.index')
+                ->with('products', $products)
+                ->with('categories', array_add(\Category::all()->lists('name', 'category_id'), '', 'Select Category'))
+                ->with('branches', array_add(\Branch::dropdown()->lists('name', 'id'), '', 'Select Branch'))
+                ->with('appends', $appends)
+                ->with('totalRows', $totalRows);
 		} catch(\Exception $e) {
+
 			return \Redirect::back()->withErrors((array)$e->getMessage());
 		}
 	}

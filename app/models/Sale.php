@@ -13,11 +13,11 @@ class Sale extends Eloquent {
 	public static $rules = [
 		'branch_id'		=> 'required|exists:branches,id',
     	'product_id' => 'required|exists:products,id',
-    	'quantity'	=> 'required|numeric|min:1',
-    	'total_amount'	=> 'required|numeric',
+    	'quantity'	=> 'required|numeric|min:0.25',
+    	'total_amount'	=> 'required|numeric|min:1',
     	'uom'	           => 'required',
     	'encoded_by' 	   => 'required|exists:users,id',
-    	'status'	       => 'required|in:0,1'
+//    	'status'	       => 'required|in:0,1'
     ];
 
     /**=================================================

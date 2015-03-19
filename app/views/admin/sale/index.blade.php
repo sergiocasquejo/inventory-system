@@ -115,7 +115,7 @@
                     @if ($sales)
                         @foreach ($sales as $sale)
                         <tr>
-                            <td>{{{ !$sale->branch?'':$sale->branch->name.' '.$sale->address }}}</td>
+                            <td>{{{ !$sale->branch?'':$sale->branch->name.' '.$sale->branch->address }}}</td>
                             <td>{{{ !$sale->product?'':$sale->product->name }}}</td>
                             <td>{{{ $sale->quantity }}}</td>
                             <td>{{{ $sale->uom }}}</td>

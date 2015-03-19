@@ -9,7 +9,8 @@ class Expense extends Eloquent {
     public static $rules = [
     	'branch_id'        => 'required|exists:branches,id',
     	'name'	           => 'required:min:5',
-    	'total_amount' 	   => 'required|numeric',
+        'quantity'          => 'required|numeric|min:0.25',
+    	'total_amount' 	   => 'required|numeric|min:1',
     	'uom'	           => 'required|whole_number:quantity',
         'date_of_expense'  => 'required|date',
     	'encoded_by' 	   => 'required|exists:users,id',

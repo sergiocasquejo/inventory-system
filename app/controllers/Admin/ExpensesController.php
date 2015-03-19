@@ -163,18 +163,22 @@ class ExpensesController extends \BaseController {
 	public function update($id)
 	{
 
-
 		$input = \Input::all();
 
 		if (!\Confide::user()->isAdmin()) {
 			$input['branch_id'] = \Confide::user()->branch_id;
 		}
 
+        $rules = \Expense::$rules;
+
+        $rules['encoded_by'] = "";
+
 		if (array_get($input, 'expense_type') == 'STORE EXPENSES') {
 			$rules['uom'] = 'whole_number:quantity';
 		}
 
-		$rules = \Expense::$rules;
+
+
 
 		$input['encoded_by'] = \Confide::user()->id;
 
@@ -185,7 +189,9 @@ class ExpensesController extends \BaseController {
 		} else {
 			try {
 				$expense = \Expense::findOrFail($id);
-				
+
+                $input['encoded_by'] = $expense->encoded_by;
+
 				if ($expense->doSave($expense, $input)) {
 					return \Redirect::route('admin_expenses.index')->with('success', \Lang::get('agrivet.updated'));
 				}
