@@ -181,18 +181,15 @@ var Script = function () {
             var slctdUOM = saleForm.find(':input[name=uom]').val();
             var quantity = $(this).val();
 
+            loadImgLoader(saleForm.find(':input[name=total_amount]'));
 
             $.get(AJAX.baseUrl+'/admin/products/'+ slctdProduct +'/get', {branch_id: slctdBranch, uom:slctdUOM }, function(response) {
-                $('#total_error').remove();
+               // $('#total_error').remove();
                 if (response.selling_price) {
 
                     saleForm.find(':input[name=total_amount]').val(response.selling_price * quantity)
-                } else {
-                    $("<span id='total_error' class='label label-warning label-mini mr-10px'>")
-                        .html('<a href="'+ AJAX.baseUrl +'/admin/products/'+ slctdProduct +'/edit">Click here</a> to setup pricing for this branch')
-                        .insertAfter(saleForm.find(':input[name=total_amount]'));
                 }
-            });
+            }).done(always(saleForm.find(':input[name=total_amount]')));
 
         }).trigger('keyup');
 
@@ -202,6 +199,7 @@ var Script = function () {
             var slctdProduct = self.val();
             var slctdBranch = saleForm.find(':input[name=branch_id]').val();
 
+            loadImgLoader(saleForm.find(':input[name=uom]'));
 
             saleForm.find(':input[name=total_amount]').val('');
             salesDDUOM(slctdProduct, slctdBranch);
@@ -237,11 +235,16 @@ var Script = function () {
             if (!slctdProduct || slctdProduct == '') return;
             var slctUOM = stockForm.find(':input[name=uom]');
 
+            loadImgLoader(stockForm.find(':input[name=uom]'));
+
+
             slctUOM.html('');
-            // slctUOM.html($('<option>').val('').text('Select Measure'));
+            slctUOM.html($('<option>').val('').text('Select Measure'));
+
+
 
             $.get(AJAX.baseUrl+'/admin/products/'+ slctdProduct +'/measures', function(response) {
-                $('span.alert-warning').remove();
+                //$('span.alert-warning').remove();
                 if (response.length) {
                     $.each(response, function(index, uom){
                         var opt = $('<option>').val(uom.name).text(uom.label);
@@ -249,18 +252,19 @@ var Script = function () {
                             opt.attr('selected', 'selected');
                         }
                         slctUOM.append(opt);
+
+
                     });
 
-                } else {
-                    $("<span class='alert alert-warning'>")
-                        .html('<a href="'+ AJAX.baseUrl +'/admin/products/'+ slctdProduct +'/edit">Click here</a> to setup stocks product')
-                        .insertAfter(self);
                 }
-            });
+            }).done(always(stockForm.find(':input[name=uom]')));
 
         }).trigger('change');
 
-
+        /**=========================================================================
+         * Expense Form
+         * @type {*|jQuery|HTMLElement}
+         * =======================================================================*/
         var expenseForm = $('#expenseForm'),
             productField = expenseForm.find(':input[name=name]'),
             uomField = expenseForm.find(':input[name=uom]');
@@ -268,12 +272,14 @@ var Script = function () {
             totalAmntField = expenseForm.find(":input[name=total_amount]");
 
         expenseForm.find('select[name=expense_type]').on('change', function() {
+            loadImgLoader(expenseForm.find(':input[name=name]'));
+
             var val = $(this).val();
-            var productSlctdValue = $(':input[name=name]').attr('data-selected');
+            var productSlctdValue = expenseForm.find(':input[name=name]').attr('data-selected');
             var productInput = '';
             if (val == 'PRODUCT EXPENSES') {
                 expenseForm.find(':input[name=uom]').removeAttr('disabled');
-                productInput = $('<select name="name" class="form-control" data-selected="'+ productSlctdValue +'" required>');
+                productInput = $('<select name="name" disabled class="form-control" data-selected="'+ productSlctdValue +'" required>');
                 expenseForm.find(":input[name=total_amount]").attr('readonly', 'readonly');
 
                 var opt = $('<option>').val('').text("Select Product").attr('selected', 'selected');
@@ -291,10 +297,12 @@ var Script = function () {
                                     ddUOM(product.id);
                                 }
                                 productInput.append(opt);
+                                removeImageLoader(expenseForm.find(':input[name=name]'));
                             }
                         });
 
                     }
+
                 });
 
 
@@ -316,13 +324,16 @@ var Script = function () {
                             slctUOM.append(opt);
                         });
 
+                        removeImageLoader(expenseForm.find(':input[name=name]'));
                     }
+
                 });
             }
 
-            expenseForm.find(':input[name=name]').replaceWith(productInput);
-            expenseForm.find(':input[name=name]').trigger('change');
 
+            /** Replace input to select type or vise versa and trigger change*/
+            expenseForm.find(':input[name=name]').replaceWith(productInput).trigger('change');
+            /**  Trigger change */
             expenseForm.find(':input[name=uom]').trigger('change');
 
 
@@ -335,6 +346,8 @@ var Script = function () {
 
         $('body').on('change', ':input[name=name]', function() {
 
+            loadImgLoader(expenseForm.find(':input[name=uom]'));
+
             totalAmntField.val('');
 
             if (expenseForm.find('select[name=expense_type]').val() == 'STORE EXPENSES') return;
@@ -342,9 +355,6 @@ var Script = function () {
 
             var self = $(this);
             var slctdProduct = self.val();
-
-
-
 
             if (!slctdProduct || slctdProduct == '' ||  expenseForm.find('select[name=expense_type]').val() == 'STORE EXPENSES') return;
 
@@ -360,27 +370,29 @@ var Script = function () {
 
 
         expenseForm.find(':input[name=quantity]').on('keyup', function() {
+            var self  = $(this);
             totalAmntField.val('');
-            if (expenseForm.find('select[name=expense_type]').val() == 'STORE EXPENSES') return;
 
+
+            loadImgLoader(expenseForm.find(":input[name=total_amount]"));
 
             var slctdProduct = expenseForm.find(':input[name=name]').val();
             var slctdBranch = expenseForm.find(':input[name=branch_id]').val();
             var slctdUOM = expenseForm.find(':input[name=uom]').val();
             var quantity = $(this).val();
 
-            if (typeof slctdProduct == 'undefined' || !slctdProduct || slctdProduct == null || slctdUOM == 'Select Measure') return;
+
+            if (expenseForm.find('select[name=expense_type]').val() == 'STORE EXPENSES'
+                || typeof slctdProduct == 'undefined' || !slctdProduct || slctdProduct == null || slctdUOM == 'Select Measure') {
+                removeImageLoader(expenseForm.find(":input[name=total_amount]"));
+                return;
+            }
 
             $.get(AJAX.baseUrl+'/admin/products/'+ slctdProduct +'/get', {branch_id: slctdBranch, uom:slctdUOM }, function(response) {
-                $('#total_error').remove();
                 if (response.selling_price && response.selling_price != 0) {
                     expenseForm.find(":input[name=total_amount]").val(response.selling_price * quantity);
-                } else {
-                    $("<span id='total_error' class='label label-warning label-mini mr-10px'>")
-                        .html('<a href="'+ AJAX.baseUrl +'/admin/products/'+ slctdProduct +'/edit">Click here</a> to setup pricing for this product')
-                        .insertAfter(expenseForm.find(":input[name=total_amount]"));
                 }
-            });
+            }).done(always(expenseForm.find(":input[name=total_amount]")));
 
         }).trigger('keyup');
 
@@ -405,12 +417,13 @@ var Script = function () {
             var slctdUOM = creditForm.find(':input[name=uom]').val();
             var quantity = $(this).val();
 
-
+            loadImgLoader(creditForm.find(':input[name=total_amount]'));
+            /** Get selling price by product ID */
             $.get(AJAX.baseUrl+'/admin/products/'+ slctdProduct +'/get', {branch_id: slctdBranch, uom:slctdUOM }, function(response) {
                 if (response.selling_price) {
                     totalAmntField.val(response.selling_price * quantity)
                 }
-            });
+            }).done(always(creditForm.find(':input[name=total_amount]')));
 
         }).trigger('keyup');
 
@@ -421,6 +434,8 @@ var Script = function () {
             var slctdBranch = creditForm.find(':input[name=branch_id]').val();
 
             var slctUOM = creditForm.find(':input[name=uom]');
+            loadImgLoader(creditForm.find(':input[name=uom]'));
+
 
             totalAmntField.val('');
 
@@ -430,7 +445,6 @@ var Script = function () {
             slctUOM.html($('<option>').val('').text('Select Measure'));
 
             $.get(AJAX.baseUrl+'/admin/products/'+ slctdProduct +'/uom', {branch_id: slctdBranch }, function(response) {
-                $('#total_error').remove();
                 if (response.length) {
                     $.each(response, function(index, uom){
                         var opt = $('<option>').val(uom.name).text(uom.label);
@@ -440,12 +454,8 @@ var Script = function () {
                         slctUOM.append(opt);
                     });
 
-                } else {
-                    $("<span id='total_error' class='label label-warning label-mini mr-10px'>")
-                        .html('<a href="'+ AJAX.baseUrl +'/admin/products/'+ slctdProduct +'/edit">Click here</a> to setup pricing for this branch')
-                        .insertAfter(self);
                 }
-            });
+            }).done(always(creditForm.find(':input[name=uom]')));
 
 
 
@@ -565,6 +575,11 @@ var Script = function () {
 
     });
 
+    /**
+     * Add options to sales unit of measures
+     * @param slctdProduct
+     * @param slctdBranch
+     */
 
     function salesDDUOM(slctdProduct, slctdBranch) {
 
@@ -573,7 +588,7 @@ var Script = function () {
         slctUOM.html($('<option>').val('').text('Select Measure').attr('selected', 'selected'));
 
         $.get(AJAX.baseUrl+'/admin/products/'+ slctdProduct +'/uom', {branch_id: slctdBranch }, function(response) {
-            $('#total_error').remove();
+            //$('#total_error').remove();
             if (response.length) {
                 $.each(response, function(index, uom){
                     var opt = $('<option>').val(uom.name).text(uom.label);
@@ -583,16 +598,17 @@ var Script = function () {
                     slctUOM.append(opt);
                 });
 
-            } else {
-                $("<span id='total_error' class='label label-warning label-mini mr-10px'>")
-                    .html('<a href="'+ AJAX.baseUrl +'/admin/products/'+ slctdProduct +'/edit">Click here</a> to setup pricing for this branch')
-                    .insertAfter($(":input[name=total_amount]"));
             }
-        });
+        }).done(always($(':input[name=uom]')));
     }
+
+
+    /**
+     * Add option to unit of measure element
+     * @param slctdProduct
+     */
     function ddUOM(slctdProduct) {
         var slctUOM = $(':input[name=uom]');
-
 
         slctUOM.html($('<option>').val('').text('Select Measure'));
 
@@ -609,10 +625,42 @@ var Script = function () {
                     }
                     slctUOM.append(opt);
                 });
-
             }
-        });
 
+        }).done(always($(':input[name=uom]')));
+
+    }
+
+    /**
+     * Load image loader
+     * @param el - Dom element
+     */
+    function loadImgLoader(el, addAttrDisabled) {
+
+        if ( typeof addAttrDisabled == 'undefined' || addAttrDisabled == true ) {
+            el.attr('disabled', true);
+        }
+
+        $('<img class="img-loader" src="'+ AJAX.baseUrl +'/assets/backend/img/ajax-loader.gif" />').insertBefore(el);
+    }
+
+    /**
+     * Remove image loader
+     * @param el
+     * @param removeAttrDisabled
+     */
+    function removeImageLoader(el, removeAttrDisabled) {
+
+        if ( typeof removeAttrDisabled == 'undefined' || removeAttrDisabled == true ) {
+            el.removeAttr('disabled');
+        }
+
+        el.prevAll('.img-loader').remove();
+    }
+
+
+    function always(el) {
+        removeImageLoader(el);
     }
 
 
