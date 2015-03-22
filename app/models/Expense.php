@@ -33,6 +33,10 @@ class Expense extends Eloquent {
         return $this->belongsTo('Product', 'name');
     }
 
+    public function stockOnHand() {
+        return $this->hasOne('StockOnHand');
+    }
+
     /**=================================================
      * SCOPE QUERY
      *==================================================*/
@@ -113,7 +117,11 @@ class Expense extends Eloquent {
 	public function doSave(Expense $instance, $input) {
 		$instance->branch_id = array_get($input, 'branch_id');
         $instance->expense_type = array_get($input, 'expense_type');
-		$instance->name = array_get($input, 'name');
+        if (array_get($input, 'stock_on_hand_id') != 0) {
+            $instance->stock_on_hand_id = array_get($input, 'stock_on_hand_id');
+        }
+
+        $instance->name = array_get($input, 'name');
 		$instance->total_amount = array_get($input, 'total_amount');
 		$instance->quantity = array_get($input, 'quantity');
 		$instance->uom = array_get($input, 'uom');
