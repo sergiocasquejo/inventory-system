@@ -127,29 +127,76 @@ var Script = function () {
      * AGRIVATE CUSTOM SCRIPTS
      *==================================================*/
 
-    $(':input[name=brand_id]').on('change', function() {
-        var brand = $(this),
-            _id = brand.val(),
-            data = [];
-        data.push($('<option>').text('Select category').val(0));
 
-        $.get(AJAX.baseUrl + '/admin/brands/'+ _id + '/categories', function(response) {
-            $.each(response, function(index, value) {
-                var option = $('<option>');
-                option.text(value).val(index);
-                if (index == $(':input[name=category_id]').data('selected')) {
-                    option.attr('selected', 'selected');
-                }
-
-                data.push(option)
-            });
-
-            $(':input[name=category_id]').html(data);
-
-        });
-    }).trigger('change');
 
     $(function () {
+
+        var customers = {};
+
+
+        $.get(AJAX.baseUrl + '/admin/customers', function(response) {
+            console.log(response.length);
+            if (response.length) {
+
+                for (var data in response) {
+                    console.log(data);
+                    customers.id = data.customer_id;
+                    customers.name = data.customer_name;
+                    customers.address = data.address;
+                    customers.contact_no = data.contact_no;
+
+                }
+            }
+        }, 'json');
+
+        console.log(customers);
+
+        var $input = $('.typeahead');
+        $input.typeahead({source:[{id: "someId1", name: "Display name 1"},
+            {id: "someId2", name: "Display name 2"}],
+            autoSelect: true});
+        $input.change(function() {
+            var current = $input.typeahead("getActive");
+            if (current) {
+                // Some item from your model is active!
+                if (current.name == $input.val()) {
+                    // This means the exact match is found. Use toLowerCase() if you want case insensitive match.
+                } else {
+                    // This means it is only a partial match, you can either add a new item
+                    // or take the active if you don't want new items
+                }
+            } else {
+                // Nothing is active so it is a new value (or maybe empty value)
+            }
+        });
+
+
+
+        $(':input[name=brand_id]').on('change', function() {
+            var brand = $(this),
+                _id = brand.val(),
+                data = [];
+            data.push($('<option>').text('Select category').val(0));
+
+            $.get(AJAX.baseUrl + '/admin/brands/'+ _id + '/categories', function(response) {
+                $.each(response, function(index, value) {
+                    var option = $('<option>');
+                    option.text(value).val(index);
+                    if (index == $(':input[name=category_id]').data('selected')) {
+                        option.attr('selected', 'selected');
+                    }
+
+                    data.push(option)
+                });
+
+                $(':input[name=category_id]').html(data);
+
+            });
+        }).trigger('change');
+
+
+
+
         $('[data-toggle="popover"]').popover()
 
         $('a[rel=popover-image]').popover({
@@ -171,7 +218,8 @@ var Script = function () {
             productField = saleForm.find(':input[name=product_id]'),
             uomField = saleForm.find(':input[name=uom]'),
             branchField = saleForm.find(':input[name=branch_id]')
-            totalAmntField = saleForm.find(':input[name=total_amount]');
+            totalAmntField = saleForm.find(':input[name=total_amount]'),
+                totalAmountHolder = $('span.total_amount');
 
 
         qtyField.on('keyup', function() {
@@ -187,9 +235,12 @@ var Script = function () {
                // $('#total_error').remove();
                 if (response.selling_price) {
 
-                    saleForm.find(':input[name=total_amount]').val(response.selling_price * quantity)
+                    saleForm.find(':input[name=total_amount]').val(response.selling_price * quantity);
+                    totalAmountHolder.text(formatNumberStr(response.selling_price * quantity));
+
                 }
-            }).done(always(saleForm.find(':input[name=total_amount]')));
+                always(saleForm.find(':input[name=total_amount]'));
+            });//.always(always(saleForm.find(':input[name=total_amount]')));
 
         }).trigger('keyup');
 
@@ -202,6 +253,7 @@ var Script = function () {
             loadImgLoader(saleForm.find(':input[name=uom]'));
 
             saleForm.find(':input[name=total_amount]').val('');
+            totalAmountHolder.text(formatNumberStr(0));
             salesDDUOM(slctdProduct, slctdBranch);
 
 
@@ -214,6 +266,7 @@ var Script = function () {
         // Trigger qty to change price
         uomField.on('change', function () {
             saleForm.find(':input[name=total_amount]').val('');
+            totalAmountHolder.text(formatNumberStr(0));
             saleForm.find(':input[name=quantity]').trigger('keyup');
         })
         branchField.on('change', function() {
@@ -252,12 +305,11 @@ var Script = function () {
                             opt.attr('selected', 'selected');
                         }
                         slctUOM.append(opt);
-
-
+                        always(stockForm.find(':input[name=uom]'))
                     });
 
                 }
-            }).done(always(stockForm.find(':input[name=uom]')));
+            });//.always(always(stockForm.find(':input[name=uom]')));
 
         }).trigger('change');
 
@@ -280,8 +332,11 @@ var Script = function () {
             if (val == 'PRODUCT EXPENSES') {
                 expenseForm.find(':input[name=uom]').removeAttr('disabled');
                 productInput = $('<select name="name" disabled class="form-control" data-selected="'+ productSlctdValue +'" required>');
-                expenseForm.find(":input[name=total_amount]").attr('readonly', 'readonly');
+                expenseForm.find(":input[name=total_amount]").attr('readonly', 'readonly').addClass('hidden');
+                qtyField = expenseForm.find(':input[name=quantity]');
+                qtyField.val(qtyField.data('selected')).removeAttr('readonly');
 
+                totalAmountHolder.removeClass('hidden');
                 var opt = $('<option>').val('').text("Select Product").attr('selected', 'selected');
 
                 productInput.append(opt);
@@ -297,8 +352,8 @@ var Script = function () {
                                     ddUOM(product.id);
                                 }
                                 productInput.append(opt);
-                                removeImageLoader(expenseForm.find(':input[name=name]'));
                             }
+                            removeImageLoader(expenseForm.find(':input[name=name]'));
                         });
 
                     }
@@ -306,9 +361,16 @@ var Script = function () {
                 });
 
 
+
+                /**  Trigger change */
+                expenseForm.find(':input[name=uom]').trigger('change');
+
+
             } else if (val == 'STORE EXPENSES') {
                 expenseForm.find(':input[name=uom]').attr('disabled','disabled');
-                totalAmntField.removeAttr('readonly');
+                expenseForm.find(":input[name=total_amount]").removeClass('hidden').removeAttr('readonly');
+                expenseForm.find(':input[name=quantity]').attr('readonly', true);
+                totalAmountHolder.addClass('hidden');
 
                 productInput = $('<input type="text" name="name" data-selected="'+ productSlctdValue +'" value="'+ productSlctdValue +'" class="form-control" required>');
                 var slctUOM = expenseForm.find(':input[name=uom]');
@@ -333,25 +395,26 @@ var Script = function () {
 
             /** Replace input to select type or vise versa and trigger change*/
             expenseForm.find(':input[name=name]').replaceWith(productInput).trigger('change');
-            /**  Trigger change */
-            expenseForm.find(':input[name=uom]').trigger('change');
+
 
 
         }).trigger('change');
 
         expenseForm.find(':input[name=uom]').on('change', function() {
             expenseForm.find(":input[name=total_amount]").val('');
+            totalAmountHolder.text(formatNumberStr(parseFloat(totalAmountHolder.data('selected'))));
             expenseForm.find(':input[name=quantity]').trigger('keyup');
         });
 
         $('body').on('change', ':input[name=name]', function() {
 
-            loadImgLoader(expenseForm.find(':input[name=uom]'));
+
 
             totalAmntField.val('');
-
+            totalAmountHolder.text(formatNumberStr(parseFloat(totalAmountHolder.data('selected'))));
             if (expenseForm.find('select[name=expense_type]').val() == 'STORE EXPENSES') return;
 
+            loadImgLoader(expenseForm.find(':input[name=uom]'));
 
             var self = $(this);
             var slctdProduct = self.val();
@@ -371,7 +434,6 @@ var Script = function () {
 
         expenseForm.find(':input[name=quantity]').on('keyup', function() {
             var self  = $(this);
-            totalAmntField.val('');
 
 
             loadImgLoader(expenseForm.find(":input[name=total_amount]"));
@@ -388,11 +450,18 @@ var Script = function () {
                 return;
             }
 
+            totalAmntField.val('');
+            totalAmountHolder.text(formatNumberStr(parseFloat(totalAmountHolder.data('selected'))));
+
+
             $.get(AJAX.baseUrl+'/admin/products/'+ slctdProduct +'/get', {branch_id: slctdBranch, uom:slctdUOM }, function(response) {
                 if (response.selling_price && response.selling_price != 0) {
-                    expenseForm.find(":input[name=total_amount]").val(response.selling_price * quantity);
+                    expenseForm.find(":input[name=total_amount]").val(response.supplier_price * quantity);
+                    totalAmountHolder.text(formatNumberStr(response.supplier_price * quantity));
                 }
-            }).done(always(expenseForm.find(":input[name=total_amount]")));
+                always(expenseForm.find(":input[name=total_amount]"));
+
+            });
 
         }).trigger('keyup');
 
@@ -407,7 +476,8 @@ var Script = function () {
             productField = creditForm.find(':input[name=product_id]'),
             uomField = creditForm.find(':input[name=uom]'),
             branchField = creditForm.find(':input[name=branch_id]'),
-            totalAmntField = creditForm.find(':input[name=total_amount]');
+            totalAmntField = creditForm.find(':input[name=total_amount]'),
+            totalAmountHolder = $('span.total_amount');
 
 
         qtyField.on('keyup', function() {
@@ -422,8 +492,10 @@ var Script = function () {
             $.get(AJAX.baseUrl+'/admin/products/'+ slctdProduct +'/get', {branch_id: slctdBranch, uom:slctdUOM }, function(response) {
                 if (response.selling_price) {
                     totalAmntField.val(response.selling_price * quantity)
+                    totalAmountHolder.text(formatNumberStr(response.selling_price * quantity));
                 }
-            }).done(always(creditForm.find(':input[name=total_amount]')));
+                always(creditForm.find(':input[name=total_amount]'));
+            });//.always(always(creditForm.find(':input[name=total_amount]')));
 
         }).trigger('keyup');
 
@@ -438,7 +510,7 @@ var Script = function () {
 
 
             totalAmntField.val('');
-
+            totalAmountHolder.text(formatNumberStr(parseFloat(totalAmountHolder.data('selected'))));
             qtyField.trigger('keyup');
 
             slctUOM.html('');
@@ -455,7 +527,8 @@ var Script = function () {
                     });
 
                 }
-            }).done(always(creditForm.find(':input[name=uom]')));
+                always(creditForm.find(':input[name=uom]'));
+            });//.always(always(creditForm.find(':input[name=uom]')));
 
 
 
@@ -465,10 +538,12 @@ var Script = function () {
         // Trigger qty to change price
         uomField.on('change', function () {
             totalAmntField.val('');
+            totalAmountHolder.text(formatNumberStr(0));
             creditForm.find(':input[name=quantity]').trigger('keyup');
         })
         branchField.on('change', function() {
             totalAmntField.val('');
+            totalAmountHolder.text(formatNumberStr(0));
             creditForm.find(':input[name=product_id]').trigger('change');
             creditForm.find(':input[name=quantity]').trigger('keyup');
 
@@ -496,6 +571,7 @@ var Script = function () {
             $(':input[name=comments]').val(comments);
             $(':input[name=date_of_sale]').val(date_of_sale);
             $(':input[name=action][value=review]').text('Update Review');
+            $('.total_amount').text(formatNumberStr(total_amount));
 
             var input = hiddenInput.val(_self.data('review-id'));
 
@@ -532,6 +608,7 @@ var Script = function () {
             $(':input[name=comments]').val(comments);
             $(':input[name=date_of_sale]').val(date_of_sale);
             $(':input[name=action][value=review]').text('Update Review');
+            $('.total_amount').text(formatNumberStr(total_amount));
 
             var input = hiddenInput.val(_self.data('review-id'));
 
@@ -564,6 +641,7 @@ var Script = function () {
             $(':input[name=comments]').val(comments);
             $(':input[name=date_of_sale]').val(date_of_sale);
             $(':input[name=action][value=review]').text('Update Review');
+            $('.total_amount').text(formatNumberStr(total_amount));
 
             var input = hiddenInput.val(_self.data('review-id'));
 
@@ -599,7 +677,8 @@ var Script = function () {
                 });
 
             }
-        }).done(always($(':input[name=uom]')));
+            always($(':input[name=uom]'));
+        });//.always(always($(':input[name=uom]')));
     }
 
 
@@ -625,9 +704,13 @@ var Script = function () {
                     }
                     slctUOM.append(opt);
                 });
+
+
             }
 
-        }).done(always($(':input[name=uom]')));
+            always($(':input[name=uom]'));
+
+        });//.always(always($(':input[name=uom]')));
 
     }
 
@@ -661,6 +744,28 @@ var Script = function () {
 
     function always(el) {
         removeImageLoader(el);
+    }
+
+    /**
+     * Add comma to a number
+     * @param nStr
+     * @returns {*}
+     */
+    function formatNumberStr(number)
+    {
+        number = isNaN(number) ? 0 : number;
+
+        nStr = number.toFixed(2).toString();
+        nStr += '';
+        x = nStr.split('.');
+        x1 = x[0];
+        x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+
+        return 'Php '+ x1 + x2;
     }
 
 
