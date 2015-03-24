@@ -131,37 +131,97 @@ var Script = function () {
 
     $(function () {
 
-        var customers = {};
+        /** Get credit information by customer id */
+        $('#partialPaymentModal select[name=customer]').on('change', function() {
+            var custId = $(this).val();
+            if (!custId) return;
+
+            $.get(AJAX.baseUrl + '/admin/credits/info-by-customer/'+ custId, function(response) {
+                var total = amount = 0;
+                if (response.data.length) {
+                    total = response.data[0].total_amount;
+                    amount = parseFloat(total);
+
+                }
+
+                $('.total-credits').text(formatNumberStr(amount));
+                $('input[name=amount]').val(total);
+            });
+        }).trigger('change');
+
+        $('#pay').on('click', function(e) {
+            e.preventDefault();
+            $('.alert-message').addClass('hide').text('');
+            var data = $('form#partialPayForm').serialize();
+
+            $.post(AJAX.baseUrl + '/admin/credits/partial-payment', data).done(function(response) {
+
+                if (response.error) {
+                    console.log(response.error);
+
+                    $('.alert-message').removeClass('hide').addClass('alert-warning').text(response.error);
+                } else if ( response.errors ) {
+
+                    var msg = '';
+                    $.each(response.errors, function(index, text) {
+                        msg += text + '<br />';
+                    });
+
+                    $('.alert-message').removeClass('hide').addClass('alert-warning').html(msg);
+
+                } else if (response.success) {
+                    $('.alert-message').removeClass('hide alert-warning').addClass('alert-success').text(response.success);
+                    $('form#partialPayForm')[0].reset();
+                }
+            },'json').error(function(response) {
+                $('.alert-message').removeClass('hide').addClass('alert-warning').text('Error: please check the form or reload the page.');
+            });
+
+            return false;
+        });
+
+
+
+
+        var customers = [];
 
 
         $.get(AJAX.baseUrl + '/admin/customers', function(response) {
-            console.log(response.length);
-            if (response.length) {
+           if (response.customers.length) {
+               $.each(response.customers, function(index, data) {
 
-                for (var data in response) {
-                    console.log(data);
-                    customers.id = data.customer_id;
-                    customers.name = data.customer_name;
-                    customers.address = data.address;
-                    customers.contact_no = data.contact_no;
+                    var customer = {};
 
-                }
+                   customer.id = data.customer_id;
+                   customer.name = data.customer_name;
+                   customer.address = data.address;
+                   customer.contact_no = data.contact_no;
+
+                   customers.push(customer);
+               });
+
             }
         }, 'json');
 
-        console.log(customers);
 
-        var $input = $('.typeahead');
-        $input.typeahead({source:[{id: "someId1", name: "Display name 1"},
-            {id: "someId2", name: "Display name 2"}],
-            autoSelect: true});
+
+
+        var $input = $('input[name=customer_name].typeahead');
+        $input.typeahead({source:customers,
+            autoSelect: false});
         $input.change(function() {
             var current = $input.typeahead("getActive");
             if (current) {
                 // Some item from your model is active!
                 if (current.name == $input.val()) {
+
+                    $(':input[name=address]').val(current.address);
+                    $(':input[name=contact_number]').val(current.contact_no);
+                    $(':input[name=customer_id]').val(current.id);
+
                     // This means the exact match is found. Use toLowerCase() if you want case insensitive match.
                 } else {
+                    $(':input[name=customer_id]').val(0);
                     // This means it is only a partial match, you can either add a new item
                     // or take the active if you don't want new items
                 }
@@ -595,10 +655,12 @@ var Script = function () {
                 address = trEl.find('td[data-address]').data('address'),
                 customer_name = trEl.find('td[data-customer_name]').data('customer_name'),
                 contact_number = trEl.find('td[data-contact_number]').data('contact_number'),
+                customer_id = trEl.find('td[data-contact_number]').data('customer_id'),
                 hiddenInput = $('<input type="hidden" name="review_id">');
             $(':input[name=review_id]').remove();
             $(':input[name=branch_id]').val(branch).attr('data-selected', branch);
             $(':input[name=customer_name]').val(customer_name);
+            $(':input[name=customer_id]').val(customer_id);
             $(':input[name=address]').val(address);
             $(':input[name=contact_number]').val(contact_number);
             $(':input[name=product_id]').val(product).attr('data-selected', product).trigger('change');
