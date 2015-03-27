@@ -14,6 +14,9 @@ class ConfideSetupUsersTable extends Migration
             $table->increments('id')->unsigned();
             $table->string('username', 100)->unique();
             $table->string('email')->unique();
+            $table->string('contact_no');
+            $table->string('address');
+            $table->string('birthdate');
             $table->string('password');
             $table->string('display_name', 70);
             $table->string('first_name', 70);

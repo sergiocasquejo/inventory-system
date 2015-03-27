@@ -72,7 +72,7 @@ class Helper {
 	 */
 
 	public static function nf($price, $dp = 2, $ps = '.', $ts = ', ', $echo = true) {
-		$formatted =  Config::get('agrivate.default_currency').number_format($price, $dp, $ps, $ts);
+		$formatted =  Config::get('agrivet.default_currency').number_format($price, $dp, $ps, $ts);
 
 		if (!$echo) {
 			return $formatted;		
@@ -136,5 +136,10 @@ class Helper {
 			static::$str = $name;
 			return static::$str;
 		}
+	}
+
+	public static function is_decimal( $val )
+	{
+	    return is_numeric( $val ) && floor( $val ) != $val;
 	}
 }

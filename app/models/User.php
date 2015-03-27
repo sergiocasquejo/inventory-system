@@ -99,6 +99,9 @@ class User extends Eloquent implements ConfideUserInterface {
 
 
     	$instance->display_name = array_get($input, 'display_name');
+        $instance->contact_no = array_get($input, 'contact_no');
+        $instance->address = array_get($input, 'address');
+        $instance->birthdate = array_get($input, 'birthdate');
     	$instance->first_name = array_get($input, 'first_name');
     	$instance->last_name = array_get($input, 'last_name');
     	$instance->is_admin = array_get($input, 'is_admin', 0);
@@ -123,7 +126,7 @@ class User extends Eloquent implements ConfideUserInterface {
 
 
         $avatars = array();
-        $avatar = \Config::get('agrivate.avatar');
+        $avatar = \Config::get('agrivet.avatar');
         $fileName = $avatar['filename'];
         $fileExtension = $avatar['extension'];
         

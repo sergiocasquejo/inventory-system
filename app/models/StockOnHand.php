@@ -10,7 +10,7 @@ class StockOnHand extends Eloquent {
 		'branch_id'		=> 'required|exists:branches,id',
     	'product_id' => 'required|exists:products,id',
     	'total_stocks'	=> 'required|numeric',
-    	'uom'	           => 'required',
+    	'uom'	           => 'required|whole_number:total_stocks',
     ];
 
 
@@ -40,8 +40,9 @@ class StockOnHand extends Eloquent {
         	$query->where('products.name', 'LIKE', "%$keyword%");	
         }
 
+        $query->whereNull('branches.deleted_at');
 
-
+        $query->where('branches.status', '=', 1);
 		return $query;
 	}
 

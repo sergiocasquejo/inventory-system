@@ -104,4 +104,5 @@ return array(
 		),
 
 	"greater_than_equal" => "The :attribute must be greater than or equal to :field.",
+	"whole_number" => "Stock must not decimal number.",
 );

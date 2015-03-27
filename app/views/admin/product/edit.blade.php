@@ -13,9 +13,6 @@
 	                  <a data-toggle="tab" href="#general">General</a>
 	              	</li>
 	              	<li class="">
-	                  <a data-toggle="tab" href="#stock">Stocks On Hand</a>
-	              	</li>
-	              	<li class="">
 	                  <a data-toggle="tab" href="#pricing">Pricing</a>
 	              	</li>
          	 	</ul>
@@ -76,72 +73,18 @@
 						<div class="form-group">
 						  <label class="col-sm-2 control-label">Status</label>
 						  <div class="col-sm-10">
-						      {{ Form::select('status', \Config::get('agrivate.statuses'), Input::old('status', $product->status), ['class' => 'form-control m-bot15']) }}
+						      {{ Form::select('status', \Config::get('agrivet.statuses'), Input::old('status', $product->status), ['class' => 'form-control m-bot15']) }}
 						  </div>
 						</div>
 						<button type="submit" class="btn btn-shadow btn-primary">Update</button>
 
 					</form>
 				</div>
-				<div class="tab-pane" id="stock">
-					<div class="row">
-						<form id="stock-form" data-action="{{ route('admin_product_stocks.store', $product->id) }}" action="{{ route('admin_product_stocks.store', $product->id) }}"  class="form-horizontal tasi-form" method="POST">
-				  			<input type="hidden" name="_token" value="{{ csrf_token() }}" />
-							<div class="col-sm-2">
-								<input type="number" step="any"  name="total_stocks" min="0" placeholder="Stocks" value="{{ Input::old('total_stocks') }}" class="form-control">
-							</div>
-							<div class="col-sm-2">
-								{{ Form::select('uom', $dd_measures, Input::old('uom', $product->uom), ['class' => 'form-control m-bot15']) }}
-							</div>
-							<div class="col-sm-4">
-								{{ Form::select('branch_id', $branches, Input::old('branch_id'), ['class' => 'form-control m-bot15']) }}
-							</div>
-							<div class="col-sm-2">
-								<button class="btn btn-info" type="submit" name="action" value="add_stock">Add</button>
-								<button class="btn btn-warning" type="reset" name="reset">Cancel</button>
-							</div>
-						</form>
-					</div>
-
-					<table class="table table-striped table-advance table-hover">
-				        <thead>
-				          <tr>
-			          		
-				              <th>Stocks</th>
-				              <th>Unit of measure</th>
-				              <th>Branch</th>
-				              <th></th>
-				          </tr>
-				        </thead>
-				        <tbody>
-
-				          @if ($product->stocks)
-				              @foreach ($product->stocks as $stock)
-				              <tr>
-				                  <td>{{{ $stock->total_stocks }}}</td>
-				                  <td>{{{ $stock->uom }}}</td>
-				                  <td>{{{ $stock->branch->name .' ('.$stock->branch->address.')' }}}</td>
-				                  <td>
-				                      <a href="{{{ route('admin_product_stocks.edit', ['pid' => $product->id, 'stock_on_hand_id' => $stock->stock_on_hand_id]) }}}" class="btn btn-primary btn-xs" data-form="#stock-form" data-fetch="STOCK" title="Edit"><i class="icon-pencil"></i></a>
-				    
-				                      <a href="{{{ route('admin_product_stocks.destroy', ['pid' => $product->id, 'stock_on_hand_id' => $stock->stock_on_hand_id]) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
-				                        <i class="icon-remove"></i>
-				                      </a>
-				                  </td>
-				              </tr>
-				              @endforeach
-				          @else
-				              <tr>
-				                <td colspan="4">{{{ \Lang::get('agrivate.empty', 'Stocks') }}}</td>
-				              </tr>
-				          @endif
-				        </tbody>
-				    </table>
-				</div>
 			  	<div class="tab-pane" id="pricing">
 			  		<div class="row">
 						<form id="price-form" data-action="{{ route('admin_product_prices.store', $product->id) }}"  action="{{ route('admin_product_prices.store', $product->id) }}"  class="form-horizontal tasi-form" method="POST">
 				  			<input type="hidden" name="_token" value="{{ csrf_token() }}" />
+				  			<input type="hidden" name="product_id" value="{{{ $product->id }}}" />
 							<div class="col-sm-2">
 								<input type="number" step="any"  name="supplier_price" min="0" placeholder="Supplier Price" value="{{ Input::old('supplier_price') }}" class="form-control">
 							</div>
@@ -184,7 +127,7 @@
 				                  	<td data-uom="{{{ $price->per_unit }}}">
 				                  		{{{ $price->per_unit }}}
 				                  	</td>
-				                  	<td data-branch="{{{ $price->branch_id }}}">{{{ $price->branch->name  .' ('.$price->branch->address.')' }}}</td>
+				                  	<td data-branch="{{{ $price->branch_id }}}">{{{ !$price->branch?'':$price->branch->name  .' ('.$price->branch->address.')' }}}</td>
 									<td>
 										<a href="{{{ route('admin_product_prices.edit', ['pid' => $product->id, 'price_id' => $price->price_id]) }}}" class="btn btn-primary btn-xs" data-id="{{ $price->price_id }}" data-form="#price-form" data-fetch="PRICE" title="Edit"><i class="icon-pencil"></i></a>
 
@@ -196,7 +139,7 @@
 				              @endforeach
 				          @else
 				              <tr>
-				                <td colspan="4">{{{ \Lang::get('agrivate.empty', 'Prices') }}}</td>
+				                <td colspan="4">{{{ \Lang::get('agrivet.empty', 'Prices') }}}</td>
 				              </tr>
 				          @endif
 				        </tbody>

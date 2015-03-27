@@ -19,7 +19,7 @@ class CategoriesController extends \BaseController {
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
-		$countries = \Config::get('agrivate.countries');
+		$countries = \Config::get('agrivet.countries');
 		return \View::make('admin.category.index')
 			->with('categories', $categories)
 			->with('appends', $appends)
@@ -72,7 +72,7 @@ class CategoriesController extends \BaseController {
 						$category->brands()->sync(array_get($input, 'brand'));
 					}
 
-					return \Redirect::route('admin_categories.edit', $category->category_id)->with('success', \Lang::get('agrivate.created'));
+					return \Redirect::route('admin_categories.edit', $category->category_id)->with('success', \Lang::get('agrivet.created'));
 				}
 
 				return \Redirect::back()->withErrors($category->errors())->withInput();
@@ -125,7 +125,7 @@ class CategoriesController extends \BaseController {
 			
 				if ($category->doSave($category, $input)) {
 					$category->brands()->sync(array_get($input, 'brand'));
-					return \Redirect::route('admin_categories.index')->with('success', \Lang::get('agrivate.updated'));
+					return \Redirect::route('admin_categories.index')->with('success', \Lang::get('agrivet.updated'));
 				}
 
 				return \Redirect::back()->withErrors($category->errors())->withInput();
@@ -147,8 +147,8 @@ class CategoriesController extends \BaseController {
 	{
 		try {
 			$category = \Category::findOrFail($id);
-			$message = \Lang::get('agrivate.trashed');
-			if (!$category->delete()) {
+			$message = \Lang::get('agrivet.trashed');
+			if (!$category->delete() || \Input::get('remove') == 1) {
 				return \Redirect::back()->withErrors($category->errors());			
 	        }
 

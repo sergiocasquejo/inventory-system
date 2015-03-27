@@ -2,6 +2,12 @@
 
 class UsersController extends \BaseController {
 
+	public function __construct() {
+
+        $this->beforeFilter('owner', array('only' => array('index', 'create', 'edit', 'update')));
+        $this->beforeFilter('profileOwner', array('only' => array('show')));
+    }
+
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -18,7 +24,7 @@ class UsersController extends \BaseController {
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
-		$countries = \Config::get('agrivate.countries');
+		$countries = \Config::get('agrivet.countries');
 		return \View::make('admin.user.index')
 			->with('users', $users)
 			->with('appends', $appends)
@@ -35,7 +41,7 @@ class UsersController extends \BaseController {
 	{
 
 		return \View::make('admin.user.create')
-			->with('branches', array_add(\Branch::all()->lists('name', 'id'), '0', 'Select Branch') );
+			->with('branches', array_add(\Branch::dropdown()->lists('name', 'id'), '', 'Select Branch'));
 	}
 
 
@@ -61,7 +67,7 @@ class UsersController extends \BaseController {
 				if ($user->doSave($user, $input)) {
 					$this->upload($user->id);
 					
-					return \Redirect::route('admin_users.index')->with('success', \Lang::get('agrivate.created'));
+					return \Redirect::route('admin_users.index')->with('success', \Lang::get('agrivet.created'));
 				}
 
 				return \Redirect::back()->withErrors($user->errors())->withInput();
@@ -72,6 +78,10 @@ class UsersController extends \BaseController {
 	}
 
 
+	public function show($id) {
+		$user = \User::findOrFail($id);
+		return \View::make('admin.user.show')->with('user', $user);
+	}
 
 	/**
 	 * Show the form for editing the specified resource.
@@ -85,19 +95,19 @@ class UsersController extends \BaseController {
 		try {
 			$user = \User::findOrFail($id);
 		} catch(\Exception $e) {
-			return \Redirect::back()->with('info', \Lang::get('agrivate.errors.restore'));
+			return \Redirect::back()->with('info', \Lang::get('agrivet.errors.restore'));
 		}
 
 		return \View::make('admin.user.edit')
 		->with('user', $user)
-		->with('branches', array_add(\Branch::all()->lists('name', 'id'), '0', 'Select Branch') );
+		->with('branches', array_add(\Branch::dropdown()->lists('name', 'id'), '', 'Select Branch'));
 	}
 
 	
 
 	public function upload($id) {
 		if (\Input::hasFile('photo')) {
-			$avatar = \Config::get('agrivate.avatar');
+			$avatar = \Config::get('agrivet.avatar');
 			$fileName = $avatar['filename'];
 			$fileExtension = $avatar['extension'];
 
@@ -147,8 +157,8 @@ class UsersController extends \BaseController {
 				if ($user->doSave($user, $input)) {
 					
 					$this->upload($id);
-					
-					return \Redirect::route('admin_users.index')->with('success', \Lang::get('agrivate.updated'));
+					//route('admin_users.index')
+					return \Redirect::back()->with('success', \Lang::get('agrivet.updated'));
 				}
 
 				return \Redirect::back()->withErrors($user->errors())->withInput();
@@ -171,15 +181,15 @@ class UsersController extends \BaseController {
 	public function destroy($id)
 	{
 		if (\User::withTrashed()->where('id', $id)->first()->is_admin == 1) {
-			return \Redirect::back()->with('warning', \Lang::get('agrivate.errors.delete_owner_permission'));
+			return \Redirect::back()->with('warning', \Lang::get('agrivet.errors.delete_owner_permission'));
 		}
 
 
 		$user = \User::withTrashed()->where('id', $id)->first();
-		$message = \Lang::get('agrivate.trashed');
-		if ($user->trashed()) {
+		$message = \Lang::get('agrivet.trashed');
+		if ($user->trashed() || \Input::get('remove') == 1) {
             $user->forceDelete();
-            $message = \Lang::get('agrivate.deleted');
+            $message = \Lang::get('agrivet.deleted');
         } else {
             $user->delete();
         }
@@ -206,7 +216,7 @@ class UsersController extends \BaseController {
 			return \Redirect::back()->withErrors($user->errors());			
 		}
 
-		return \Redirect::back()->with('success', \Lang::get('agrivate.restored'));
+		return \Redirect::back()->with('success', \Lang::get('agrivet.restored'));
 	}
 
 

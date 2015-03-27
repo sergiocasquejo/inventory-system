@@ -18,7 +18,7 @@ class BranchesController extends \BaseController {
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
-		$countries = \Config::get('agrivate.countries');
+		$countries = \Config::get('agrivet.countries');
 		return \View::make('admin.branch.index')
 			->with('branches', $branches)
 			->with('countries', $countries)
@@ -35,8 +35,8 @@ class BranchesController extends \BaseController {
 	public function create()
 	{
 
-		$countries = \Config::get('agrivate.countries');
-		$default_country_code = \Config::get('agrivate.default_country_code');
+		$countries = \Config::get('agrivet.countries');
+		$default_country_code = \Config::get('agrivet.default_country_code');
 
 		return \View::make('admin.branch.create')->with('countries', $countries)->with('default_country_code', $default_country_code);
 	}
@@ -62,7 +62,7 @@ class BranchesController extends \BaseController {
 				$branch = new \Branch;
 
 				if ($branch->doSave($branch, $input)) {
-					return \Redirect::route('admin_branches.index')->with('success', \Lang::get('agrivate.created'));
+					return \Redirect::route('admin_branches.index')->with('success', \Lang::get('agrivet.created'));
 				}
 
 				return \Redirect::back()->withErrors($branch->errors())->withInput();
@@ -85,9 +85,9 @@ class BranchesController extends \BaseController {
 
 		try {
 			$branch = \Branch::findOrFail($id);
-			$countries = \Config::get('agrivate.countries');
+			$countries = \Config::get('agrivet.countries');
 		} catch(\Exception $e) {
-			return \Redirect::back()->with('info', \Lang::get('agrivate.errors.restore'));
+			return \Redirect::back()->with('info', \Lang::get('agrivet.errors.restore'));
 		}
 
 		return \View::make('admin.branch.edit')->with('branch', $branch)->with('countries', $countries);
@@ -121,7 +121,7 @@ class BranchesController extends \BaseController {
 				$branch = \Branch::findOrFail($id);
 				
 				if ($branch->doSave($branch, $input)) {
-					return \Redirect::route('admin_branches.index')->with('success', \Lang::get('agrivate.updated'));
+					return \Redirect::route('admin_branches.index')->with('success', \Lang::get('agrivet.updated'));
 				}
 
 				return \Redirect::back()->withErrors($branch->errors())->withInput();
@@ -141,10 +141,10 @@ class BranchesController extends \BaseController {
 	public function destroy($id)
 	{
 		$branch = \Branch::withTrashed()->where('id', $id)->first();
-		$message = \Lang::get('agrivate.trashed');
-		if ($branch->trashed()) {
+		$message = \Lang::get('agrivet.trashed');
+		if ($branch->trashed() || \Input::get('remove') == 1) {
             $branch->forceDelete();
-            $message = \Lang::get('agrivate.deleted');
+            $message = \Lang::get('agrivet.deleted');
         } else {
             $branch->delete();
         }
@@ -167,7 +167,7 @@ class BranchesController extends \BaseController {
 			return \Redirect::back()->withErrors($branch->errors());			
 		}
 
-		return \Redirect::back()->with('success', \Lang::get('agrivate.restored'));
+		return \Redirect::back()->with('success', \Lang::get('agrivet.restored'));
 	}
 
 

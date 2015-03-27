@@ -4,6 +4,7 @@
     @include ('admin._partials.breadcrumbs')
 
     <div class="row">
+      @if (\Confide::user()->isAdmin())
       <div class="col-lg-12">
           <div class="row state-overview">
             <div class="col-lg-3 col-sm-6">
@@ -48,6 +49,7 @@
             </div>
           </div>
       </div>
+      @endif
       
       <div class="col-lg-12">
           <section class="panel">
@@ -61,17 +63,23 @@
                     <div class="col-sm-6">
                       <div id="sample_1_length" class="dataTables_length">
                         <label>
-                          {{ Form::select('records_per_page', \Config::get('agrivate.records_per_page'), Input::get('records_per_page', 10), ['class' => 'form-control', 'size' => '1', 'onchange' => 'this.form.submit();']) }} 
+                          {{ Form::select('records_per_page', \Config::get('agrivet.records_per_page'), Input::get('records_per_page', 10), ['class' => 'form-control', 'size' => '1', 'onchange' => 'this.form.submit();']) }}
                           records per page
                         </label>
                       </div>
                     </div>
+                  </div>
+
               <table class="table table-striped table-advance table-hover">
                   <thead>
                     <tr>
                         <th>
                           <div class="col-sm-12">
+                            @if (\Confide::user()->isAdmin())
                             {{ Form::select('branch', $branches, Input::get('branch', ''), ['class' => 'form-control input-xs']) }}
+                            @else
+                              Branch
+                            @endif
                           </div>
                         </th>
                         <th>
@@ -98,9 +106,6 @@
                         <th>Comments</th>
                         <th>Encoded By</th>
                         <th>
-                          {{ Form::select('status', $statuses, Input::get('status', ''), ['class' => 'form-control input-xs']) }} 
-                        </th>
-                        <th>
                             <button type="submit" class="btn btn-info btn-xs">Filter</button>
                         </th>
                     </tr>
@@ -110,8 +115,8 @@
                     @if ($sales)
                         @foreach ($sales as $sale)
                         <tr>
-                            <td>{{{ $sale->branch->name }}}</td>
-                            <td>{{{ $sale->product->name }}}</td>
+                            <td>{{{ !$sale->branch?'':$sale->branch->name.' '.$sale->branch->address }}}</td>
+                            <td>{{{ !$sale->product?'':$sale->product->name }}}</td>
                             <td>{{{ $sale->quantity }}}</td>
                             <td>{{{ $sale->uom }}}</td>
                             <td>{{{ $sale->total_amount }}}</td>
@@ -120,27 +125,27 @@
                               <a class="badge bg-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="{{{ $sale->comments }}}">?</a>
 
                             </td>
-                            <td>{{{ $sale->user->username }}}</td>
-                            <td>
-                                <span class="label label-{{{ $sale->status ? 'success' : 'warning' }}} label-mini">
-                                    {{{ $sale->status ? 'Active' : 'Inactive' }}}
-                                </span>
-                            </td>
+                            <td>{{{ !$sale->user?'':$sale->user->username }}}</td>
                             <td>
                                 @if ($sale->trashed())
                                   <a href="{{{ route('admin_sales.restore', $sale->sale_id) }}}" data-method="RESTORE" class="btn btn-primary btn-xs" title="Restore"><i class="icon-rotate-left"></i></a>
                                 @else
                                   <a href="{{{ route('admin_sales.edit', $sale->sale_id) }}}" class="btn btn-primary btn-xs" title="Edit"><i class="icon-pencil"></i></a>
                                 @endif
-                                <a href="{{{ route('admin_sales.destroy', $sale->sale_id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="{{{ $sale->trashed() ? 'Delete' : 'Trash' }}}" class="btn btn-danger btn-xs">
-                                  <i class="icon-{{{ $sale->trashed() ? 'remove' : 'trash' }}} "></i>
+                                @if (!$sale->trashed())
+                                <a href="{{{ route('admin_sales.destroy', $sale->sale_id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Trash" class="btn btn-danger btn-xs">
+                                  <i class="icon-trash"></i>
+                                </a>
+                                @endif
+                                <a href="{{{ route('admin_sales.destroy', ['id' => $sale->sale_id, 'remove' => 1]) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
+                                  <i class="icon-remove"></i>
                                 </a>
                             </td>
                         </tr>
                         @endforeach
                     @else
                         <tr>
-                          <td colspan="10">{{{ \Lang::get('agrivate.empty', 'Expense') }}}</td>
+                          <td colspan="10">{{{ \Lang::get('agrivet.empty', 'Expense') }}}</td>
                         </tr>
                     @endif
                   </tbody>
@@ -154,10 +159,8 @@
                       </tr>
                   </tfoot>
               </table>
-              <div class="row">
                   <div class="col-sm-6">
-                    <div class="dataTables_length">
-                      {{{ $totalRows }}} entries</div>
+                    <div class="dataTables_length">{{{ $totalRows }}} entries</div>
                   </div>
                   <div class="col-sm-6">
                     <div class="dataTables_filter pagination-sm">
@@ -165,7 +168,6 @@
                     </div>
                   </div>
                 </div>
-              </div>
           </section>
       </div>
   </div>

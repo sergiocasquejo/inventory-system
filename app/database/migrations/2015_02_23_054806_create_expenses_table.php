@@ -17,11 +17,12 @@ class CreateExpensesTable extends Migration {
             $table->engine ='InnoDB';
             $table->bigIncrements('expense_id')->unsigned();
             $table->integer('branch_id')->unsigned();
+            $table->enum('expense_type',  array('PRODUCT EXPENSES', 'STORE EXPENSES'))->default('STORE EXPENSES');
             $table->string('name', 255);
             $table->decimal('total_amount', 10, 2);
-            $table->float('quantity');
-            $table->string('uom', 120);
-            $table->text('comments');
+            $table->decimal('quantity', 10, 2);
+            $table->string('uom', 120)->nullable();
+            $table->text('comments')->nullable();
             $table->tinyInteger('status')->default(0);
             $table->integer('encoded_by')->unsigned();
             $table->date('date_of_expense');
@@ -53,3 +54,4 @@ class CreateExpensesTable extends Migration {
 	}
 
 }
+

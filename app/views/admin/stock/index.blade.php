@@ -44,7 +44,7 @@
                               <td>{{{ $stock['sack_stock'] }}}</td>
                               <td>{{{ $stock['total_stocks'] }}}</td>
                               <td>
-                                  <a href="{{{ route('admin_stocks.edit', $stock['stock_id']) }}}" class="btn btn-primary btn-xs" data-form="#stock-form" data-fetch="STOCK" title="Edit"><i class="icon-pencil"></i></a>
+                                  <a href="{{{ route('admin_stocks.edit', $stock['stock_id']) }}}" class="btn btn-primary btn-xs"  title="Edit"><i class="icon-pencil"></i></a>
                 
                                   <a href="{{{ route('admin_stocks.destroy', $stock['stock_id']) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
                                     <i class="icon-remove"></i>

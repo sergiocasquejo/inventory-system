@@ -18,7 +18,7 @@ class CreateStocksOnHandTable extends Migration {
             $table->increments('stock_on_hand_id')->unsigned();
             $table->bigInteger('product_id')->unsigned();
             $table->integer('branch_id')->unsigned();
-            $table->float('total_stocks')->unsigned();
+            $table->decimal('total_stocks', 10, 2)->unsigned();
             $table->string('uom', 120);
             $table->foreign('product_id')
      			->references('id')->on('products')

@@ -13,11 +13,11 @@ class Sale extends Eloquent {
 	public static $rules = [
 		'branch_id'		=> 'required|exists:branches,id',
     	'product_id' => 'required|exists:products,id',
-    	'quantity'	=> 'required|numeric|min:1',
-    	'total_amount'	=> 'required|numeric',
+    	'quantity'	=> 'required|numeric|min:0.25',
+    	'total_amount'	=> 'required|numeric|min:1',
     	'uom'	           => 'required',
     	'encoded_by' 	   => 'required|exists:users,id',
-    	'status'	       => 'required|in:0,1'
+//    	'status'	       => 'required|in:0,1'
     ];
 
     /**=================================================
@@ -27,6 +27,10 @@ class Sale extends Eloquent {
 		return $this->belongsTo('Branch', 'branch_id');
 	}
 
+
+	public function credit() {
+        return $this->hasOne('Credit');
+    }
 
 	public function product() {
 		return $this->belongsTo('Product', 'product_id');
@@ -42,13 +46,13 @@ class Sale extends Eloquent {
      * SCOPE QUERY
      *==================================================*/
 
-	public function scopeActive($query) {
-		return $query->where('status', 1);
-	}
-
-	public function scopeInActive($query) {
-		return $query->where('status', 0);
-	}
+//	public function scopeActive($query) {
+//		return $query->where('status', 1);
+//	}
+//
+//	public function scopeInActive($query) {
+//		return $query->where('status', 0);
+//	}
 
 	public function scopeFilterBranch($query) {
 		if (!\Confide::user()->isAdmin()) {
@@ -57,17 +61,25 @@ class Sale extends Eloquent {
 		return $query;
 	}
 
+	public function scopeOwned($query) {
+        if (!\Confide::user()->isAdmin()) {
+            $query->where('encoded_by', \Confide::user()->id);
+        }   
+        return $query;
+    }
+    
+
 	public function scopeFilter($query, $input) {
 
 		$branch = array_get($input, 'branch');
-		$status = array_get($input, 'status');
+		//$status = array_get($input, 'status');
 		$product = array_get($input, 'product');
 		$total = array_get($input, 'total');
 		$year = $year = array_get($input, 'year');
 		$month = $month = array_get($input, 'month');
 		$day = $day = array_get($input, 'day');
 
-
+		$query->whereRaw('sale_type = "SALE"');
 	 	/* Check if current user is not admin
         * filter only his branch
         */
@@ -93,9 +105,9 @@ class Sale extends Eloquent {
 		if ($day != '') {
 			$query->whereRaw('DAY(date_of_sale) = '. (int)$day);
 		}
-		if ($status != '') {
-			$query->whereRaw('status = '. (int)$status);
-		}
+//		if ($status != '') {
+//			$query->whereRaw('status = '. (int)$status);
+//		}
 
 
 		return $query;
@@ -111,6 +123,7 @@ class Sale extends Eloquent {
 
 	public function doSave(Sale $instance, $input) {
 		$instance->branch_id = array_get($input, 'branch_id');
+		$instance->sale_type = array_get($input, 'sale_type', 'SALE');
 		$instance->product_id = array_get($input, 'product_id');
 		$instance->supplier_price = array_get($input, 'supplier_price');
 		$instance->selling_price = array_get($input, 'selling_price');
@@ -120,7 +133,7 @@ class Sale extends Eloquent {
 		$instance->comments = array_get($input, 'comments');
 		$instance->date_of_sale = date('Y-m-d', strtotime(array_get($input, 'date_of_sale')));
 		$instance->encoded_by = array_get($input, 'encoded_by');
-		$instance->status = array_get($input, 'status');
+		//$instance->status = array_get($input, 'status');
 		
 		$instance->save();
 		return $instance;

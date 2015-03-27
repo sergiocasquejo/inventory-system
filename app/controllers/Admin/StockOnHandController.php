@@ -33,7 +33,7 @@ class StockOnHandController extends \BaseController {
 
 			if ($stock->uom == 'kg') {
 				//1 Sack equivalent
-				$sackEqui = \Config::get('agrivate.equivalent_measure.sacks.per');
+				$sackEqui = \Config::get('agrivet.equivalent_measure.sacks.per');
 
 				$sack = 0;
 				$quantity = (float)$stock->total_stocks / (float)$sackEqui;
@@ -42,7 +42,7 @@ class StockOnHandController extends \BaseController {
 
 				if ($stock->total_stocks  >= $sackEqui) {
 					$sack = floor( $quantity );
-					$total_stocks = $sackStr = $sack .' sacks';
+					$total_stocks = $sackStr = $sack .' sack(s)';
 				}
 
 				
@@ -101,75 +101,73 @@ class StockOnHandController extends \BaseController {
 	 *
 	 * @return Response
 	 */
-	public function store($product_id = false)
+	public function store()
 	{
 		$input = \Input::all();
 
-		$stock = new \StockOnHand;
-		
-
-		if (array_get($input, 'product_id', 0)) {
-
-			$input['product_id'] = $product_id = array_get($input, 'product_id');	
-		} else {
-			$input['product_id'] = $product_id;
-		}
-		
-		$branch_id = array_get($input, 'branch_id');
-		$uom = array_get($input, 'uom');
-
-		// Get user branch
-		$branch_id = array_get($input, 'branch_id');
-		$uom = array_get($input, 'uom');
-		$product = array_get($input, 'product_id');
 
 
-		$stockObj = \StockOnHand::whereRaw("branch_id = {$branch_id} AND product_id = {$product_id}  AND uom = '{$uom}'")->first();
-
-		if ($stockObj) {
-			$stock = $stockObj;
-			$input['total_stocks'] = $stock->total_stocks + array_get($input, 'total_stocks', 0);
-		}
-
-
-		// Do conversion sacks to kilogram
-		$uomInput = array_get($input, 'uom');
-		if ($uomInput == 'sacks') {
-
-			$equi_config = \Config::get('agrivate.equivalent_measure.sacks');
-			$input['uom'] = $uom = $equi_config['to'];
-			
-			$total_stocks = array_get($input, 'total_stocks', 0) * $equi_config['per'];
-
-			$stockObj = \StockOnHand::whereRaw("branch_id = {$branch_id} AND product_id = {$product_id}  AND uom = '{$uom}'")->first();
-
-			if ($stockObj) {
-				$stock = $stockObj;
-				$total_stocks = $stock->total_stocks + $total_stocks;
-			}
-
-			$input['total_stocks'] = $total_stocks;
-
-		}
-
-		
-
-		$uom = array_get($input, 'uom');
-		
 		$rules = \StockOnHand::$rules;
 
 		$validator = \Validator::make($input, $rules);
 
 		if ($validator->fails()) {
-			return \Response::json(['errors' => $validator->errors()]);
+			if (\Request::ajax()) {
+				return \Response::json(['errors' => $validator->errors()]);
+			} else {
+				return \Redirect::back()->withErrors($validator->errors())->withInput();
+			}
 		} else {
 			try {
 				
+
+				$stock = new \StockOnHand;
+		
+
+				// Get user branch
+				$branch_id = array_get($input, 'branch_id');
+				$uom = array_get($input, 'uom');
+				$product_id = array_get($input, 'product_id');
+
+
+				$stockObj = \StockOnHand::whereRaw("branch_id = {$branch_id} AND product_id = {$product_id}  AND uom = '{$uom}'")->first();
+
+				if ($stockObj) {
+					$stock = $stockObj;
+					$input['total_stocks'] = $stock->total_stocks + array_get($input, 'total_stocks', 0);
+				}
+
+
+				// Do conversion sacks to kilogram
+				$uomInput = array_get($input, 'uom');
+				if (strpos($uomInput, 'sack') !== false) {
+
+					$equi_config = \Config::get('agrivet.equivalent_measure.sacks');
+					$input['uom'] = $uom = $equi_config['to'];
+					
+					$total_stocks = array_get($input, 'total_stocks', 0) * $equi_config['per'];
+
+					$stockObj = \StockOnHand::whereRaw("branch_id = {$branch_id} AND product_id = {$product_id}  AND uom = '{$uom}'")->first();
+
+					if ($stockObj) {
+						$stock = $stockObj;
+						$total_stocks = $stock->total_stocks + $total_stocks;
+					}
+
+					$input['total_stocks'] = $total_stocks;
+
+				}
+
+				
+
+				$uom = array_get($input, 'uom');
+
+
 				if ($stock->doSave($stock, $input)) {
 					if (\Request::ajax()) {
-						return \Response::json(['success' => \Lang::get('agrivate.created')]);
+						return \Response::json(['success' => \Lang::get('agrivet.created')]);
 					} else {
-						return \Redirect::route('admin_stocks.index')->with('success', \Lang::get('agrivate.created'));
+						return \Redirect::route('admin_stocks.index')->with('success', \Lang::get('agrivet.created'));
 					}
 				}
 				if (\Request::ajax()) {
@@ -196,19 +194,24 @@ class StockOnHandController extends \BaseController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function edit($product_id = false, $stock_id = false)
+	public function edit($stock_id = false)
 	{	
+
+		$input = \Input::all();
+		$product_id = array_get($input, 'product_id');
 
 		if (\Request::ajax()) {
 			$stock = \StockOnHand::findOrFail($stock_id);
 			
 			return \Response::json($stock->toArray());
 		} else {
+
+
 			$measures = \UnitOfMeasure::all()->lists('label', 'name');
 
 
 			$products = array_add(\Product::all()->lists('name', 'id'), '', 'Select Product');
-			$stock = \StockOnHand::findOrFail($product_id);
+			$stock = \StockOnHand::findOrFail($stock_id);
 
 			return \View::make('admin.stock.edit')
 			->with('products', $products)
@@ -226,38 +229,45 @@ class StockOnHandController extends \BaseController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update($product_id = false, $stock_id = false)
+	public function update($stock_id = false)
 	{
 
 		$input = \Input::all();
 
+
+
+
 		$rules = \StockOnHand::$rules; 
 
 		$uom = array_get($input, 'uom');
+
+		$product_id = array_get($input, 'product_id');
+
 		
 		$rules['branch_id'] = 'required|exists:branches,id|unique:stocks_on_hand,branch_id,'.$stock_id.',stock_on_hand_id,product_id,'.$product_id.',uom,'.$uom;
 
-		if (array_get($input, 'product_id', 0)) {
-
-			$input['product_id'] = $product_id = array_get($input, 'product_id');	
-		} else {
-			$input['product_id'] = $product_id;
-		}
 
 		$validator = \Validator::make($input, $rules);
 
 		if ($validator->fails()) {
-			return \Response::json(['errors' => $validator->errors()]);
+
+			if (\Request::ajax()) {
+				return \Response::json(['errors' => $validator->errors()]);
+			} else {
+				return \Redirect::back()->withErrors($validator->errors())->withInput();
+			}
 		} else {
 			try {
+
+
 				$stock = \StockOnHand::findOrFail($stock_id);
 				
 				// Do conversion sacks to kilogram
 				$uomInput = array_get($input, 'uom');
-				if ($uomInput == 'sacks') {
+				if (strpos($uomInput, 'sack')  !== false) {
 
 
-					$equi_config = \Config::get('agrivate.equivalent_measure.sacks');
+					$equi_config = \Config::get('agrivet.equivalent_measure.sacks');
 					$input['uom'] = $uom = $equi_config['to'];
 					
 					$input['total_stocks'] = array_get($input, 'total_stocks', 0) * $equi_config['per'];
@@ -267,12 +277,26 @@ class StockOnHandController extends \BaseController {
 
 
 				if ($stock->doSave($stock, $input)) {
-					return \Response::json(['success' => \Lang::get('agrivate.updated')]);
+					if (\Request::ajax()) {
+						return \Response::json(['success' => \Lang::get('agrivet.updated')]);
+					} else {
+						return \Redirect::route('admin_stocks.index')->with('success', \Lang::get('agrivet.created'));
+					}
 				}
 
-				return \Response::json(['errors' => $stock->errors()]);
+				if (\Request::ajax()) {
+					return \Response::json(['errors' => $stock->errors()]);
+				} else {
+					return \Redirect::back()->withErrors($stock->errors())->withInput();
+				}
+
+				
 			} catch(\Exception $e) {
-				return \Response::json(['errors' => (array)$e->getMessage()]);
+				if (\Request::ajax()) {
+					return \Response::json(['errors' => (array)$e->getMessage()]);
+				} else {
+					return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
+				}
 			}
 		}
 	}
@@ -284,16 +308,29 @@ class StockOnHandController extends \BaseController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy($product_id, $stock_id)
+	public function destroy($stock_id = false)
 	{
+
 		$stock = \StockOnHand::find($stock_id)->delete();
 		if ($stock) {
-			return \Redirect::back()->with('success', \Lang::get('agrivate.deleted'));
-			// return \Response::json(['success' => \Lang::get('agrivate.deleted')]);
+			return \Redirect::back()->with('success', \Lang::get('agrivet.deleted'));
+			// return \Response::json(['success' => \Lang::get('agrivet.deleted')]);
 		} 
 		return \Redirect::back()->withErrors($stock->errors());
 		// return \Response::json($stock->errors());
 	}
 
 
+
+	public function uom() {
+		$product_id = \Input::get('product_id');
+		$product = \Product::find($product_id);
+
+		$uoms = implode("','", json_decode($product->uom));
+
+		$measures = \UnitOfMeasure::whereRaw("name IN ('$uoms')")->lists('label', 'name');
+
+		return \Response::json($measures);
+
+	}
 }

@@ -9,12 +9,11 @@ class Expense extends Eloquent {
     public static $rules = [
     	'branch_id'        => 'required|exists:branches,id',
     	'name'	           => 'required:min:5',
-    	'total_amount' 	   => 'required|numeric',
-    	// 'quantity'		   => 'required|numeric',
-    	//'uom'	           => 'required',
+        'quantity'          => 'required|numeric|min:0.25',
+    	'total_amount' 	   => 'required|numeric|min:1',
+    	'uom'	           => 'required|whole_number:quantity',
         'date_of_expense'  => 'required|date',
     	'encoded_by' 	   => 'required|exists:users,id',
-    	'status'	       => 'required|in:0,1'
     ];
 
     /**=================================================
@@ -30,17 +29,25 @@ class Expense extends Eloquent {
         return $this->belongsTo('Branch', 'branch_id');
     }
 
+    public function product() {
+        return $this->belongsTo('Product', 'name');
+    }
+
+    public function stockOnHand() {
+        return $this->hasOne('StockOnHand');
+    }
+
     /**=================================================
      * SCOPE QUERY
      *==================================================*/
 
-    public function scopeActive($query) {
-        return $query->where('status', 1);
-    }
-
-    public function scopeInActive($query) {
-        return $query->where('status', 0);
-    }
+//    public function scopeActive($query) {
+//        return $query->where('status', 1);
+//    }
+//
+//    public function scopeInActive($query) {
+//        return $query->where('status', 0);
+//    }
 
     public function scopeSearch($query, $input) {
         
@@ -51,6 +58,15 @@ class Expense extends Eloquent {
         return $query;
     }
 
+
+    public function scopeOwned($query) {
+        if (!\Confide::user()->isAdmin()) {
+            $query->where('encoded_by', \Confide::user()->id);
+        }   
+        return $query;
+    }
+
+    
     public function scopeFilterBranch($query) {
         if (!\Confide::user()->isAdmin()) {
             $query->where('branch_id', \Confide::user()->branch_id);
@@ -61,7 +77,6 @@ class Expense extends Eloquent {
     public function scopeFilter($query, $input) {
 
         $branch = array_get($input, 'branch');
-        $status = array_get($input, 'status');
         $total = array_get($input, 'total');
         $year = $year = array_get($input, 'year');
         $month = $month = array_get($input, 'month');
@@ -89,9 +104,9 @@ class Expense extends Eloquent {
         if ($day != '') {
             $query->whereRaw('DAY(date_of_expense) = '. (int)$day);
         }
-        if ($status != '') {
-            $query->whereRaw('status = '. (int)$status);
-        }
+//        if ($status != '') {
+//            $query->whereRaw('status = '. (int)$status);
+//        }
 
 
         return $query;
@@ -101,12 +116,17 @@ class Expense extends Eloquent {
 
 	public function doSave(Expense $instance, $input) {
 		$instance->branch_id = array_get($input, 'branch_id');
-		$instance->name = array_get($input, 'name');
+        $instance->expense_type = array_get($input, 'expense_type');
+        if (array_get($input, 'stock_on_hand_id') != 0) {
+            $instance->stock_on_hand_id = array_get($input, 'stock_on_hand_id');
+        }
+
+        $instance->name = array_get($input, 'name');
 		$instance->total_amount = array_get($input, 'total_amount');
 		$instance->quantity = array_get($input, 'quantity');
 		$instance->uom = array_get($input, 'uom');
 		$instance->comments = array_get($input, 'comments');
-		$instance->status = array_get($input, 'status');
+//		$instance->status = array_get($input, 'status');
         $instance->encoded_by = array_get($input, 'encoded_by');
         $instance->date_of_expense = date('Y-m-d', strtotime(array_get($input, 'date_of_expense')));
 		

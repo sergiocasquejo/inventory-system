@@ -19,7 +19,7 @@ class UnitOfMeasuresController extends \BaseController {
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
-		$countries = \Config::get('agrivate.countries');
+		$countries = \Config::get('agrivet.countries');
 		return \View::make('admin.uom.index')
 			->with('uoms', $uoms)
 			->with('appends', $appends)
@@ -60,7 +60,7 @@ class UnitOfMeasuresController extends \BaseController {
 
 
 				if ($uom->doSave($uom, $input)) {
-					return \Redirect::route('admin_uoms.edit', $uom->uom_id)->with('success', \Lang::get('agrivate.created'));
+					return \Redirect::route('admin_uoms.edit', $uom->uom_id)->with('success', \Lang::get('agrivet.created'));
 				}
 
 				return \Redirect::back()->withErrors($uom->errors())->withInput();
@@ -110,7 +110,7 @@ class UnitOfMeasuresController extends \BaseController {
 				$uom = \UnitOfMeasure::findOrFail($id);
 				
 				if ($uom->doSave($uom, $input)) {
-					return \Redirect::route('admin_uoms.index')->with('success', \Lang::get('agrivate.updated'));
+					return \Redirect::route('admin_uoms.index')->with('success', \Lang::get('agrivet.updated'));
 				}
 
 				return \Redirect::back()->withErrors($uom->errors())->withInput();
@@ -132,7 +132,7 @@ class UnitOfMeasuresController extends \BaseController {
 	{
 		try {
 			$uom = \UnitOfMeasure::findOrFail($id);
-			$message = \Lang::get('agrivate.trashed');
+			$message = \Lang::get('agrivet.trashed');
 			if (!$uom->delete()) {
 				return \Redirect::back()->withErrors($uom->errors());			
 	        }
@@ -146,6 +146,12 @@ class UnitOfMeasuresController extends \BaseController {
     	}
 	}
 
+
+	public function dropdown() {
+		$measures = \UnitOfMeasure::all();
+
+		return \Response::json($measures);
+	}
 
 	
 

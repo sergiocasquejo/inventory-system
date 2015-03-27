@@ -11,40 +11,36 @@ class ProductsController extends \BaseController {
 	{
 
 		try {
-		$input = \Input::all();
+            $input = \Input::all();
 
-		$px = \DB::getTablePrefix();
+            $px = \DB::getTablePrefix();
 
-		
-		$products = \Product::withTrashed()->select(
-					"products.id", "products.status", "branches.name as branch_name", "products.name",
-					\DB::raw("GROUP_CONCAT('P', selling_price, '/', per_unit) as selling_price")
-				)
-				/*\DB::raw(
-					"CONCAT(TRUNCATE(SUM(IF({$px}product_pricing.per_unit ='sacks', {$px}product_pricing.selling_price, NULL  )), 0), ' ', 'sacks') as sacks"
-				),
-				\DB::raw(
-					"CONCAT(IF({$px}product_pricing.per_unit = 'sacks', SUM({$px}product_pricing.selling_price) - SUM(IF({$px}product_pricing.per_unit ='sacks', {$px}product_pricing.selling_price, NULL  )), SUM({$px}product_pricing.selling_price)  ), ' ', IF ({$px}product_pricing.per_unit = 'sacks', 'kg', {$px}product_pricing.per_unit )) as other")
-				)*/
-				->filter($input)
-				->leftJoin('product_pricing', 'products.id', '=', 'product_pricing.product_id')
-				->leftJoin('branches', 'product_pricing.branch_id', '=', 'branches.id')
-				->groupBy('products.id')
-				->paginate(intval(array_get($input, 'records_per_page', 10)));
 
-			$totalRows = \Product::withTrashed()->count();
+            $products = \Product::withTrashed()->select(
+                        "products.id", "products.deleted_at", "products.status", "branches.address", "branches.city", "products.name",
+                        \DB::raw("GROUP_CONCAT('P', selling_price, '/', per_unit) as selling_price")
+                    )
 
-			$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
+                    ->filter($input)
+                    ->leftJoin('product_pricing', 'products.id', '=', 'product_pricing.product_id')
+                    ->leftJoin('branches', 'product_pricing.branch_id', '=', 'branches.id')
+                    ->groupBy('products.id')
+                    ->paginate(intval(array_get($input, 'records_per_page', 10)));
 
-			$countries = \Config::get('agrivate.countries');
+                $totalRows = \Product::withTrashed()->count();
 
-		return \View::make('admin.product.index')
-			->with('products', $products)
-			->with('categories', array_add(\Category::all()->lists('name', 'category_id'), '', 'Select Category'))
-			->with('branches', array_add(\Branch::dropdown()->lists('name', 'id'), '', 'Select Branch'))
-			->with('appends', $appends)
-			->with('totalRows', $totalRows);
+                $appends = ['records_per_page' => \Input::get('records_per_page', 10)];
+
+                $countries = \Config::get('agrivet.countries');
+
+            return \View::make('admin.product.index')
+                ->with('products', $products)
+                ->with('categories', array_add(\Category::all()->lists('name', 'category_id'), '', 'Select Category'))
+                ->with('branches', array_add(\Branch::dropdown()->lists('name', 'id'), '', 'Select Branch'))
+                ->with('appends', $appends)
+                ->with('totalRows', $totalRows);
 		} catch(\Exception $e) {
+
 			return \Redirect::back()->withErrors((array)$e->getMessage());
 		}
 	}
@@ -87,7 +83,7 @@ class ProductsController extends \BaseController {
 
 
 				if ($product->doSave($product, $input)) {
-					return \Redirect::route('admin_products.edit', $product->id)->with('success', \Lang::get('agrivate.created'));
+					return \Redirect::route('admin_products.edit', $product->id)->with('success', \Lang::get('agrivet.created'));
 				}
 
 				return \Redirect::back()->withErrors($product->errors())->withInput();
@@ -150,7 +146,7 @@ class ProductsController extends \BaseController {
 				
 				$input['encoded_by'] = $product->encoded_by;
 				if ($product->doSave($product, $input)) {
-					return \Redirect::route('admin_products.index')->with('success', \Lang::get('agrivate.updated'));
+					return \Redirect::route('admin_products.index')->with('success', \Lang::get('agrivet.updated'));
 				}
 
 				return \Redirect::back()->withErrors($product->errors())->withInput();
@@ -171,10 +167,10 @@ class ProductsController extends \BaseController {
 	public function destroy($id)
 	{
 		$product = \Product::withTrashed()->where('id', $id)->first();
-		$message = \Lang::get('agrivate.trashed');
-		if ($product->trashed()) {
+		$message = \Lang::get('agrivet.trashed');
+		if ($product->trashed() || \Input::get('remove') == 1) {
             $product->forceDelete();
-            $message = \Lang::get('agrivate.deleted');
+            $message = \Lang::get('agrivet.deleted');
         } else {
             $product->delete();
         }
@@ -194,7 +190,7 @@ class ProductsController extends \BaseController {
 			return \Redirect::back()->withErrors($product->errors());			
 		}
 
-		return \Redirect::back()->with('success', \Lang::get('agrivate.restored'));
+		return \Redirect::back()->with('success', \Lang::get('agrivet.restored'));
 	}
 
 	/**
@@ -241,5 +237,34 @@ class ProductsController extends \BaseController {
 
 
 		return \Response::json($uoms->get());
+	}
+
+
+	/**
+	 * Show the form for editing the specified resource.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function measures($id)
+	{	
+		$branch = \Input::get('branch_id');
+
+		$product = \Product::findOrFail($id);
+		$measures = [];
+
+		if ($product) {
+			$uoms = implode("','", json_decode($product->uom));
+			$measures = \UnitOfMeasure::whereRaw("name IN ('". $uoms ."') ")->select('label', 'name');
+		}
+
+		
+
+		return \Response::json($measures->get());
+	}
+
+	public function dropdown() {
+		$products = \Product::all();
+		return \Response::json($products);
 	}
 }	

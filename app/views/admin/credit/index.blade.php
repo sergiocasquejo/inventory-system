@@ -4,6 +4,7 @@
     @include ('admin._partials.breadcrumbs')
 
     <div class="row">
+      @if (\Confide::user()->isAdmin())
       <div class="col-lg-12">
           <div class="row state-overview">
             <div class="col-lg-3 col-sm-6">
@@ -48,7 +49,7 @@
             </div>
           </div>
       </div>
-      
+      @endif
       <div class="col-lg-12">
           <section class="panel">
             <form action="{{ route('admin_credits.index') }}"  class="form-inline tasi-form" method="GET">
@@ -61,7 +62,7 @@
                   <div class="col-sm-6">
                     <div id="sample_1_length" class="dataTables_length">
                       <label>
-                        {{ Form::select('records_per_page', \Config::get('agrivate.records_per_page'), Input::get('records_per_page', 10), ['class' => 'form-control', 'size' => '1', 'onchange' => 'this.form.submit();']) }} 
+                        {{ Form::select('records_per_page', \Config::get('agrivet.records_per_page'), Input::get('records_per_page', 10), ['class' => 'form-control', 'size' => '1', 'onchange' => 'this.form.submit();']) }}
                         records per page
                       </label>
                     </div>
@@ -76,7 +77,13 @@
                 <table class="table table-striped table-advance table-hover">
                     <thead>
                       <tr>
-                          <th>{{ Form::select('branch', $branches, Input::get('branch', ''), ['class' => 'form-control input-xs']) }}</th>
+                          <th>
+                            @if (\Confide::user()->isAdmin())
+                            {{ Form::select('branch', $branches, Input::get('branch', ''), ['class' => 'form-control input-xs']) }}
+                            @else
+                              Branch
+                            @endif
+                          </th>
                           <th>Cust. Name</th>
                           <th>Cust. Info</th>
                           <th>Quantity</th>
@@ -106,17 +113,17 @@
                       @if ($credits)
                           @foreach ($credits as $credit)
                           <tr>
-                              <td>{{{ !$credit->branch?'':$credit->branch->name }}}</td>
+                              <td>{{{ !$credit->sale || !$credit->sale->branch ?'':$credit->sale->branch->name.' '.$credit->sale->branch->address }}}</td>
                               <td>{{{ $credit->customer_name }}}</td>
-                              <td><a class="badge bg-primary" data-html="true" data-container="body" data-toggle="popover" data-placement="top" data-content="{{ '<p> Addres: '.$credit->customer.'</p>'.'<p> Contact #: '.$credit->contact_number.'</p>' }}">?</a></td>
-                              <td>{{{ $credit->quantity }}}</td>
-                              <td>{{{ \Helper::nf($credit->total_amount) }}}</td>
+                              <td><a class="badge bg-primary" data-html="true" data-container="body" data-toggle="popover" data-placement="top" data-content="{{ '<p> Addres: '.$credit->address.'</p>'.'<p> Contact #: '.$credit->contact_number.'</p>' }}">?</a></td>
+                              <td>{{{ !$credit->sale?'':$credit->sale->quantity }}}</td>
+                              <td>{{{ !$credit->sale?'':\Helper::nf($credit->sale->total_amount) }}}</td>
                               <td><a class="badge bg-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="{{{ $credit->comments }}}">?</a></td>
-                              <td>{{{ $credit->date_of_credit }}}</td>
+                              <td>{{{ !$credit->sale?'':$credit->sale->date_of_sale }}}</td>
                               <td> <span class="label label-{{{ $credit->is_paid ? 'success' : 'warning' }}} label-mini">
                                       {{{ $credit->is_paid ? 'Paid' : 'Not Paid' }}}
                                   </span></td>
-                              <td>{{{ $credit->user->username }}}</td>
+                              <td>{{{ !$credit->sale || !$credit->sale->user?'': $credit->sale->user->username }}}</td>
                               <td>{{{ \Helper::timeElapsedString(strtotime($credit->created_at)) }}}</td>
                               <td>{{{ \Helper::timeElapsedString(strtotime($credit->updated_at)) }}}</td>
                               <td>
@@ -125,15 +132,21 @@
                                   @else
                                     <a href="{{{ route('admin_credits.edit', $credit->credit_id) }}}" class="btn btn-primary btn-xs" title="Edit"><i class="icon-pencil"></i></a>
                                   @endif
-                                  <a href="{{{ route('admin_credits.destroy', $credit->credit_id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="{{{ $credit->trashed() ? 'Delete' : 'Trash' }}}" class="btn btn-danger btn-xs">
-                                    <i class="icon-{{{ $credit->trashed() ? 'remove' : 'trash' }}} "></i>
+                                  @if (!$credit->trashed())
+                                  <a href="{{{ route('admin_credits.destroy', $credit->credit_id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Trash" class="btn btn-danger btn-xs">
+                                    <i class="icon-trash"></i>
                                   </a>
+                                  @endif
+                                  <a href="{{{ route('admin_credits.destroy', ['id' => $credit->credit_id, 'remove' => 1]) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
+                                    <i class="icon-remove"></i>
+                                  </a>
+
                               </td>
                           </tr>
                           @endforeach
                       @else
                           <tr>
-                            <td colspan="8">{{{ \Lang::get('agrivate.empty', 'Credits') }}}</td>
+                            <td colspan="8">{{{ \Lang::get('agrivet.empty', 'Credits') }}}</td>
                           </tr>
                       @endif
                     </tbody>

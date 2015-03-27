@@ -26,11 +26,11 @@
             <li class="sub-menu">
                 <a href="javascript:;" class="">
                     <i class="icon-bar-chart"></i>
-                    <span>Catelogue</span>
+                    <span>Products</span>
                     <span class="arrow"></span>
                 </a>
                 <ul class="sub">
-                    <li><a class="" href="{{ route('admin_products.index') }}">Products</a></li>
+                    <li><a class="" href="{{ route('admin_products.index') }}">All Products</a></li>
                     <li><a class="" href="{{ route('admin_brands.index') }}">Brands</a></li>
                     <li><a class="" href="{{ route('admin_categories.index') }}">Categories</a></li>
                 </ul>

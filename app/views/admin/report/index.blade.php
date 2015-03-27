@@ -15,19 +15,24 @@
                 <div class="dataTables_wrapper">
                   <br />
                   <div class="col-md-12">
-                      <div class="form-group">
-                        <input type="text" placeholder="From" name="date_from" value="{{ Input::get('date_from') }}" class="datepicker form-control">
+                      <div class="pull-left">
+                        <div class="form-group">
+                            {{ Form::select('branch', $branches, Input::get('branch', ''), ['class' => 'form-control']) }}
+                        </div>
+                        <div class="form-group">
+                          <input type="text" placeholder="From" name="date_from" value="{{ Input::get('date_from') }}" class="datepicker form-control">
+                        </div>
+                        <div class="form-group">
+                          <input type="text" name="date_to" placeholder="To" value="{{ Input::get('date_to') }}" class="datepicker form-control">
+                        </div>
+                        <button type="submit" class="btn btn-info">Filter</button>
                       </div>
-                      <div class="form-group">
-                        <input type="text" name="date_to" placeholder="To" value="{{ Input::get('date_to') }}" class="datepicker form-control">
-                      </div>
-                      <button type="submit" class="btn btn-info">Filter</button>
                   </div>
                 
                   <table class="table table-striped table-advance table-hover">
                       <thead>
                         <tr>
-                            <th>KM AGRIVATE BRANCHES</th>
+                            <th>KM agrivet BRANCHES</th>
                             <th>TOTAL AMOUNT OF EXPENSE</th>
                             <th>TOTAL AMOUNT OF CREDITS</th>
                             <th>TOTAL AMOUNT OF INCOME</th>

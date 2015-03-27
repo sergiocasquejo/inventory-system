@@ -12,15 +12,12 @@
                   Brands <a class="btn btn-info btn-xs" href="{{ route('admin_uoms.create') }}">Add New</a> <a class="btn btn-warning btn-xs" href="{{ route('admin_uoms.index') }}" title="Reset"><i class=" icon-refresh"></i></a>
               </header>
               <div class="dataTables_wrapper form-inline">
-                <div class="row">
-                  <div class="col-sm-6">
-                    <div id="sample_1_length" class="dataTables_length">
-                      <label>
-                        {{ Form::select('records_per_page', \Config::get('agrivate.records_per_page'), Input::get('records_per_page', 10), ['class' => 'form-control', 'size' => '1', 'onchange' => 'this.form.submit();']) }} 
-                        records per page
-                      </label>
-                    </div>
-                  </div>
+                <br />
+                <div class="col-sm-1">
+                    <label>
+                      {{ Form::select('records_per_page', \Config::get('agrivet.records_per_page'), Input::get('records_per_page', 10), ['class' => 'form-control', 'size' => '1', 'onchange' => 'this.form.submit();']) }}
+                      per page
+                    </label>
                 </div>
 
                 <div class="col-md-4">
@@ -46,17 +43,17 @@
                               <td>{{{ $uom->name }}}</td>
                               <td>{{{ $uom->label }}}</td>
                               <td>
-                                    <a href="{{{ route('admin_uoms.edit', $uom->uom_id) }}}" class="btn btn-primary btn-xs" title="Edit"><i class="icon-pencil"></i></a>
+                                 <!--   <a href="{{{ route('admin_uoms.edit', $uom->uom_id) }}}" class="btn btn-primary btn-xs" title="Edit"><i class="icon-pencil"></i></a>
                                
                                   <a href="{{{ route('admin_uoms.destroy', $uom->uom_id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
                                     <i class="icon-remove"></i>
-                                  </a>
+                                  </a>-->
                               </td>
                           </tr>
                           @endforeach
                       @else
                           <tr>
-                            <td colspan="8">{{{ \Lang::get('agrivate.empty', 'Brand') }}}</td>
+                            <td colspan="8">{{{ \Lang::get('agrivet.empty', 'Brand') }}}</td>
                           </tr>
                       @endif
                     </tbody>
