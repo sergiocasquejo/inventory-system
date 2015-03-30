@@ -138,7 +138,7 @@ var Script = function () {
         payableList.on('change', 'select[name=branch].branch-filter', function() {
             var self = $(this);
             var $supField = payableList.find('select[name=supplier].supplier-filter');
-            $supField.html('');
+            $supField.html('<option>Select Supplier</option>');
 
             loadImgLoader($supField);
 
@@ -495,7 +495,54 @@ var Script = function () {
             productField = expenseForm.find(':input[name=name]'),
             uomField = expenseForm.find(':input[name=uom]');
             qtyField = expenseForm.find(':input[name=quantity]'),
-            totalAmntField = expenseForm.find(":input[name=total_amount]");
+            totalAmntField = expenseForm.find(":input[name=total_amount]"),
+            branchField = expenseForm.find('select[name=branch_id]'),
+            supplierField = expenseForm.find('select[name=supplier]');
+
+        branchField.on('change', function() {
+            var self = $(this);
+            var $supField = expenseForm.find('select[name=supplier]');
+            $supField.html('<option>Select Supplier</option>');
+
+            loadImgLoader($supField);
+
+            $.post(AJAX.baseUrl + '/admin/suppliers/list-by-branch', { branch: self.val() }).done(function(response) {
+
+                if (response.length) {
+                    $.each(response, function(index, data) {
+                        var option = $('<option>').text(data.supplier_name).val(data.supplier_id);
+                        $supField.append(option);
+                    });
+                }
+
+                removeImageLoader($supField, false);
+            });
+        }).trigger('change');
+
+        supplierField.on('change', function() {
+            var self = $(this);
+            var productField = expenseForm.find('select[name=name]');
+            loadImgLoader(productField);
+
+            $.post(AJAX.baseUrl+'/admin/products/suppliers-product', { supplier: self.val() }).done(function(response) {
+
+
+                productField.html('');
+                if (response.length) {
+                    $.each(response, function(index, data){
+                        var option = $('<option>').val(data.id).text(data.name);
+                        productField.append(option);
+                    });
+
+                    always(productField);
+
+                    /**  Trigger change */
+                    productField.trigger('change');
+                }
+            });
+        });
+
+
 
         expenseForm.find('select[name=expense_type]').on('change', function() {
             loadImgLoader(expenseForm.find(':input[name=name]'));
@@ -504,6 +551,8 @@ var Script = function () {
             var productSlctdValue = expenseForm.find(':input[name=name]').attr('data-selected');
             var productInput = '';
             if (val == 'PRODUCT EXPENSES') {
+                supplierField.removeAttr('disabled');
+                expenseForm.find(':input[name=is_payable]').removeAttr('disabled');
                 expenseForm.find(':input[name=uom]').removeAttr('disabled');
                 productInput = $('<select name="name" disabled class="form-control" data-selected="'+ productSlctdValue +'" required>');
                 expenseForm.find(":input[name=total_amount]").attr('readonly', 'readonly').addClass('hidden');
@@ -515,32 +564,33 @@ var Script = function () {
 
                 productInput.append(opt);
 
-                $.get(AJAX.baseUrl+'/admin/products/dropdown', function(response) {
+                //$.get(AJAX.baseUrl+'/admin/products/dropdown', function(response) {
+                //
+                //    if (response.length) {
+                //        $.each(response, function(index, product){
+                //            if (product.name != '') {
+                //                var opt = $('<option>').val(product.id).text(product.name);
+                //                if (product.id == productInput.data('selected')) {
+                //                    opt.attr('selected', 'selected');
+                //                    ddUOM(product.id);
+                //                }
+                //                productInput.append(opt);
+                //            }
+                //            removeImageLoader(expenseForm.find(':input[name=name]'));
+                //        });
+                //
+                //    }
+                //
+                //});
 
-                    if (response.length) {
-                        $.each(response, function(index, product){
-                            if (product.name != '') {
-                                var opt = $('<option>').val(product.id).text(product.name);
-                                if (product.id == productInput.data('selected')) {
-                                    opt.attr('selected', 'selected');
-                                    ddUOM(product.id);
-                                }
-                                productInput.append(opt);
-                            }
-                            removeImageLoader(expenseForm.find(':input[name=name]'));
-                        });
-
-                    }
-
-                });
 
 
 
-                /**  Trigger change */
-                expenseForm.find(':input[name=uom]').trigger('change');
 
 
             } else if (val == 'STORE EXPENSES') {
+                supplierField.attr('disabled', true);
+                expenseForm.find(':input[name=is_payable]').attr('checked', false).attr('disabled','disabled');
                 expenseForm.find(':input[name=uom]').attr('disabled','disabled');
                 expenseForm.find(":input[name=total_amount]").removeClass('hidden').removeAttr('readonly');
                 expenseForm.find(':input[name=quantity]').attr('readonly', true);
@@ -806,7 +856,9 @@ var Script = function () {
             total_amount = trEl.find('td[data-total_amount]').data('total_amount')
             comments = trEl.find('td[data-comments]').data('comments')
             date_of_sale = trEl.find('td[data-date_of_sale]').data('date_of_sale'),
-                hiddenInput = $('<input type="hidden" name="review_id">');
+                hiddenInput = $('<input type="hidden" name="review_id">')
+            isPayable = trEl.find('td[data-is_payable]').data('is_payable');
+
             $(':input[name=review_id]').remove();
             $(':input[name=branch_id]').val(branch).attr('data-selected', branch);
             $(':input[name=expense_type]').val(expense_type).attr('data-selected', expense_type).trigger('change');
@@ -818,6 +870,13 @@ var Script = function () {
             $(':input[name=date_of_sale]').val(date_of_sale);
             $(':input[name=action][value=review]').text('Update Review');
             $('.total_amount').text(formatNumberStr(total_amount));
+
+            if (isPayable == 1) {
+                $('input[name=is_payable]').attr('checked', true);
+            } else {
+                $('input[name=is_payable]').attr('checked', false);
+            }
+
 
             var input = hiddenInput.val(_self.data('review-id'));
 
@@ -899,6 +958,8 @@ var Script = function () {
         if ( typeof addAttrDisabled == 'undefined' || addAttrDisabled == true ) {
             el.attr('disabled', true);
         }
+
+        $(el).prevAll('.img-loader').remove();
 
         $('<img class="img-loader" src="'+ AJAX.baseUrl +'/assets/backend/img/ajax-loader.gif" />').insertBefore(el);
     }
