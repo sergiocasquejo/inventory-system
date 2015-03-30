@@ -131,6 +131,29 @@ var Script = function () {
 
     $(function () {
 
+
+
+        var payableList = $('form#payableList');
+
+        payableList.on('change', 'select[name=branch].branch-filter', function() {
+            var self = $(this);
+            var $supField = payableList.find('select[name=supplier].supplier-filter');
+            $supField.html('');
+
+            loadImgLoader($supField);
+
+            $.post(AJAX.baseUrl + '/admin/suppliers/list-by-branch', { branch: self.val() }).done(function(response) {
+
+                if (response.length) {
+                    $.each(response, function(index, data) {
+                        var option = $('<option>').text(data.supplier_name).val(data.supplier_id);
+                        $supField.append(option);
+                    });
+                }
+                always($supField);
+            });
+        }).trigger('change');
+
         /** Get credit information by customer id */
         $('#partialPaymentModal select[name=customer]').on('change', function() {
             var custId = $(this).val();
@@ -138,16 +161,67 @@ var Script = function () {
 
             $.get(AJAX.baseUrl + '/admin/credits/info-by-customer/'+ custId, function(response) {
                 var total = amount = 0;
-                if (response.data.length) {
-                    total = response.data[0].total_amount;
+                console.log(response.data.total_credits);
+
+               // if (response.data.length) {
+                    total = response.data.total_credits;
                     amount = parseFloat(total);
 
-                }
+               // }
 
                 $('.total-credits').text(formatNumberStr(amount));
                 $('input[name=amount]').val(total);
             });
         }).trigger('change');
+
+        $('#partialPaymentModal select[name=supplier]').on('change', function() {
+            var supplierId = $(this).val();
+            if (!supplierId) return;
+
+            $.get(AJAX.baseUrl + '/admin/credits/info-by-supplier/'+ supplierId, function(response) {
+                var total = amount = 0;
+
+                // if (response.data.length) {
+                total = response.data.total_payables;
+                amount = parseFloat(total);
+
+                // }
+
+                $('.total-payables').text(formatNumberStr(amount));
+                $('input[name=amount]').val(total);
+            });
+        }).trigger('change');
+
+        $('#payPayables').on('click', function(e) {
+            e.preventDefault();
+            $('.alert-message').addClass('hide').text('');
+            var data = $('form#payablesPayForm').serialize();
+
+            $.post(AJAX.baseUrl + '/admin/credits/payables-partial-payment', data).done(function(response) {
+
+                if (response.error) {
+
+                    $('.alert-message').removeClass('hide').addClass('alert-warning').text(response.error);
+                } else if ( response.errors ) {
+
+                    var msg = '';
+                    $.each(response.errors, function(index, text) {
+                        msg += text + '<br />';
+                    });
+
+                    $('.alert-message').removeClass('hide').addClass('alert-warning').html(msg);
+
+                } else if (response.success) {
+                    $('.alert-message').removeClass('hide alert-warning').addClass('alert-success').text(response.success);
+                    $('form#payablesPayForm')[0].reset();
+                }
+            },'json').error(function(response) {
+                $('.alert-message').removeClass('hide').addClass('alert-warning').text('Error: please check the form or reload the page.');
+            });
+
+            return false;
+        });
+
 
         $('#pay').on('click', function(e) {
             e.preventDefault();
@@ -157,7 +231,6 @@ var Script = function () {
             $.post(AJAX.baseUrl + '/admin/credits/partial-payment', data).done(function(response) {
 
                 if (response.error) {
-                    console.log(response.error);
 
                     $('.alert-message').removeClass('hide').addClass('alert-warning').text(response.error);
                 } else if ( response.errors ) {
@@ -186,7 +259,7 @@ var Script = function () {
         var customers = [];
 
 
-        $.get(AJAX.baseUrl + '/admin/customers', function(response) {
+        $.get(AJAX.baseUrl + '/admin/customers/lists', function(response) {
            if (response.customers.length) {
                $.each(response.customers, function(index, data) {
 
@@ -339,7 +412,48 @@ var Script = function () {
 
         var stockForm = $('#stockForm'),
             productField = stockForm.find(':input[name=product_id]'),
-            uomField = stockForm.find(':input[name=uom]');
+            uomField = stockForm.find(':input[name=uom]'),
+            supplierField = stockForm.find('select[name=supplier]'),
+            branchField = stockForm.find('select[name=branch_id]');
+
+        branchField.on('change', function() {
+            var self = $(this);
+            var $supField = stockForm.find('select[name=supplier]');
+            $supField.html('<option>Select Supplier</option>');
+
+            loadImgLoader($supField);
+
+            $.post(AJAX.baseUrl + '/admin/suppliers/list-by-branch', { branch: self.val() }).done(function(response) {
+
+                if (response.length) {
+                    $.each(response, function(index, data) {
+                        var option = $('<option>').text(data.supplier_name).val(data.supplier_id);
+                        $supField.append(option);
+                    });
+                }
+                always($supField);
+            });
+        }).trigger('change');
+
+        supplierField.on('change', function() {
+            var self = $(this);
+            var productField = stockForm.find('select[name=product_id]');
+            loadImgLoader(productField);
+
+            $.post(AJAX.baseUrl+'/admin/products/suppliers-product', { supplier: self.val() }).done(function(response) {
+
+
+                productField.html('');
+                if (response.length) {
+                    $.each(response, function(index, data){
+                       var option = $('<option>').val(data.id).text(data.name);
+                        productField.append(option);
+                    });
+
+                    always(productField);
+                }
+            });
+        }).trigger('change');
 
         productField.on('change', function() {
             var self = $(this);
@@ -365,13 +479,13 @@ var Script = function () {
                             opt.attr('selected', 'selected');
                         }
                         slctUOM.append(opt);
-                        always(stockForm.find(':input[name=uom]'))
-                    });
 
+                    });
+                    always(stockForm.find(':input[name=uom]'));
                 }
             });//.always(always(stockForm.find(':input[name=uom]')));
 
-        }).trigger('change');
+        });//.trigger('change');
 
         /**=========================================================================
          * Expense Form
