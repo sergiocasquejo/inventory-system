@@ -12,26 +12,41 @@ class ExpensesController extends \BaseController {
 		$input = \Input::all();
 
 
+        $totalRows = \Expense::withTrashed()
+            ->filter($input)
+             ->search($input)
+            ->paidPayable()
+            ->owned()->count();
+
+
+
+        $offset = intval(array_get($input, 'records_per_page', 10));
+        if ( $offset == -1 ) {
+            $offset = $totalRows;
+
+        }
+
 		$expenses = \Expense::withTrashed()
-		->filter($input)
-		->search($input)
-		->owned()
-		->orderBy('expense_id', 'desc')
-		->paginate(intval(array_get($input, 'records_per_page', 10)));
+            ->filter($input)
+            ->search($input)
+                ->paidPayable()
+            ->owned()
+            ->orderBy('expense_id', 'desc')
+            ->paginate($offset);
 		
 
 
-		$totalRows = \Expense::owned()->count();
+
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
 		$countries = \Config::get('agrivet.countries');
 
 
-		$yearly = \Expense::owned()->whereRaw('YEAR(date_of_expense) = YEAR(CURDATE())')->sum('total_amount');
-		$monthly = \Expense::owned()->whereRaw('MONTH(date_of_expense) = MONTH(CURDATE())')->sum('total_amount');
-		$weekly = \Expense::owned()->whereRaw('WEEK(date_of_expense) = WEEK(CURDATE())')->sum('total_amount');
-		$daily = \Expense::owned()->whereRaw('DAY(date_of_expense) = DAY(CURDATE())')->sum('total_amount');
+		$yearly = \Expense::whereRaw('YEAR(date_of_expense) = YEAR(CURDATE())')->paidPayable()->sum('total_amount');
+		$monthly = \Expense::whereRaw('MONTH(date_of_expense) = MONTH(CURDATE())')->paidPayable()->sum('total_amount');
+		$weekly = \Expense::whereRaw('WEEK(date_of_expense) = WEEK(CURDATE())')->paidPayable()->sum('total_amount');
+		$daily = \Expense::whereRaw('DAY(date_of_expense) = DAY(CURDATE())')->paidPayable()->sum('total_amount');
 
 
 		$branches = \DB::table('expenses')->join('branches', 'expenses.branch_id', '=', 'branches.id')
@@ -89,6 +104,7 @@ class ExpensesController extends \BaseController {
 	{
 		$input = \Input::all();
 
+
 		if (array_get($input, 'action') == 'review') {
 			$reviewId = false;
 			if (array_get($input, 'review_id')) {
@@ -105,7 +121,11 @@ class ExpensesController extends \BaseController {
 
 		if (array_get($input, 'expense_type') == 'STORE EXPENSES') {
 			$rules['uom'] = 'whole_number:quantity';
+            $rules['quantity'] = 'numeric';
 		}
+
+
+
 
 		$input['encoded_by'] = \Confide::user()->id;
 
@@ -116,12 +136,31 @@ class ExpensesController extends \BaseController {
 		} else {
 			try {
 				$expense = new \Expense;
+                $errors = [];
 
-				if ($expense->doSave($expense, $input)) {
-					return \Redirect::route('admin_expenses.index')->with('success', \Lang::get('agrivet.created'));
-				}
 
-				return \Redirect::back()->withErrors($expense->errors())->withInput();
+                \DB::transaction(function() use(&$expense, &$input){
+                    $input['stock_on_hand_id'] = 0;
+                    if (array_get($input, 'expense_type') == 'PRODUCT EXPENSES') {
+                        $stock = $this->addToStock($input);
+                        $input['stock_on_hand_id'] = $stock->stock_on_hand_id;
+                    }
+
+
+                    if (!$expense->doSave($expense, $input)) {
+
+                        $errors[] = $expense->errors();
+                    }
+
+                });
+
+
+
+                if  ( count($errors) != 0 ) {
+                    return \Redirect::back()->withErrors($errors)->withInput();
+                } else {
+                    return \Redirect::route('admin_expenses.index')->with('success', \Lang::get('agrivet.created'));
+                }
 			} catch(\Exception $e) {
 				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
 			}
@@ -169,15 +208,20 @@ class ExpensesController extends \BaseController {
 			$input['branch_id'] = \Confide::user()->branch_id;
 		}
 
+
         $rules = \Expense::$rules;
 
+        $rules['branch_id'] = "";
+        $rules['name'] = "";
+        $rules['quantity'] = "";
+        $rules['total_amount'] = "";
+        $rules['uom'] = "";
         $rules['encoded_by'] = "";
+
 
 		if (array_get($input, 'expense_type') == 'STORE EXPENSES') {
 			$rules['uom'] = 'whole_number:quantity';
 		}
-
-
 
 
 		$input['encoded_by'] = \Confide::user()->id;
@@ -188,15 +232,38 @@ class ExpensesController extends \BaseController {
 			return \Redirect::back()->withErrors($validator->errors())->withInput();
 		} else {
 			try {
+                $errors = [];
 				$expense = \Expense::findOrFail($id);
 
-                $input['encoded_by'] = $expense->encoded_by;
+//                $input['encoded_by'] = $expense->encoded_by;
+//                $input['is_payable'] = $expense->is_payable;
+//                $input['product_id'] = $input['name'];
 
-				if ($expense->doSave($expense, $input)) {
-					return \Redirect::route('admin_expenses.index')->with('success', \Lang::get('agrivet.updated'));
-				}
 
-				return \Redirect::back()->withErrors($expense->errors())->withInput();
+                \DB::transaction(function() use(&$errors, &$expense, &$input){
+
+//                        if ($expense->stock_on_hand_id != 0) {
+//                            $stock = \StockOnHand::findOrFail($expense->stock_on_hand_id);
+//                        } else {
+//                            $stock = new \StockOnHand();
+//                        }
+//
+//                        $oldStock = $expense->quantity;
+
+                        if (!$expense->doSave($expense, $input)) {
+                            $errors[] = $expense->errors();
+                        }
+
+
+
+                });
+
+                if (count($errors) == 0) {
+                    return \Redirect::back()->with('success', \Lang::get('agrivet.updated'));
+                } else {
+                    return \Redirect::back()->withErrors($expense->errors())->withInput();
+                }
+
 			} catch(\Exception $e) {
 				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput();
 			}
@@ -222,7 +289,7 @@ class ExpensesController extends \BaseController {
         }
 
         // Session::set('success', 'Successfully deleted');
-        return \Redirect::route('admin_expenses.index')->with('success', $message);
+        return \Redirect::back()->with('success', $message);
         
 	}
 
@@ -235,7 +302,7 @@ class ExpensesController extends \BaseController {
 	 */
 	public function restore($id) {
 		$expense = \Expense::withTrashed()->where('expense_id', $id)->first();
-		if (!$expense->restore()) {
+		if (!$expense->restore($id)) {
 			return \Redirect::back()->withErrors($expense->errors());			
 		}
 
@@ -254,8 +321,8 @@ class ExpensesController extends \BaseController {
 		}
 
 		if (array_get($input, 'expense_type') == 'STORE EXPENSES') {
-			$input['uom'] = '';
 			$rules['uom'] = 'whole_number:quantity';
+            $rules['quantity'] = 'numeric';
 		}
 
 		$input['encoded_by'] = \Confide::user()->id;
@@ -282,7 +349,7 @@ class ExpensesController extends \BaseController {
 				\Session::put('expensesReview', $review);
 				
 
-				return \Redirect::route('admin_expenses.create')->with('success', \Lang::get('agrivet.add_to_review'));
+				return \Redirect::back()->with('success', \Lang::get('agrivet.add_to_review'));
 
 			} catch(\Exception $e) {
 				return \Redirect::back()->withErrors((array)$e->getMessage())->withInput($input);
@@ -299,16 +366,26 @@ class ExpensesController extends \BaseController {
 	public function saveReview() {
 		try {
 			$reviews = \Session::get('expensesReview');
-
+            $errors = [];
 			foreach ($reviews as $key => $input) {
-				$errors = [];
-				$input['encoded_by'] = \Confide::user()->id;
-				
-				$expense = new \Expense;
 
-				if ($expense->doSave($expense, $input)) {
-					\Session::forget("expensesReview.$key");
-				}
+				$input['encoded_by'] = \Confide::user()->id;
+
+                \DB::transaction(function() use(&$input, &$key) {
+                    $expense = new \Expense;
+                    if (array_get($input, 'expense_type') == 'PRODUCT EXPENSES') {
+                        $stock = $this->addToStock($input);
+                        $input['stock_on_hand_id'] = $stock->stock_on_hand_id;
+                    }
+
+                    if (!$expense->doSave($expense, $input)) {
+
+                        $errors[] = $expense->errors();
+                    } else {
+                        \Session::forget("expensesReview.$key");
+                    }
+
+                });
 
 			}
 				
@@ -325,5 +402,59 @@ class ExpensesController extends \BaseController {
 			return \Redirect::back()->withErrors((array)$e->getMessage());
 		}
 	}
+
+
+
+    public function addToStock($input) {
+
+        $stock = new \StockOnHand;
+
+
+        if (\Confide::user()->isAdmin()) {
+            // Get user branch
+            $branch_id = array_get($input, 'branch_id');
+        } else {
+            $branch_id = \Confide::user()->branch_id;
+        }
+
+        $uom = array_get($input, 'uom');
+        $product_id = array_get($input, 'name');
+
+
+
+
+        $stockObj = \StockOnHand::whereRaw("branch_id = {$branch_id} AND product_id = {$product_id}  AND uom = '{$uom}'")->first();
+
+        if ($stockObj) {
+            $stock = $stockObj;
+            $input['total_stocks'] = $stock->total_stocks + array_get($input, 'quantity', 0);
+        }
+
+
+        // Do conversion sacks to kilogram
+        $uomInput = array_get($input, 'uom');
+        if (strpos($uomInput, 'sack') !== false) {
+
+            $equi_config = \Config::get('agrivet.equivalent_measure.sacks');
+            $input['uom'] = $uom = $equi_config['to'];
+
+            $total_stocks = array_get($input, 'quantity', 0) * $equi_config['per'];
+
+            $stockObj = \StockOnHand::whereRaw("branch_id = {$branch_id} AND product_id = {$product_id}  AND uom = '{$uom}'")->first();
+
+            if ($stockObj) {
+                $stock = $stockObj;
+                $total_stocks = $stock->total_stocks + $total_stocks;
+            }
+
+            $input['total_stocks'] = $total_stocks;
+
+        }
+
+        $input['product_id'] = $product_id;
+        return $stock->doSave($stock, $input);
+
+    }
+
 
 }
