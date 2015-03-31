@@ -34,7 +34,7 @@ Route::group(['before' => 'auth', 'prefix' => 'admin'], function() {
 			Route::resource('prices', 'Admin\PricesController', ['names' => $prefixResourceNamespace('admin_product_prices'), 'except' => ['show']] );
 		});
 		// Products routes
-		
+        Route::post('products/suppliers-product/', ['uses' => 'Admin\ProductsController@getBySupplier', 'as' => 'admin_products.by_supplier']);
 		Route::post('products/{id}/restore', ['uses' => 'Admin\ProductsController@restore', 'as' => 'admin_products.restore']);
 		Route::resource('products', 'Admin\ProductsController', ['names' => $prefixResourceNamespace('admin_products'), 'except' => ['show']]);
 		// Brands routes
@@ -44,8 +44,15 @@ Route::group(['before' => 'auth', 'prefix' => 'admin'], function() {
 		Route::resource('categories', 'Admin\CategoriesController', ['names' => $prefixResourceNamespace('admin_categories'), 'except' => ['show']]);
 		
 		Route::resource('uoms', 'Admin\UnitOfMeasuresController', ['names' => $prefixResourceNamespace('admin_uoms'), 'except' => ['show']]);
-	
+
+        //Supplier Routes
+        Route::post('suppliers/list-by-branch', ['uses' => 'Admin\SuppliersController@getByBranch', 'as' => 'admin_suppliers.by_branch']);
+        Route::resource('suppliers', 'Admin\SuppliersController', ['names' => $prefixResourceNamespace('admin_suppliers')]);
+
 	});
+    // Customers routeslist
+    Route::get('customers/lists', ['uses' => 'Admin\CustomersController@lists', 'as' => 'admin_customers.list']);
+    Route::resource('customers', 'Admin\CustomersController', ['names' => $prefixResourceNamespace('admin_customers')]);
 	Route::get('products/dropdown', ['uses' => 'Admin\ProductsController@dropdown', 'as' => 'admin_products.dropdown']);
 	Route::get('uoms/dropdown', ['uses' => 'Admin\UnitOfMeasuresController@dropdown', 'as' => 'admin_uoms.dropdown']);
 	
@@ -53,6 +60,14 @@ Route::group(['before' => 'auth', 'prefix' => 'admin'], function() {
 	Route::get('products/{id}/uom', ['uses' => 'Admin\ProductsController@uom', 'as' => 'admin_products.uom']);
 	Route::get('products/{id}/get', ['uses' => 'Admin\ProductsController@get', 'as' => 'admin_products.get']);
 	// Credits routes
+
+    Route::post('credits/partial-payment', ['uses' => 'Admin\CreditsController@partialPayment', 'as' => 'admin_credits.partails'])->before('csrf');
+    Route::get('credits/info-by-customer/{id}', ['uses' => 'Admin\CreditsController@infoByCusId', 'as' => 'admin_credits.info_by_cusid']);
+    Route::post('credits/payables-partial-payment', ['uses' => 'Admin\PayablesController@partialPayablePayment', 'as' => 'admin_credits.partail_payables'])->before('csrf');
+    Route::get('credits/info-by-supplier/{id}', ['uses' => 'Admin\PayablesController@infoBySupplierId', 'as' => 'admin_credits.info_by_supplier']);
+    Route::put('credits/payables/{id}/paid', ['uses' => 'Admin\PayablesController@paid', 'as' => 'admin_credits.payables_paid']);
+    Route::get('credits/payables/details', ['uses' => 'Admin\PayablesController@details', 'as' => 'admin_credits.payable_details']);
+    Route::get('credits/payables', ['uses' => 'Admin\PayablesController@index', 'as' => 'admin_credits.payables']);
 	Route::post('credits/save-review', ['uses' => 'Admin\CreditsController@saveReview', 'as' => 'admin_credits.saveReview']);
 	Route::get('credits/{id}/delete-review', ['uses' => 'Admin\CreditsController@deleteReview', 'as' => 'admin_credits.deleteReview']);
 	Route::post('credits/{id}/restore', ['uses' => 'Admin\CreditsController@restore', 'as' => 'admin_credits.restore']);
