@@ -14,6 +14,7 @@ class UnitOfMeasure extends Eloquent {
 	public static $rules = [
 		'name'		=> 'required|unique:unit_of_measures,name',
     	'label' => 'required|unique:unit_of_measures,label',
+        'total_amount' => 'numeric'
     ];
 
 

@@ -8,6 +8,7 @@ class StockOnHand extends Eloquent {
 	
 	public static $rules = [
 		'branch_id'		=> 'required|exists:branches,id',
+        'supplier' => 'required|exists:suppliers,supplier_id',
     	'product_id' => 'required|exists:products,id',
     	'total_stocks'	=> 'required|numeric',
     	'uom'	           => 'required|whole_number:total_stocks',
@@ -22,11 +23,16 @@ class StockOnHand extends Eloquent {
         return $this->belongsTo('Branch', 'branch_id');
     }
 
+    public function expense() {
+        return $this->belongsTo('Expense', 'stock_on_hand_id');
+    }
+
 
     public function scopeFilter($query, $input) {
 
 		$branch = array_get($input, 'branch');
 		$keyword = array_get($input, 's');
+        $brand = array_get($input, 'brand');
 
 
 	 	/* Check if current user is not admin
@@ -38,6 +44,10 @@ class StockOnHand extends Eloquent {
 
         if ($keyword != '') {
         	$query->where('products.name', 'LIKE', "%$keyword%");	
+        }
+
+        if ($brand != '') {
+            $query->where('products.brand_id', $brand);
         }
 
         $query->whereNull('branches.deleted_at');

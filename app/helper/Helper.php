@@ -72,7 +72,7 @@ class Helper {
 	 */
 
 	public static function nf($price, $dp = 2, $ps = '.', $ts = ', ', $echo = true) {
-		$formatted =  Config::get('agrivet.default_currency').number_format($price, $dp, $ps, $ts);
+		$formatted =  Config::get('agrivet.default_currency').' '.number_format($price, $dp, $ps, $ts);
 
 		if (!$echo) {
 			return $formatted;		

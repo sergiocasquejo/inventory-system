@@ -146,14 +146,14 @@
                           @endforeach
                       @else
                           <tr>
-                            <td colspan="10">{{{ \Lang::get('agrivet.empty', 'Expense') }}}</td>
+                            <td colspan="10">{{{ \Lang::get('agrivet.empty', ['name' => 'Expense']) }}}</td>
                           </tr>
                       @endif
                     </tbody>
                     <tfoot>
                       <tr>
                           <td colspan="2"></td>
-                          <td><strong>{{{ \Helper::nf($expenses->sum('quantity')) }}}</strong></td>
+                          <td><strong>{{{ $expenses->sum('quantity') }}}</strong></td>
                           <td><strong>{{{ \Helper::nf($expenses->sum('total_amount')) }}}</strong></td>
                           <td colspan="6"></td>
                       </tr>

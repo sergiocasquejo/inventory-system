@@ -20,9 +20,16 @@ class Branch extends Eloquent {
     /**=================================================
      * QUERY RELATIONSHIPS
      *==================================================*/
+    public function customers() {
+        return $this->hasMany('Customer');
+    }
 	public function users() {
 		return $this->hasMany('User');
 	}
+
+    public function suppliers() {
+        return $this->hasMany('Supplier');
+    }
 
 	public function expense() {
 		return $this->hasMany('Expense');

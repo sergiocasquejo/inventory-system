@@ -11,62 +11,63 @@ class CreditsController extends \BaseController {
 	{
 
 
-		
+		try {
 
-		$input = \Input::all();
+            $input = \Input::all();
 
+            $lists =  \Credit::withTrashed()
+                ->join('sales', 'credits.sale_id', '=', 'sales.sale_id')
+                ->join('customers', 'customers.customer_id', '=', 'credits.customer_id')
+                //->unPaid()
+                ->owned()
+                ->filter($input)->orderBy('credit_id', 'desc');
 
-		$credits = \Credit::withTrashed()->join('sales', 'credits.sale_id', '=', 'sales.sale_id')
-			->filter($input)
-			->search($input)
-			->owned()
-			->orderBy('credit_id', 'desc')
-			->paginate(intval(array_get($input, 'records_per_page', 10)));
-		
-		$totalRows = \Credit::withTrashed()->owned()->count();
+            $totalRows = $lists->count();
 
-		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
+            $offset = intval(array_get($input, 'records_per_page', 10));
+            if ( $offset == -1 ) {
+                $offset = $totalRows;
 
-		// $countries = \Config::get('agrivet.countries');
+            }
 
-
-
-		$yearly = \Credit::owned()->join('sales', 'credits.sale_id', '=', 'sales.sale_id')->whereRaw('sale_type = "CREDIT" AND YEAR(date_of_sale) = YEAR(CURDATE())')->sum('total_amount');
-		$monthly = \Credit::owned()->join('sales', 'credits.sale_id', '=', 'sales.sale_id')->whereRaw('sale_type = "CREDIT" AND MONTH(date_of_sale) = MONTH(CURDATE())')->sum('total_amount');
-		$weekly = \Credit::owned()->join('sales', 'credits.sale_id', '=', 'sales.sale_id')->whereRaw('sale_type = "CREDIT" AND WEEK(date_of_sale) = WEEK(CURDATE())')->sum('total_amount');
-		$daily = \Credit::owned()->join('sales', 'credits.sale_id', '=', 'sales.sale_id')->whereRaw('sale_type = "CREDIT" AND DAY(date_of_sale) = DAY(CURDATE())')->sum('total_amount');
-
-		$branches = \DB::table('expenses')->join('branches', 'expenses.branch_id', '=', 'branches.id')
-					->select(\DB::raw('CONCAT(SUBSTRING('.\DB::getTablePrefix().'branches.name, 1, 20),"...") AS name, '.\DB::getTablePrefix().'branches.id'));
-
-
-					
-		// Filter branch if user is not owner
-		if (!\Confide::user()->isAdmin()) {
-			$branches = $branches->where('branches.id', \Confide::user()->branch_id);
-		}
-
-
-		$all = [
-			'daily' => $daily,
-			'weekly' => $weekly,
-			'monthly' => $monthly,
-			'yearly' => $yearly,
-			'branches' =>array_add($branches->lists('name', 'id'), '', 'Branch'),
-			'totals' => array_add(\Credit::filterBranch()->join('sales', 'credits.sale_id', '=', 'sales.sale_id')->lists('total_amount', 'total_amount'), '', 'Amount'),
-			'days' => array_add(\Credit::filterBranch()->join('sales', 'credits.sale_id', '=', 'sales.sale_id')->select(\DB::raw('DAY(date_of_sale) as day'))->lists('day', 'day'), '', 'Day'),
-			'months' => array_add(\Credit::filterBranch()->join('sales', 'credits.sale_id', '=', 'sales.sale_id')->select(\DB::raw('DATE_FORMAT(date_of_sale, "%b") as month, MONTH(date_of_sale) as month_no'))->lists('month', 'month_no'), '', 'Month'),
-			'years' => array_add(\Credit::filterBranch()->join('sales', 'credits.sale_id', '=', 'sales.sale_id')->select(\DB::raw('YEAR(date_of_sale) as year'))->lists('year', 'year'), '', 'Year'),
-			'statuses' => array_add(\Credit::filterBranch()->select(\DB::raw('is_paid, IF (is_paid = 1, \'Paid\', \'Not Paid\') as name'))->lists('name', 'is_paid'), '', 'Is Paid?'),
-		];
+            $credits = $lists->search($input)->paginate($offset);
 
 
 
-		return \View::make('admin.credit.index', $all)
-			->with('credits', $credits)
-			->with('branches', \Branch::filterBranch()->select(\DB::raw('CONCAT(address, " ", city) as name'), 'id')->lists('name', 'id'))
-			->with('appends', $appends)
-			->with('totalRows', $totalRows);
+            $appends = ['records_per_page' => \Input::get('records_per_page', 10)];
+
+
+
+
+
+
+            $branches = \DB::table('expenses')->join('branches', 'expenses.branch_id', '=', 'branches.id')
+                ->select(\DB::raw('CONCAT(SUBSTRING(' . \DB::getTablePrefix() . 'branches.name, 1, 20),"...") AS name, ' . \DB::getTablePrefix() . 'branches.id'));
+
+
+            // Filter branch if user is not owner
+            if (!\Confide::user()->isAdmin()) {
+                $branches = $branches->where('branches.id', \Confide::user()->branch_id);
+            }
+
+
+            $all = [
+                'totals' => array_add(\Sale::filterBranch()->join('credits', 'credits.sale_id', '=', 'sales.sale_id')->lists('total_amount', 'total_amount'), '', 'Amount'),
+                'days' => array_add(\Sale::filterBranch()->join('credits', 'credits.sale_id', '=', 'sales.sale_id')->select(\DB::raw('DAY(date_of_sale) as day'))->lists('day', 'day'), '', 'Day'),
+                'months' => array_add(\Sale::filterBranch()->join('credits', 'credits.sale_id', '=', 'sales.sale_id')->select(\DB::raw('DATE_FORMAT(date_of_sale, "%b") as month, MONTH(date_of_sale) as month_no'))->lists('month', 'month_no'), '', 'Month'),
+                'years' => array_add(\Sale::filterBranch()->join('credits', 'credits.sale_id', '=', 'sales.sale_id')->select(\DB::raw('YEAR(date_of_sale) as year'))->lists('year', 'year'), '', 'Year'),
+            ];
+
+
+            return \View::make('admin.credit.index', $all)
+                ->with('credits', $credits)
+                ->with('customers', array_add( $credits = \Customer::hasCredits()->belongToBranch()->lists('customer_name', 'customer_id'), '', 'Select Customer'))
+                ->with('branches', array_add(\Branch::filterBranch()->select(\DB::raw('CONCAT(address, " ", city) as name'), 'id')->lists('name', 'id'), '', 'Select Branch'))
+                ->with('appends', $appends)
+                ->with('totalRows', $totalRows);
+        } catch (\Exception $e) {
+            return \Redirect::back()->withErrors([$e->getMessage()]);
+        }
 
 	}
 
@@ -93,7 +94,21 @@ class CreditsController extends \BaseController {
 	 */
 	public function store()
 	{
-		$input = \Input::all();
+        $input = \Input::all();
+
+        $rules = \Customer::$rules;
+
+        if (array_get($input, 'customer_id') == 0) {
+            $rules['customer_name']	= 'required|unique:customers,customer_name,NULL,customer_id,address,'.array_get($input, 'address', '');
+        } else {
+            $rules['customer_name']	= 'required|unique:customers,customer_name,'. array_get($input, 'customer_id')  .',customer_id,address,'.array_get($input, 'address', '');
+        }
+
+
+        $validator = $this->validateCustomer($input, $rules);
+        if ( $validator->fails()) {
+            return \Redirect::back()->withErrors($validator->errors())->withInput();
+        }
 
 		if (array_get($input, 'action') == 'review') {
 			$reviewId = false;
@@ -127,7 +142,7 @@ class CreditsController extends \BaseController {
 
 					// Get user branch
 					$branch_id = array_get($input, 'branch_id');
-					$uom = array_get($input, 'uom');
+                    $oldMeasure = $uom = array_get($input, 'uom');
 					$product = array_get($input, 'product_id');
 					$quantity = array_get($input, 'quantity');
 
@@ -144,7 +159,16 @@ class CreditsController extends \BaseController {
 									->where('uom', $uom)
 									->first();
 
-		
+
+                    if (array_get($input, 'customer_id') == 0) {
+                        $customer = new \Customer;
+                    } else {
+                        $customer = \Customer::findOrFail(array_get($input, 'customer_id'));
+                    }
+                    $input['total_credits'] = $customer->total_credits + array_get($input, 'total_amount');
+                    $customer->doSave($customer, $input);
+                    $input['customer_id'] = $customer->customer_id;
+
 					if ($stock && $stock->total_stocks > 0) {
 
 						if ($stock->total_stocks >= array_get($input, 'quantity', 0)) {
@@ -226,7 +250,24 @@ class CreditsController extends \BaseController {
 	 */
 	public function update($id)
 	{
-		$input = \Input::all();
+
+        $input = \Input::all();
+
+        $rules = \Customer::$rules;
+
+        if (array_get($input, 'customer_id') == 0) {
+            $rules['customer_name']	= 'required|unique:customers,customer_name,NULL,customer_id,address,'.array_get($input, 'address', '');
+        } else {
+            $rules['customer_name']	= 'required|unique:customers,customer_name,'. array_get($input, 'customer_id')  .',customer_id,address,'.array_get($input, 'address', '');
+        }
+
+        $rules['branch_id'] = '';
+
+        $validator = $this->validateCustomer($input, $rules);
+        if ( $validator->fails()) {
+            return \Redirect::back()->withErrors($validator->errors())->withInput();
+        }
+
 
 		if (!\Confide::user()->isAdmin()) {
 			$input['branch_id'] = \Confide::user()->branch_id;
@@ -249,7 +290,7 @@ class CreditsController extends \BaseController {
 
 					// Get user branch
 					$branch_id = array_get($input, 'branch_id');
-					$uom = array_get($input, 'uom');
+                    $oldMeasure = $uom = array_get($input, 'uom');
 					$product = array_get($input, 'product_id');
 					$quantity = array_get($input, 'quantity', 0);
 
@@ -265,53 +306,28 @@ class CreditsController extends \BaseController {
 									->where('uom', $uom)
 									->first();
 
-					$branch = \ProductPricing::whereRaw("branch_id = {$branch_id} AND product_id = {$product}  AND per_unit = '{$uom}'")->first();
 
-					$input['supplier_price'] = 	$branch->supplier_price;
-					$input['selling_price'] = 	$branch->selling_price;
 					$input['sale_type'] 	= 	"CREDIT";
-					$input['encoded_by'] 	= 	\Confide::user()->id;
 
 
 					$credit = \Credit::findOrFail($id);
 
 					$sale = \Sale::findOrFail($credit->sale_id);
 
-					if ($sale->quantity > $quantity) {
-							$stock->total_stocks = $stock->total_stocks +  ($sale->quantity - array_get($input, 'quantity'));
-							$stock->save();
+                    if (array_get($input, 'customer_id') == 0) {
+                        $customer = new \Customer;
+                    } else {
+                        $customer = \Customer::findOrFail($credit->customer_id);
+                    }
 
-							
+                    $customer->doSave($customer, $input);
 
+                    $input['customer_id'] = $customer->customer_id;
 
-					} else if ($sale->quantity < $quantity) {
-						
-						$total = $stock->total_stocks -  ($quantity - $sale->quantity);
+                    if (!$sale->doSave($sale, $input)) {
+                        $errors = $sale->errors();
+                    }
 
-
-						// Check if stock is insufficient
-						if ($total < 0) {
-							$errors = [\Lang::get('agrivet.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
-							return;
-						}
-
-						$stock->total_stocks = $total;
-
-						$stock->save();
-
-					}
-
-					$input['total_amount'] = 	$branch->selling_price * $input['quantity'];
-					if (!$sale->doSave($sale, $input)) {			
-						$errors = $sale->errors();
-
-					} else {
-						$stock->total_stocks = $stock->total_stocks - $quantity;
-						$stock->save();
-
-						$input['sale_id'] = $sale->sale_id;
-						$credit->doSave($credit, $input);
-					}
 
 				});
 
@@ -342,11 +358,17 @@ class CreditsController extends \BaseController {
 	{
 		$credit = \Credit::withTrashed()->where('credit_id', $id)->first();
 		$message = \Lang::get('agrivet.trashed');
-		if ($credit->trashed() || \Input::get('remove') == 1) {
-            $credit->sale->forceDelete();
-            $message = \Lang::get('agrivet.deleted');
-        } else {
-            $credit->sale->delete();
+        try {
+            if (!$credit->sale)  return \Redirect::back();
+
+            if ($credit->trashed() || \Input::get('remove') == 1) {
+                $credit->sale->forceDelete();
+                $message = \Lang::get('agrivet.deleted');
+            } else {
+                $credit->sale->delete();
+            }
+        } catch(\FatalErrorException $e) {
+            return \Redirect::back()->withErrors([$e->getMessage()]);
         }
 
         return \Redirect::route('admin_credits.index')->with('success', $message);
@@ -360,15 +382,41 @@ class CreditsController extends \BaseController {
 	 */
 	public function restore($id) {
 		$credit = \Credit::withTrashed()->where('credit_id', $id)->first();
-		if (!$credit->restore()) {
+		if (!$credit->restore($credit->credit_id)) {
 			return \Redirect::back()->withErrors($credit->errors());			
 		}
 
 		return \Redirect::back()->with('success', \Lang::get('agrivet.restored'));
 	}
 
+    private function validateCustomer($input, $rules) {
+
+
+
+
+        $validator = \Validator::make($input, $rules);
+
+        return $validator;
+
+    }
+
+
+
 	public function review($reviewId = false) {
-		$input = \Input::all();
+        $input = \Input::all();
+
+        $rules = \Customer::$rules;
+
+        if (array_get($input, 'customer_id') == 0) {
+            $rules['customer_name']	= 'required|unique:customers,customer_name,NULL,customer_id,address,'.array_get($input, 'address', '');
+        } else {
+            $rules['customer_name']	= 'required|unique:customers,customer_name,'. array_get($input, 'customer_id')  .',customer_id,address,'.array_get($input, 'address', '');
+        }
+
+        $validator = $this->validateCustomer($input, $rules);
+        if ( $validator->fails()) {
+            return \Redirect::back()->withErrors($validator->errors())->withInput();
+        }
 
 
 		$rules = \Sale::$rules;
@@ -395,6 +443,11 @@ class CreditsController extends \BaseController {
 				if (!$reviewId) {
 					$reviewId = time();
 				}
+
+
+
+
+
 
 				$review[$reviewId] = array_add($input, 'branch_id', $input['branch_id']);
 
@@ -432,7 +485,7 @@ class CreditsController extends \BaseController {
 
 					// Get user branch
 					$branch_id = array_get($input, 'branch_id');
-					$uom = array_get($input, 'uom');
+                    $oldMeasure = $uom = array_get($input, 'uom');
 					$product = array_get($input, 'product_id');
 					$quantity = array_get($input, 'quantity');
 
@@ -469,6 +522,19 @@ class CreditsController extends \BaseController {
 								$stock->total_stocks = $stock->total_stocks - array_get($input, 'quantity');
 								$stock->save();
 
+                                if (array_get($input, 'customer_id') == 0) {
+                                    $customer = new \Customer;
+                                } else {
+                                    $customer = \Customer::findOrFail(array_get($input, 'customer_id'));
+                                }
+
+                                $input['total_credits'] = $customer->total_credits + array_get($input, 'total_amount');
+
+                                $customer->doSave($customer, $input);
+                                $input['customer_id'] = $customer->customer_id;
+
+
+
 								$credit = new \Credit;
 								$input['sale_id'] = $sale->sale_id;
 								$credit->doSave($credit, $input);
@@ -476,12 +542,12 @@ class CreditsController extends \BaseController {
 							}
 						} else {
 							if (strpos($oldMeasure, 'sack') !== false) $input['uom'] = $oldMeasure;
-							$errors = [\Lang::get('agrivet.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
+							$errors = [\Product::find($product)->name.' '.\Lang::get('agrivet.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
 						}
 
 					} else {
 						if (strpos($oldMeasure,'sack') !== false) $input['uom'] = $oldMeasure;
-						$errors = [\Lang::get('agrivet.errors.out_of_stocks')];
+						$errors = [\Product::find($product)->name.' '.\Lang::get('agrivet.errors.out_of_stocks')];
 
 					}
 				});
@@ -491,7 +557,7 @@ class CreditsController extends \BaseController {
 				if (count($errors) == 0) {
 					\Session::forget("creditsReview.$key");
 				} else {
-					$errors[] = $credit->errors();
+					$errors[] = $errors;
 				}
 
 			}
@@ -509,6 +575,161 @@ class CreditsController extends \BaseController {
 			return \Redirect::route('admin_credits.create')->withErrors((array)$e->getMessage());
 		}
 	}
+
+
+    public function payables() {
+        $input = \Input::all();
+
+
+        $appends = '';
+        $totalRows = 0;
+        $expenses = array();
+
+        if ($input) {
+            $lists = \Expense::filter($input)->owned()->payable()->orderBy('expense_id', 'desc');
+
+
+            $totalRows = $lists->count();
+
+            $offset = intval(array_get($input, 'records_per_page', 10));
+            if ($offset == -1) {
+                $offset = $totalRows;
+
+            }
+
+            $expenses = $lists->paginate($offset);
+
+
+            $appends = ['records_per_page' => \Input::get('records_per_page', 10)];
+
+        }
+
+
+        return \View::make('admin.credit.payable')
+            ->with('branches', array_add(\Branch::lists('address', 'id'), '', 'Branch'))
+            ->with('brands', array_add(\Brand::all()->lists('name', 'brand_id'), '', 'Select Brand'))
+            ->with('suppliers', array_add(\Supplier::hasPayables()->lists('supplier_name', 'supplier_id'), '', 'Select Supplier'))
+            ->with('expenses', $expenses)
+            ->with('appends', $appends)
+            ->with('totalRows', $totalRows);
+    }
+
+
+
+
+    public  function infoBySupplierId($supplierId) {
+
+        $payables = \Supplier::findOrFail($supplierId);
+
+        return \Response::json(['data' => $payables]);
+    }
+
+
+    public  function infoByCusId($cusId) {
+
+        $credits = \Customer::findOrFail($cusId);
+
+        return \Response::json(['data' => $credits]);
+    }
+
+    public function partialPayablePayment() {
+        $input = \Input::all();
+
+        try {
+
+            $rules = [
+                'amount' => 'required|numeric|min:1',
+                'supplier' => 'required|exists:suppliers,supplier_id'
+            ];
+
+
+            $validator = \Validator::make($input, $rules);
+
+            if ($validator->fails()) {
+                return \Response::json(['errors' => $validator->errors()]);
+            } else {
+
+                $supplierId = array_get($input, 'supplier');
+                $supplier = \Supplier::findOrFail($supplierId);
+
+                $supplier->total_payables = $supplier->total_payables - array_get($input, 'amount');
+                if (! $supplier->save()) {
+                    return \Response::json(['errors' => $supplier->errors()]);
+                } else {
+                    return \Response::json(['success' => 'Successfully saved.']);
+                }
+            }
+
+        } catch(\Exception $e) {
+            return \Response::json(['error' =>  $e->getMessage()]);
+        }
+
+    }
+
+
+
+    public function partialPayment() {
+
+        $input = \Input::all();
+
+        try {
+
+            $rules = [
+                'amount' => 'required|numeric|min:1',
+                'customer' => 'required|exists:customers,customer_id'
+            ];
+
+
+            $validator = \Validator::make($input, $rules);
+
+            if ($validator->fails()) {
+                return \Response::json(['errors' => $validator->errors()]);
+            } else {
+
+                $cusId = array_get($input, 'customer');
+                $customer = \Customer::find($cusId);
+
+                $input['branch_id'] = $customer->branch_id;
+                $input['sale_type'] = 'SALE';
+                $input['product_id'] = 0;
+                $input['supplier_price'] = 0;
+                $input['selling_price'] = 0;
+                $input['quantity'] = 0;
+                $input['uom'] = '';
+                $input['total_amount'] = array_get($input, 'amount');
+                $input['comments'] = array_get($input, 'comments');
+                $input['date_of_sale'] = date('Y-m-d');
+                $input['encoded_by'] = \Confide::user()->id;
+
+                $errors = [];
+
+                \DB::transaction(function() use (&$input, &$customer, &$errors) {
+                    $sale = new \Sale;
+
+                    if (!$sale->doSave($sale, $input)) {
+                        $errors[] = $sale->errors();
+                    } else {
+                        $customer->total_credits = $customer->total_credits - array_get($input, 'amount');
+                        $customer->save();
+                    }
+                });
+
+
+                if (count($errors) != 0) {
+                    return \Response::json(['errors' => $errors]);
+                } else {
+                    return \Response::json(['success' => 'Successfully saved.']);
+                }
+            }
+
+        } catch(\Exception $e) {
+            return \Response::json(['error' =>  $e->getMessage()]);
+        }
+
+
+
+
+    }
 
 
 }

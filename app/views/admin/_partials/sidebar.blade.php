@@ -21,11 +21,22 @@
                     <li><a class="" href="{{ route('admin_branches.create') }}">Add New</a></li>
                 </ul>
             </li>
+            <li class="sub-menu">
+                <a href="javascript:;" class="">
+                    <i class="icon-truck"></i>
+                    <span>Suppliers</span>
+                    <span class="arrow"></span>
+                </a>
+                <ul class="sub">
+                    <li><a class="" href="{{ route('admin_suppliers.index') }}">All</a></li>
+                    <li><a class="" href="{{ route('admin_suppliers.create') }}">Add New</a></li>
+                </ul>
+            </li>
             
             
             <li class="sub-menu">
                 <a href="javascript:;" class="">
-                    <i class="icon-bar-chart"></i>
+                    <i class="icon-shopping-cart"></i>
                     <span>Products</span>
                     <span class="arrow"></span>
                 </a>
@@ -38,7 +49,7 @@
 
             <li class="sub-menu">
                 <a href="javascript:;" class="">
-                    <i class="icon-bar-chart"></i>
+                    <i class="icon-dropbox"></i>
                     <span>Stocks</span>
                     <span class="arrow"></span>
                 </a>
@@ -81,6 +92,10 @@
                 <ul class="sub">
                     <li><a class="" href="{{ route('admin_credits.index') }}">All</a></li>
                     <li><a class="" href="{{ route('admin_credits.create') }}">Add New</a></li>
+                    <li><a class="" href="{{ route('admin_customers.index') }}">Customers</a></li>
+                    @if (Confide::user()->isAdmin())
+                    <li><a class="" href="{{ route('admin_credits.payables') }}">Payables</a></li>
+                    @endif
                 </ul>
             </li>
 
@@ -101,7 +116,7 @@
 
             <li class="sub-menu">
                 <a href="{{ route('admin_reports.index') }}" class="">
-                    <i class="icon-bar-chart"></i>
+                    <i class="icon-table"></i>
                     <span>Reports</span>
                 </a>
             </li>

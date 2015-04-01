@@ -18,6 +18,7 @@ class CreateExpensesTable extends Migration {
             $table->bigIncrements('expense_id')->unsigned();
             $table->integer('branch_id')->unsigned();
             $table->enum('expense_type',  array('PRODUCT EXPENSES', 'STORE EXPENSES'))->default('STORE EXPENSES');
+            $table->bigInteger('stock_on_hand_id')->unsigned();
             $table->string('name', 255);
             $table->decimal('total_amount', 10, 2);
             $table->decimal('quantity', 10, 2);
@@ -35,6 +36,11 @@ class CreateExpensesTable extends Migration {
      		$table->foreign('branch_id')
      			->references('id')->on('branches')
      			->onDelete('cascade');
+
+
+            $table->foreign('stock_on_hand_id')
+                ->references('stock_on_hand_id')->on('stocks_on_hand')
+                ->onDelete('cascade');
         });
 	}
 

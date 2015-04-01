@@ -29,7 +29,8 @@
 							<tr>
 								<td data-customer_name="{{ $review['customer_name'] }}" 
 								data-address="{{ $review['address'] }}" 
-								data-contact_number="{{ $review['contact_number'] }}">
+								data-contact_number="{{ $review['contact_number'] }}"
+                                        data-customer_id="{{ $review['customer_id']  }}">
 									<a class="badge bg-primary" data-html="true" data-container="body" data-toggle="popover" data-placement="top" 
 										data-content="{{ 'Name: '. $review['customer_name'] .'<br />'. 
 										'Address: '. $review['address'] .'<br />'.
@@ -69,6 +70,7 @@
 			<div class="panel-body">
 			  	<form action="{{ route('admin_credits.store') }}" id="creditForm"  class="form-horizontal tasi-form" method="POST">
 			  		<input type="hidden" name="_token" value="{{ csrf_token() }}" />
+                    <input type="hidden" name="customer_id" value="{{ Input::old('customer_id', 0)  }}">
 			  		<div class="form-group">
 			          <label class="col-sm-2 control-label">Branch</label>
 			          <div class="col-sm-10">
@@ -79,7 +81,7 @@
 			       <div class="form-group">
 			          <label class="col-sm-2 control-label">Customer Name</label>
 			          <div class="col-sm-10">
-			              <input type="text" name="customer_name" maxlength="255" class="form-control" value="{{ Input::old('customer_name') }}" />
+			              <input type="text" name="customer_name" autocomplete="off" maxlength="255" class="form-control typeahead" value="{{ Input::old('customer_name') }}" />
 			              <span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
 			          </div>
 			      	</div>
@@ -148,12 +150,12 @@
 					  </div>
 					</div>
 					
-					<div class="form-group">
+					<!--<div class="form-group">
 					  <label class="col-sm-2 control-label">Is Paid</label>
 					  <div class="col-sm-10">
 					      {{ Form::select('is_paid', \Config::get('agrivet.credit_statuses'), Input::old('is_paid', 0), ['class' => 'form-control m-bot15', 'disabled' => 'disabled']) }}
 					  </div>
-					</div>
+					</div>-->
 
 
 					<button type="submit" name="action" value="review" class="btn btn-shadow btn-info">Add to Review</button>

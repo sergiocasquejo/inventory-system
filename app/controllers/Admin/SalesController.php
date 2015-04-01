@@ -11,23 +11,37 @@ class SalesController extends \BaseController {
 	{
 		$input = \Input::all();
 
+        $totalRows = \Sale::withTrashed()
+            ->filter($input)
+            ->owned()
+            ->orderBy('sale_id', 'desc')->count();
+
+
+        $offset = intval(array_get($input, 'records_per_page', 10));
+        if ( $offset == -1 ) {
+            $offset = $totalRows;
+
+        }
+
+
 		$sales = \Sale::withTrashed()
 				->filter($input)
+                ->sale()
 				->owned()
 				->orderBy('sale_id', 'desc')
-				->paginate(intval(array_get($input, 'records_per_page', 10)));
+				->paginate($offset);
 		
-		$totalRows = \Sale::withTrashed()->owned()->count();
+
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
 		$countries = \Config::get('agrivet.countries');
 
 
-		$yearly = \Sale::owned()->whereRaw('sale_type="SALE" AND YEAR(date_of_sale) = YEAR(CURDATE())')->sum('total_amount');
-		$monthly = \Sale::owned()->whereRaw('sale_type="SALE" AND MONTH(date_of_sale) = MONTH(CURDATE())')->sum('total_amount');
-		$weekly = \Sale::owned()->whereRaw('sale_type="SALE" AND WEEK(date_of_sale) = WEEK(CURDATE())')->sum('total_amount');
-		$daily = \Sale::owned()->whereRaw('sale_type="SALE" AND DAY(date_of_sale) = DAY(CURDATE())')->sum('total_amount');
+		$yearly = \Sale::owned()->sale()->owned()->whereRaw('sale_type="SALE" AND YEAR(date_of_sale) = YEAR(CURDATE())')->sum('total_amount');
+		$monthly = \Sale::owned()->sale()->owned()->whereRaw('sale_type="SALE" AND MONTH(date_of_sale) = MONTH(CURDATE())')->sum('total_amount');
+		$weekly = \Sale::owned()->sale()->owned()->whereRaw('sale_type="SALE" AND WEEK(date_of_sale) = WEEK(CURDATE())')->sum('total_amount');
+		$daily = \Sale::owned()->sale()->owned()->whereRaw('sale_type="SALE" AND DAY(date_of_sale) = DAY(CURDATE())')->sum('total_amount');
 
 
 		$branches = \DB::table('sales')->join('branches', 'sales.branch_id', '=', 'branches.id')
@@ -101,6 +115,8 @@ class SalesController extends \BaseController {
 
 
 		$rules = \Sale::$rules;
+
+
 
 		if (!\Confide::user()->isAdmin()) {
 			$input['branch_id'] = \Confide::user()->branch_id;
@@ -230,7 +246,13 @@ class SalesController extends \BaseController {
 		}
 		
 		$rules = \Sale::$rules;
-        $rules['encoded_by'] = '';
+        $rules['branch_id'] = "";
+        $rules['product_id'] = "";
+        $rules['quantity'] = "";
+        $rules['total_amount'] = "";
+        $rules['uom'] = "";
+        $rules['encoded_by'] = "";
+        $rules['encoded_by'] = "";
 
 		$validator = \Validator::make($input, $rules);
 
@@ -244,8 +266,13 @@ class SalesController extends \BaseController {
 				$errors = [];
 
 				\DB::transaction(function() use(&$input,$id, &$errors) {
-					
+                    $sale = \Sale::findOrFail($id);
+                    if (!$sale->doSave($sale, $input)) {
+                        $errors = $sale->errors();
+                    }
 
+
+                    /*
 					// Get user branch
 					$branch_id = array_get($input, 'branch_id');
 					$uom = array_get($input, 'uom');
@@ -299,7 +326,7 @@ class SalesController extends \BaseController {
 					} else {
 						$stock->total_stocks = $stock->total_stocks - $quantity;
 						$stock->save();
-					}
+					}*/
 
 				});
 				

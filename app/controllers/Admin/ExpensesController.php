@@ -141,8 +141,7 @@ class ExpensesController extends \BaseController {
 
                 \DB::transaction(function() use(&$expense, &$input){
                     $input['stock_on_hand_id'] = 0;
-                    if (array_get($input, 'expense_type') == 'PRODUCT EXPENSES') {
-                        $stock = $this->addToStock($input);
+                    if (array_get($input, 'expense_type') == 'PRODUCT EXPENSES' && $stock = $this->addToStock($input)) {
                         $input['stock_on_hand_id'] = $stock->stock_on_hand_id;
                     }
 
@@ -150,6 +149,11 @@ class ExpensesController extends \BaseController {
                     if (!$expense->doSave($expense, $input)) {
 
                         $errors[] = $expense->errors();
+                    } else {
+
+                        $supplier = \Supplier::findOrFail(array_get($input, 'supplier'));
+                        $supplier->total_payables = $supplier->total_payables + array_get($input, 'total_amount', 0);
+                        $supplier->save();
                     }
 
                 });
@@ -373,8 +377,8 @@ class ExpensesController extends \BaseController {
 
                 \DB::transaction(function() use(&$input, &$key) {
                     $expense = new \Expense;
-                    if (array_get($input, 'expense_type') == 'PRODUCT EXPENSES') {
-                        $stock = $this->addToStock($input);
+                    if (array_get($input, 'expense_type') == 'PRODUCT EXPENSES' && $stock = $this->addToStock($input)) {
+
                         $input['stock_on_hand_id'] = $stock->stock_on_hand_id;
                     }
 
@@ -382,7 +386,10 @@ class ExpensesController extends \BaseController {
 
                         $errors[] = $expense->errors();
                     } else {
-                        \Session::forget("expensesReview.$key");
+                            $supplier = \Supplier::findOrFail(array_get($input, 'supplier'));
+                            $supplier->total_payables = $supplier->total_payables + array_get($input, 'total_amount', 0);
+                            $supplier->save();
+                            \Session::forget("expensesReview.$key");
                     }
 
                 });
@@ -421,38 +428,39 @@ class ExpensesController extends \BaseController {
         $product_id = array_get($input, 'name');
 
 
-
-
         $stockObj = \StockOnHand::whereRaw("branch_id = {$branch_id} AND product_id = {$product_id}  AND uom = '{$uom}'")->first();
 
         if ($stockObj) {
             $stock = $stockObj;
             $input['total_stocks'] = $stock->total_stocks + array_get($input, 'quantity', 0);
-        }
 
 
-        // Do conversion sacks to kilogram
-        $uomInput = array_get($input, 'uom');
-        if (strpos($uomInput, 'sack') !== false) {
 
-            $equi_config = \Config::get('agrivet.equivalent_measure.sacks');
-            $input['uom'] = $uom = $equi_config['to'];
+            // Do conversion sacks to kilogram
+            $uomInput = array_get($input, 'uom');
+            if (strpos($uomInput, 'sack') !== false) {
 
-            $total_stocks = array_get($input, 'quantity', 0) * $equi_config['per'];
+                $equi_config = \Config::get('agrivet.equivalent_measure.sacks');
+                $input['uom'] = $uom = $equi_config['to'];
 
-            $stockObj = \StockOnHand::whereRaw("branch_id = {$branch_id} AND product_id = {$product_id}  AND uom = '{$uom}'")->first();
+                $total_stocks = array_get($input, 'quantity', 0) * $equi_config['per'];
 
-            if ($stockObj) {
-                $stock = $stockObj;
-                $total_stocks = $stock->total_stocks + $total_stocks;
+                $stockObj = \StockOnHand::whereRaw("branch_id = {$branch_id} AND product_id = {$product_id}  AND uom = '{$uom}'")->first();
+
+                if ($stockObj) {
+                    $stock = $stockObj;
+                    $total_stocks = $stock->total_stocks + $total_stocks;
+                }
+
+                $input['total_stocks'] = $total_stocks;
+
             }
 
-            $input['total_stocks'] = $total_stocks;
-
+            $input['product_id'] = $product_id;
+            return $stock->doSave($stock, $input);
         }
 
-        $input['product_id'] = $product_id;
-        return $stock->doSave($stock, $input);
+        return;
 
     }
 

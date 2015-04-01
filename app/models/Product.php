@@ -51,11 +51,18 @@ class Product extends Eloquent {
         return $this->hasMany('Expense');
     }
 
+    public function supplier() {
+        return $this->belongsTo('Supplier', 'supplier_id');
+    }
+
 
     
     /**=================================================
      * SCOPE QUERY
      *==================================================*/
+    public function scopeBySupplier($query, $supplierId) {
+        return $query->where('supplier_id', $supplierId);
+    }
 
     public function scopeActive($query) {
         return $query->where('status', 1);
@@ -81,9 +88,9 @@ class Product extends Eloquent {
             $query->whereRaw("{$px}product_pricing.branch_id = $branch");   
         }
 
-        if (isset($input['category']) && $input['category'] != '') {
-            $category = array_get($input, 'category');
-            $query->whereRaw("{$px}products.category_id = $category");   
+        if (isset($input['brand']) && $input['brand'] != '') {
+            $brand = array_get($input, 'brand');
+            $query->whereRaw("{$px}products.brand_id = $brand");
         }
 
         return $query;
@@ -109,6 +116,7 @@ class Product extends Eloquent {
 		$instance->comments = array_get($input, 'comments');
 		$instance->status = array_get($input, 'status');
 		$instance->encoded_by = array_get($input, 'encoded_by');
+        $instance->supplier_id = array_get($input, 'supplier');
         $instance->brand_id = array_get($input, 'brand_id');
         $instance->category_id = array_get($input, 'category_id');
         $instance->uom = json_encode(array_get($input, 'uom'));

@@ -119,7 +119,7 @@
                             <td>{{{ !$sale->product?'':$sale->product->name }}}</td>
                             <td>{{{ $sale->quantity }}}</td>
                             <td>{{{ $sale->uom }}}</td>
-                            <td>{{{ $sale->total_amount }}}</td>
+                            <td>{{{ \Helper::nf($sale->total_amount) }}}</td>
                             <td>{{{ Helper::fd($sale->date_of_sale) }}}</td>
                             <td>
                               <a class="badge bg-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="{{{ $sale->comments }}}">?</a>
@@ -145,14 +145,14 @@
                         @endforeach
                     @else
                         <tr>
-                          <td colspan="10">{{{ \Lang::get('agrivet.empty', 'Expense') }}}</td>
+                          <td colspan="10">{{{ \Lang::get('agrivet.empty', ['name' => 'Sale']) }}}</td>
                         </tr>
                     @endif
                   </tbody>
                   <tfoot>
                       <tr>
                           <td colspan="2"></td>
-                          <td><strong>{{{ \Helper::nf($sales->sum('quantity')) }}}</strong></td>
+                          <td><strong>{{{ $sales->sum('quantity') }}}</strong></td>
                           <td></td>
                           <td><strong>{{{ \Helper::nf($sales->sum('total_amount')) }}}</strong></td>
                           <td colspan="5"></td>

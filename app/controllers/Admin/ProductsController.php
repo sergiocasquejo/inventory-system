@@ -15,19 +15,28 @@ class ProductsController extends \BaseController {
 
             $px = \DB::getTablePrefix();
 
+            $totalRows = \Product::withTrashed()->count();
+
+            $offset = intval(array_get($input, 'records_per_page', 10));
+            if ( $offset == -1 ) {
+                $offset = $totalRows;
+
+            }
+
 
             $products = \Product::withTrashed()->select(
-                        "products.id", "products.deleted_at", "products.status", "branches.address", "branches.city", "products.name",
-                        \DB::raw("GROUP_CONCAT('P', selling_price, '/', per_unit) as selling_price")
+                        "products.id", "products.supplier_id", "products.deleted_at", "products.status", "branches.address", "branches.city", "products.name",
+                        \DB::raw("GROUP_CONCAT('Php ', selling_price, '/', per_unit) as selling_price")
                     )
 
                     ->filter($input)
                     ->leftJoin('product_pricing', 'products.id', '=', 'product_pricing.product_id')
                     ->leftJoin('branches', 'product_pricing.branch_id', '=', 'branches.id')
                     ->groupBy('products.id')
-                    ->paginate(intval(array_get($input, 'records_per_page', 10)));
+                    ->orderBy('products.id', 'DESC')
+                    ->paginate($offset);
 
-                $totalRows = \Product::withTrashed()->count();
+
 
                 $appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
@@ -35,7 +44,7 @@ class ProductsController extends \BaseController {
 
             return \View::make('admin.product.index')
                 ->with('products', $products)
-                ->with('categories', array_add(\Category::all()->lists('name', 'category_id'), '', 'Select Category'))
+                ->with('brands', array_add(\Brand::all()->lists('name', 'brand_id'), '', 'Select Brand'))
                 ->with('branches', array_add(\Branch::dropdown()->lists('name', 'id'), '', 'Select Branch'))
                 ->with('appends', $appends)
                 ->with('totalRows', $totalRows);
@@ -54,6 +63,7 @@ class ProductsController extends \BaseController {
 	public function create()
 	{
 		return \View::make('admin.product.create')
+            ->with('suppliers', array_add(\Supplier::lists('supplier_name', 'supplier_id'), '', 'Select Branch'))
 		->with('brands', array_add(\Brand::all()->lists('name', 'brand_id'), 0, 'Select Brand'))
 		->with('categories', array_add(\Category::all()->lists('name', 'category_id'), 0, 'Select Category'))
 		->with('measures', \UnitOfMeasure::all()->lists('label', 'name'));
@@ -114,6 +124,7 @@ class ProductsController extends \BaseController {
 
 		return \View::make('admin.product.edit')
 		->with('product', $product)
+            ->with('suppliers', array_add(\Supplier::lists('supplier_name', 'supplier_id'), '', 'Select Branch'))
 		->with('branches', array_add(\Branch::dropdown()->lists('name', 'id'), '', 'Select Branch'))
 		->with('brands', array_add(\Brand::all()->lists('name', 'brand_id'), 0, 'Select Brand'))
 		->with('categories', array_add(\Category::all()->lists('name', 'category_id'), 0, 'Select Category'))
@@ -186,7 +197,7 @@ class ProductsController extends \BaseController {
 	 */
 	public function restore($id) {
 		$product = \Product::withTrashed()->where('id', $id)->first();
-		if (!$product->restore()) {
+		if (!$product->restore($id)) {
 			return \Redirect::back()->withErrors($product->errors());			
 		}
 
@@ -209,6 +220,7 @@ class ProductsController extends \BaseController {
 		if ($branch_id) {
 			$product = $product->where('branch_id', $branch_id);
 		}
+
 		$product = $product->first();
 
 		return \Response::json($product);
@@ -267,4 +279,16 @@ class ProductsController extends \BaseController {
 		$products = \Product::all();
 		return \Response::json($products);
 	}
+
+
+    public function getBySupplier() {
+        $supplier_id = \Input::get('supplier');
+
+        $products = array();
+        if (is_numeric($supplier_id)) {
+            $products = \Product::bySupplier($supplier_id)->select('name', 'id')->get();
+        }
+
+        return \Response::json($products);
+    }
 }	

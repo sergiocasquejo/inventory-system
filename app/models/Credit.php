@@ -8,13 +8,17 @@ class Credit extends Eloquent {
 	protected $primaryKey = 'credit_id';
 
 	public static $rules = [
-		'customer_name'	=> 'required',
+		'customer_id'	=> 'required|numeric|exists:customers,customer_id',
 
     ];
 
      /**=================================================
      * QUERY RELATIONSHIPS
      *==================================================*/
+
+    public function customer() {
+        return $this->belongsTo('Customer', 'customer_id');
+    }
 
 
     public function user() {
@@ -48,20 +52,29 @@ class Credit extends Eloquent {
 
 
     public function scopeOwned($query) {
+        $px = \DB::getTablePrefix();
+
         if (!\Confide::user()->isAdmin()) {
-            $query->where('encoded_by', \Confide::user()->id);
+            $query->where('sales.encoded_by', \Confide::user()->id);
         }   
         return $query;
     }
 
     public function scopeFilterBranch($query) {
+        $px = \DB::getTablePrefix();
         if (!\Confide::user()->isAdmin()) {
-            $query->where('branch_id', \Confide::user()->branch_id);
+            $query->where($px.'sales.branch_id', \Confide::user()->branch_id);
         }   
         return $query;
     }
 
+    public function scopeUnPaid($query) {
+        $px = \DB::getTablePrefix();
+        return $query->where('is_paid', 0);
+    }
+
     public function scopeFilter($query, $input) {
+        $px = \DB::getTablePrefix();
 
         $branch = array_get($input, 'branch');
         $status = array_get($input, 'status');
@@ -73,25 +86,25 @@ class Credit extends Eloquent {
         * filter only his branch
         */
         if (!\Confide::user()->isAdmin()) {
-           $query->whereRaw('branch_id ='. (int) \Confide::user()->branch_id); 
+           $query->whereRaw($px.'sales.branch_id ='. (int) \Confide::user()->branch_id);
         } elseif ($branch != '') {
-            $query->whereRaw('branch_id ='. (int) $branch);
+            $query->whereRaw($px.'sales.branch_id ='. (int) $branch);
         }
 
         if ($total != '') {
-            $query->whereRaw('total_amount = '. (float)$total);
+            $query->whereRaw($px.'sales.total_amount = '. (float)$total);
         }
         if ($year != '') {
-            $query->whereRaw('YEAR(date_of_credit) = '.(int)$year);
+            $query->whereRaw('YEAR(date_of_sale) = '.(int)$year);
         }
         if ($month != '') {
-            $query->whereRaw('MONTH(date_of_credit) = '.(int)$month);
+            $query->whereRaw('MONTH(date_of_sale) = '.(int)$month);
         }
         if ($day != '') {
-            $query->whereRaw('DAY(date_of_credit) = '. (int)$day);
+            $query->whereRaw('DAY(date_of_sale) = '. (int)$day);
         }
         if ($status != '') {
-            $query->whereRaw('is_paid = '. (int)$status);
+            $query->whereRaw('credits.is_paid = '. (int)$status);
         }
 
 
@@ -101,10 +114,8 @@ class Credit extends Eloquent {
 
     public function doSave(Credit $instance, $input) {
         $instance->sale_id = array_get($input, 'sale_id');
-        $instance->customer_name = array_get($input, 'customer_name');
-        $instance->address = array_get($input, 'address');
-        $instance->contact_number = array_get($input, 'contact_number');
-        $instance->is_paid = array_get($input, 'is_paid');
+        $instance->customer_id = array_get($input, 'customer_id');
+        $instance->is_paid =  array_get($input, 'is_paid', 0);
         
         $instance->save();
         return $instance;

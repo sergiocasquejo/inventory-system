@@ -66,6 +66,8 @@ Route::group(['before' => 'auth', 'prefix' => 'admin'], function() {
     Route::post('credits/payables-partial-payment', ['uses' => 'Admin\PayablesController@partialPayablePayment', 'as' => 'admin_credits.partail_payables'])->before('csrf');
     Route::get('credits/info-by-supplier/{id}', ['uses' => 'Admin\PayablesController@infoBySupplierId', 'as' => 'admin_credits.info_by_supplier']);
     Route::put('credits/payables/{id}/paid', ['uses' => 'Admin\PayablesController@paid', 'as' => 'admin_credits.payables_paid']);
+    Route::put('credits/payables/{id}/update', ['uses' => 'Admin\PayablesController@update', 'as' => 'admin_credits.payables_update']);
+    Route::get('credits/payables/{id}/edit', ['uses' => 'Admin\PayablesController@edit', 'as' => 'admin_credits.payables_edit']);
     Route::get('credits/payables/details', ['uses' => 'Admin\PayablesController@details', 'as' => 'admin_credits.payable_details']);
     Route::get('credits/payables', ['uses' => 'Admin\PayablesController@index', 'as' => 'admin_credits.payables']);
 	Route::post('credits/save-review', ['uses' => 'Admin\CreditsController@saveReview', 'as' => 'admin_credits.saveReview']);

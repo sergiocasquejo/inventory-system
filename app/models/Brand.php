@@ -21,6 +21,10 @@ class Brand extends Eloquent {
         return $this->hasMany('Products');
     }
 
+    public function payables() {
+        return $this->hasMany('Expense');
+    }
+
      /**=================================================
      * SCOPE QUERY
      *==================================================*/

@@ -17,10 +17,17 @@ class UsersController extends \BaseController {
 	{
 		$input = \Input::all();
 
+        $totalRows = \User::withTrashed()->count();
 
-		$users = \User::withTrashed()->search($input)->orderBy('id', 'desc')->paginate(intval(array_get($input, 'records_per_page', 10)));
+        $offset = intval(array_get($input, 'records_per_page', 10));
+        if ( $offset == -1 ) {
+            $offset = $totalRows;
+
+        }
+
+		$users = \User::withTrashed()->search($input)->orderBy('id', 'desc')->paginate($offset);
 		
-		$totalRows = \User::withTrashed()->count();
+
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 

@@ -29,8 +29,8 @@
                 <table class="table table-striped table-advance table-hover">
                     <thead>
                       <tr>
-                          <th>Name</th>
                           <th>Categories</th>
+                          <th>Brand</th>
                           <th>Description</th>
                           <th></th>
                       </tr>
@@ -54,7 +54,7 @@
                           @endforeach
                       @else
                           <tr>
-                            <td colspan="8">{{{ \Lang::get('agrivet.empty', 'Categories') }}}</td>
+                            <td colspan="8">{{{ \Lang::get('agrivet.empty', ['name' => 'Categories']) }}}</td>
                           </tr>
                       @endif
                     </tbody>

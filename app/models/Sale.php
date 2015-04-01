@@ -17,7 +17,6 @@ class Sale extends Eloquent {
     	'total_amount'	=> 'required|numeric|min:1',
     	'uom'	           => 'required',
     	'encoded_by' 	   => 'required|exists:users,id',
-//    	'status'	       => 'required|in:0,1'
     ];
 
     /**=================================================
@@ -46,13 +45,6 @@ class Sale extends Eloquent {
      * SCOPE QUERY
      *==================================================*/
 
-//	public function scopeActive($query) {
-//		return $query->where('status', 1);
-//	}
-//
-//	public function scopeInActive($query) {
-//		return $query->where('status', 0);
-//	}
 
 	public function scopeFilterBranch($query) {
 		if (!\Confide::user()->isAdmin()) {
@@ -67,6 +59,11 @@ class Sale extends Eloquent {
         }   
         return $query;
     }
+
+    public  function scopeSale($query) {
+        $query->where('sale_type', '=', 'SALE');
+        return $query;
+    }
     
 
 	public function scopeFilter($query, $input) {
@@ -79,7 +76,7 @@ class Sale extends Eloquent {
 		$month = $month = array_get($input, 'month');
 		$day = $day = array_get($input, 'day');
 
-		$query->whereRaw('sale_type = "SALE"');
+
 	 	/* Check if current user is not admin
         * filter only his branch
         */
@@ -122,17 +119,45 @@ class Sale extends Eloquent {
 
 
 	public function doSave(Sale $instance, $input) {
-		$instance->branch_id = array_get($input, 'branch_id');
-		$instance->sale_type = array_get($input, 'sale_type', 'SALE');
-		$instance->product_id = array_get($input, 'product_id');
-		$instance->supplier_price = array_get($input, 'supplier_price');
-		$instance->selling_price = array_get($input, 'selling_price');
-		$instance->quantity = array_get($input, 'quantity');
-		$instance->uom = array_get($input, 'uom');
-		$instance->total_amount = array_get($input, 'total_amount');
+
+        if (array_get($input, 'branch_id') != '') {
+            $instance->branch_id = array_get($input, 'branch_id');
+        }
+
+        if (array_get($input, 'product_id') != '') {
+            $instance->product_id = array_get($input, 'product_id');
+        }
+        if (array_get($input, 'supplier_price') != '') {
+            $instance->supplier_price = array_get($input, 'supplier_price');
+        }
+        if (array_get($input, 'selling_price') != '') {
+            $instance->selling_price = array_get($input, 'selling_price');
+        }
+        if (array_get($input, 'quantity')!= '') {
+            $instance->quantity = array_get($input, 'quantity');
+        }
+        if (array_get($input, 'uom')!= '') {
+            $instance->uom = array_get($input, 'uom');
+        }
+
+        if (array_get($input, 'total_amount')!= '') {
+            $instance->total_amount = array_get($input, 'total_amount');
+        }
+
+        if (array_get($input, 'encoded_by') != '') {
+            $instance->encoded_by = array_get($input, 'encoded_by');
+        }
+
+
+        if (array_get($input, 'sale_type') != '') {
+
+            $instance->sale_type = array_get($input, 'sale_type', 'SALE');
+        }
+
+
 		$instance->comments = array_get($input, 'comments');
 		$instance->date_of_sale = date('Y-m-d', strtotime(array_get($input, 'date_of_sale')));
-		$instance->encoded_by = array_get($input, 'encoded_by');
+
 		//$instance->status = array_get($input, 'status');
 		
 		$instance->save();

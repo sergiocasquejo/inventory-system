@@ -24,25 +24,29 @@
 			  		<form data-action="{{ route('admin_products.update', $product->id) }}" action="{{ route('admin_products.update', $product->id) }}"  class="form-horizontal tasi-form" method="POST">
 			  			<input type="hidden" name="_token" value="{{ csrf_token() }}" />
 			  			<input name="_method" type="hidden" value="PUT">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Supplier</label>
+                            <div class="col-sm-10">
+                                {{ Form::select('supplier', $suppliers, Input::old('supplier', $product->supplier_id), ['class' => 'form-control m-bot15']) }}
+                            </div>
+                        </div>
+
 				       	<div class="form-group">
 				          <label class="col-sm-2 control-label">Brand</label>
 				          <div class="col-sm-10">
 				              {{ Form::select('brand_id', $brands, Input::old('brand_id', $product->brand_id), ['class' => 'form-control m-bot15']) }}
-				              <span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
 				          </div>
 				      	</div>
 				      	<div class="form-group">
 				          <label class="col-sm-2 control-label">Category</label>
 				          <div class="col-sm-10">
 				              {{ Form::select('category_id', $categories, Input::old('category_id', $product->category_id), ['class' => 'form-control m-bot15', 'data-selected' => Input::old('category_id', $product->category_id)]) }}
-				              <span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
 				          </div>
 				      	</div>
 				       	<div class="form-group">
 				          <label class="col-sm-2 control-label">Name</label>
 				          <div class="col-sm-10">
 				              <input type="text" name="name" maxlength="255" class="form-control" value="{{ Input::old('name', $product->name) }}" />
-				              <span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
 				          </div>
 				      	</div>
 						<div class="form-group">

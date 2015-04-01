@@ -13,9 +13,18 @@ class BrandsController extends \BaseController {
 		$input = \Input::all();
 
 
-		$brands = \Brand::search($input)->orderBy('brand_id', 'desc')->paginate(intval(array_get($input, 'records_per_page', 10)));
+        $totalRows = \Brand::All()->count();
+
+        $offset = intval(array_get($input, 'records_per_page', 10));
+        if ( $offset == -1 ) {
+            $offset = $totalRows;
+
+        }
+
+
+		$brands = \Brand::search($input)->orderBy('brand_id', 'desc')->paginate($offset);
 		
-		$totalRows = \Brand::All()->count();
+
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
@@ -49,7 +58,6 @@ class BrandsController extends \BaseController {
 
 
 		$rules = \Brand::$rules;
-		// $rules['name'] = 'required|min:5|unique:branches,name,NULL,id,city,'.array_get($input, 'city'); 
 
 		$validator = \Validator::make($input, $rules);
 
@@ -100,7 +108,6 @@ class BrandsController extends \BaseController {
 	{
 		$input = \Input::all();
 		$rules = \Brand::$rules;
-		$rules['address'] = 'required|unique:branches,name,'.$id.',id';
 
 		$validator = \Validator::make($input, $rules);
 

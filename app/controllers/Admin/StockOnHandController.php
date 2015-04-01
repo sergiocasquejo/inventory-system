@@ -11,14 +11,33 @@ class StockOnHandController extends \BaseController {
 	{
 		$input = \Input::all();
 
-		$stocks = \StockOnHand::filter($input)
-			->select('stocks_on_hand.stock_on_hand_id', 'stocks_on_hand.uom', 
-				'stocks_on_hand.total_stocks',
-				'products.name as product_name', 
-				'branches.name as branch_name', 'branches.address')
-			->join('products', 'stocks_on_hand.product_id', '=', 'products.id')
-			->join('branches', 'branches.id', '=', 'stocks_on_hand.branch_id')
-			->orderBy('branch_id', 'asc')->get();
+        $stockSQL = \StockOnHand::select('stocks_on_hand.stock_on_hand_id', 'stocks_on_hand.uom',
+                'stocks_on_hand.total_stocks',
+                'products.name as product_name',
+                'branches.name as branch_name', 'branches.address')
+            ->join('products', 'stocks_on_hand.product_id', '=', 'products.id')
+            ->join('branches', 'branches.id', '=', 'stocks_on_hand.branch_id');
+
+        $totalRows = $stockSQL->count();
+
+        $offset = intval(array_get($input, 'records_per_page', 10));
+        if ( $offset == -1 ) {
+            $offset = $totalRows;
+
+        }
+
+
+
+        $stocks = $stockSQL->filter($input)
+			->orderBy('branch_id', 'asc')
+            ->paginate($offset);
+
+
+
+
+
+        $appends = ['records_per_page' => \Input::get('records_per_page', 10)];
+
 
 		$newStocks = [];
 		foreach ($stocks as $stock) {
@@ -72,7 +91,11 @@ class StockOnHandController extends \BaseController {
 
 		return \View::make('admin.stock.index')
 			->with('branches', array_add(\Branch::dropdown()->lists('name', 'id'), '', 'Select Branch'))
-			->with('stocks', $newStocks);
+            ->with('brands', array_add(\Brand::all()->lists('name', 'brand_id'), '', 'Select Brand'))
+			->with('stocks', $newStocks)
+            ->with('pagination', $stocks)
+            ->with('appends', $appends)
+            ->with('totalRows', $totalRows);
 	}
 
 
@@ -87,12 +110,19 @@ class StockOnHandController extends \BaseController {
 		$measures = \UnitOfMeasure::all()->lists('label', 'name');
 
 
-		$products = array_add(\Product::all()->lists('name', 'id'), '', 'Select Product');
+		//$products = array_add(\Product::all()->lists('name', 'id'), '', 'Select Product');
+
+        $suppliers = \Supplier::lists('supplier_name', 'supplier_id');
+        $brands = \Brand::lists('name', 'brand_id');
+
+
 		return \View::make('admin.stock.create')
-		->with('products', $products)
+		//->with('products', $products)
 		->with('branches', array_add(\Branch::dropdown()->lists('name', 'id'), '', 'Select Branch'))
 		->with('dd_measures', array_add($measures, '', 'Select Measure'))
-		->with('measures', \UnitOfMeasure::all()->lists('label', 'name'));
+		->with('measures', \UnitOfMeasure::all()->lists('label', 'name'))
+            ->with('suppliers', array_add($suppliers, '', 'Select Supplier'))
+            ->with('brands', array_add($brands, '', 'Select Brands'));
 	}
 
 
@@ -128,7 +158,7 @@ class StockOnHandController extends \BaseController {
 				$branch_id = array_get($input, 'branch_id');
 				$uom = array_get($input, 'uom');
 				$product_id = array_get($input, 'product_id');
-
+                $input['quantity'] = array_get($input, 'total_stocks');
 
 				$stockObj = \StockOnHand::whereRaw("branch_id = {$branch_id} AND product_id = {$product_id}  AND uom = '{$uom}'")->first();
 
@@ -158,23 +188,45 @@ class StockOnHandController extends \BaseController {
 
 				}
 
-				
+                $errors = [];
 
-				$uom = array_get($input, 'uom');
+                \DB::transaction(function() use (&$stock, &$input, &$errors) {
+                    if ($stock->doSave($stock, $input)) {
+                        if (array_get($input, 'is_payable') == 1 ) {
+                            $expense = new \Expense;
+                            $input['expense_type'] = 'PRODUCT EXPENSES';
+                            $input['is_payable_paid'] = 0;
+                            $input['name'] = array_get($input, 'product_id');
+                            $input['brand'] = array_get($input, 'brand');
+                            $input['supplier'] = array_get($input, 'supplier');
+                            $input['quantity'] = array_get($input, 'quantity');
+                            $input['encoded_by'] = \Confide::user()->id;
+                            $input['stock_on_hand_id'] = $stock->stock_on_hand_id;
+                            $input['date_of_expense'] = date('Y-m-d');
+                            $input['comments'] = array_get($input, 'comments');
+
+                            if ($expense->doSave($expense, $input)) {
+
+                                $supplier = \Supplier::findOrFail($input['supplier']);
+                                $supplier->total_payables = $supplier->total_payables + array_get($input, 'total_amount', 0);
+                                $supplier->save();
+
+                            } else {
+                                $errors[] = $expense->errors();
+                            }
+                        }
+                    } else {
+                        $errors[] = $stock->errors();
+                    }
+                });
 
 
-				if ($stock->doSave($stock, $input)) {
-					if (\Request::ajax()) {
-						return \Response::json(['success' => \Lang::get('agrivet.created')]);
-					} else {
-						return \Redirect::route('admin_stocks.index')->with('success', \Lang::get('agrivet.created'));
-					}
-				}
-				if (\Request::ajax()) {
-					return \Response::json(['errors' => $stock->errors()]);
+				if (count($errors) == 0) {
+                    return \Redirect::route('admin_stocks.index')->with('success', \Lang::get('agrivet.created'));
 				} else {
 					return \Redirect::back()->withErrors($stock->errors())->withInput();	
 				}
+
 			} catch(\Exception $e) {
 
 				if (\Request::ajax()) {
@@ -197,8 +249,10 @@ class StockOnHandController extends \BaseController {
 	public function edit($stock_id = false)
 	{	
 
-		$input = \Input::all();
-		$product_id = array_get($input, 'product_id');
+		//$input = \Input::all();
+
+        $suppliers = \Supplier::lists('supplier_name', 'supplier_id');
+		//$product_id = array_get($input, 'product_id');
 
 		if (\Request::ajax()) {
 			$stock = \StockOnHand::findOrFail($stock_id);
@@ -210,11 +264,12 @@ class StockOnHandController extends \BaseController {
 			$measures = \UnitOfMeasure::all()->lists('label', 'name');
 
 
-			$products = array_add(\Product::all()->lists('name', 'id'), '', 'Select Product');
+			//$products = array_add(\Product::all()->lists('name', 'id'), '', 'Select Product');
 			$stock = \StockOnHand::findOrFail($stock_id);
 
 			return \View::make('admin.stock.edit')
-			->with('products', $products)
+			//->with('products', $products)
+            ->with('suppliers', array_add($suppliers, '', 'Select Supplier'))
 			->with('stock', $stock)
 			->with('branches', array_add(\Branch::dropdown()->lists('name', 'id'), '', 'Select Branch'))
 			->with('dd_measures', array_add($measures, '', 'Select Measure'))

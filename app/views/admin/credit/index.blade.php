@@ -4,58 +4,14 @@
     @include ('admin._partials.breadcrumbs')
 
     <div class="row">
-      @if (\Confide::user()->isAdmin())
-      <div class="col-lg-12">
-          <div class="row state-overview">
-            <div class="col-lg-3 col-sm-6">
-                <section class="panel">
-                    <div class="symbol terques">
-                        <strong>Daily</strong>
-                    </div>
-                    <div class="value">
-                        <p>{{{ \Helper::nf($daily) }}}</p>
-                    </div>
-                </section>
-            </div>
-            <div class="col-lg-3 col-sm-6">
-                <section class="panel">
-                    <div class="symbol red">
-                        <strong>Weekly</strong>
-                    </div>
-                    <div class="value">
-                        <p>{{{ \Helper::nf($weekly) }}}</p>
-                    </div>
-                </section>
-            </div>
-            <div class="col-lg-3 col-sm-6">
-                <section class="panel">
-                    <div class="symbol yellow">
-                        <strong>Monthly</strong>
-                    </div>
-                    <div class="value">
-                        <p>{{{ \Helper::nf($monthly) }}}</p>
-                    </div>
-                </section>
-            </div>
-            <div class="col-lg-3 col-sm-6">
-                <section class="panel">
-                    <div class="symbol blue">
-                        <strong>Yearly</strong>
-                    </div>
-                    <div class="value">
-                        <p>{{{ \Helper::nf($yearly) }}}</p>
-                    </div>
-                </section>
-            </div>
-          </div>
-      </div>
-      @endif
       <div class="col-lg-12">
           <section class="panel">
             <form action="{{ route('admin_credits.index') }}"  class="form-inline tasi-form" method="GET">
               <input type="hidden" name="_token" value="{{ csrf_token() }}" />
               <header class="panel-heading">
-                  Credits <a class="btn btn-info btn-xs" href="{{ route('admin_credits.create') }}">Add New</a> <a class="btn btn-warning btn-xs" href="{{ route('admin_credits.index') }}" title="Reset"><i class=" icon-refresh"></i></a>
+                  Credits <a class="btn btn-info btn-xs" href="{{ route('admin_credits.create') }}">Add New</a>
+                  <a class="btn btn-warning btn-xs" href="{{ route('admin_credits.index') }}" title="Reset"><i class=" icon-refresh"></i></a>
+                  <a class="btn btn-primary btn-xs pull-right" data-toggle="modal" href="#partialPaymentModal">Make Partial Payment</a>
               </header>
               <div class="dataTables_wrapper form-inline">
                 <div class="row">
@@ -101,7 +57,6 @@
                               </div>
                            </div>
                          </th>
-                          <th>{{ Form::select('status', $statuses, Input::get('status', ''), ['class' => 'form-control input-xs']) }}</th>
                           <th>Encoded By</th>
                           <th>Date of encode</th>
                           <th>Last update</th>
@@ -114,15 +69,13 @@
                           @foreach ($credits as $credit)
                           <tr>
                               <td>{{{ !$credit->sale || !$credit->sale->branch ?'':$credit->sale->branch->name.' '.$credit->sale->branch->address }}}</td>
-                              <td>{{{ $credit->customer_name }}}</td>
-                              <td><a class="badge bg-primary" data-html="true" data-container="body" data-toggle="popover" data-placement="top" data-content="{{ '<p> Addres: '.$credit->address.'</p>'.'<p> Contact #: '.$credit->contact_number.'</p>' }}">?</a></td>
+                              <td><a href="{{ !$credit->customer?'#':route('admin_customers.show',$credit->customer->customer_id) }}">{{{ !$credit->customer?'':$credit->customer->customer_name }}}</a></td>
+                              <td><a class="badge bg-primary" data-html="true" data-container="body" data-toggle="popover" data-placement="top" data-content="{{ '<p> Addres: '.(!$credit->customer?'':$credit->customer->address).'</p>'.'<p> Contact #: '.(!$credit->customer?'':$credit->customer->contact_no).'</p>' }}">?</a></td>
                               <td>{{{ !$credit->sale?'':$credit->sale->quantity }}}</td>
                               <td>{{{ !$credit->sale?'':\Helper::nf($credit->sale->total_amount) }}}</td>
                               <td><a class="badge bg-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="{{{ $credit->comments }}}">?</a></td>
                               <td>{{{ !$credit->sale?'':$credit->sale->date_of_sale }}}</td>
-                              <td> <span class="label label-{{{ $credit->is_paid ? 'success' : 'warning' }}} label-mini">
-                                      {{{ $credit->is_paid ? 'Paid' : 'Not Paid' }}}
-                                  </span></td>
+
                               <td>{{{ !$credit->sale || !$credit->sale->user?'': $credit->sale->user->username }}}</td>
                               <td>{{{ \Helper::timeElapsedString(strtotime($credit->created_at)) }}}</td>
                               <td>{{{ \Helper::timeElapsedString(strtotime($credit->updated_at)) }}}</td>
@@ -146,16 +99,16 @@
                           @endforeach
                       @else
                           <tr>
-                            <td colspan="8">{{{ \Lang::get('agrivet.empty', 'Credits') }}}</td>
+                            <td colspan="11">{{{ \Lang::get('agrivet.empty', ['name' => 'Credits']) }}}</td>
                           </tr>
                       @endif
                     </tbody>
                     <tfoot>
                       <tr>
                           <td colspan="3"></td>
-                          <td><strong>{{{ \Helper::nf($credits->sum('quantity')) }}}</strong></td>
+                          <td><strong>{{{ $credits->sum('quantity') }}}</strong></td>
                           <td><strong>{{{ \Helper::nf($credits->sum('total_amount')) }}}</strong></td>
-                          <td colspan="7"></td>
+                          <td colspan="6"></td>
                       </tr>
                   </tfoot>
                 </table>
@@ -171,8 +124,12 @@
                   </div>
                 </div>
               </div>
+            </form>
           </section>
       </div>
   </div>
   <!-- page end-->
+    @include ('admin._partials.payment_form', ['customer_id' => ''])
+
+
 @stop

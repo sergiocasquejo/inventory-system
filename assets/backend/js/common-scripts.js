@@ -140,6 +140,8 @@ var Script = function () {
             var $supField = payableList.find('select[name=supplier].supplier-filter');
             $supField.html('<option>Select Supplier</option>');
 
+            console.log('test');
+
             loadImgLoader($supField);
 
             $.post(AJAX.baseUrl + '/admin/suppliers/list-by-branch', { branch: self.val() }).done(function(response) {
@@ -147,12 +149,18 @@ var Script = function () {
                 if (response.length) {
                     $.each(response, function(index, data) {
                         var option = $('<option>').text(data.supplier_name).val(data.supplier_id);
+
+                        if ($supField.data('selected') == data.supplier_id) {
+                            option.attr('selected', true);
+                        }
+
                         $supField.append(option);
                     });
                 }
                 always($supField);
             });
-        }).trigger('change');
+        });
+        $('select[name=branch].branch-filter').trigger('change');
 
         /** Get credit information by customer id */
         $('#partialPaymentModal select[name=customer]').on('change', function() {
@@ -857,11 +865,13 @@ var Script = function () {
             comments = trEl.find('td[data-comments]').data('comments')
             date_of_sale = trEl.find('td[data-date_of_sale]').data('date_of_sale'),
                 hiddenInput = $('<input type="hidden" name="review_id">')
-            isPayable = trEl.find('td[data-is_payable]').data('is_payable');
+            isPayable = trEl.find('td[data-is_payable]').data('is_payable'),
+                supplier = trEl.find('td[data-supplier]').data('supplier');
 
             $(':input[name=review_id]').remove();
             $(':input[name=branch_id]').val(branch).attr('data-selected', branch);
             $(':input[name=expense_type]').val(expense_type).attr('data-selected', expense_type).trigger('change');
+            $(':input[name=supplier] option[value='+ supplier +']').attr('selected', true).attr('data-selected', expense_type).trigger('change');
             $(':input[name=name]').val(name).attr('data-selected', name);//.trigger('change');
             $(':input[name=uom]').val(uom).attr('data-selected', uom);
             $(':input[name=quantity]').val(quantity);

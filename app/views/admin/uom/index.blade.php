@@ -9,7 +9,7 @@
             <form action="{{ route('admin_uoms.index') }}"  class="form-inline tasi-form" method="GET">
               <input type="hidden" name="_token" value="{{ csrf_token() }}" />
               <header class="panel-heading">
-                  Brands <a class="btn btn-info btn-xs" href="{{ route('admin_uoms.create') }}">Add New</a> <a class="btn btn-warning btn-xs" href="{{ route('admin_uoms.index') }}" title="Reset"><i class=" icon-refresh"></i></a>
+                  Unite of Measures <a class="btn btn-info btn-xs" href="{{ route('admin_uoms.create') }}">Add New</a> <a class="btn btn-warning btn-xs" href="{{ route('admin_uoms.index') }}" title="Reset"><i class=" icon-refresh"></i></a>
               </header>
               <div class="dataTables_wrapper form-inline">
                 <br />
@@ -53,7 +53,7 @@
                           @endforeach
                       @else
                           <tr>
-                            <td colspan="8">{{{ \Lang::get('agrivet.empty', 'Brand') }}}</td>
+                            <td colspan="8">{{{ \Lang::get('agrivet.empty', ['name' => 'Measures']) }}}</td>
                           </tr>
                       @endif
                     </tbody>

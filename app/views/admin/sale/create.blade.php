@@ -30,8 +30,8 @@
                                 @if (\Confide::user()->isAdmin())
 								<td>{{ \Branch::find($review['branch_id'])->address }}</td>
                                 @endif
-								<td data-quantity="{{{ $review['quantity'] }}}" data-uom="{{{ $review['uom'] }}}">{{ \Helper::nf($review['quantity']) .' '.$review['uom'] }}</td>
-								<td data-total_amount="{{{ $review['total_amount'] }}}">{{ $review['total_amount'] }}</td>
+								<td data-quantity="{{{ $review['quantity'] }}}" data-uom="{{{ $review['uom'] }}}">{{ $review['quantity'] .' '.$review['uom'] }}</td>
+								<td data-total_amount="{{{ $review['total_amount'] }}}">{{ Helper::nf($review['total_amount']) }}</td>
 								<td data-date_of_sale="{{{ $review['date_of_sale'] }}}">{{ $review['date_of_sale'] }}</td>
 								<td data-comments="{{{ $review['comments'] }}}"><a class="badge bg-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="{{{ $review['comments'] }}}">?</a></td>
 								<td>
@@ -97,7 +97,8 @@
 					<div class="form-group">
 					  <label class="col-sm-2 control-label">Total Amount</label>
 					  <div class="col-sm-10">
-					      <input type="number" name="total_amount" value="{{ Input::old('total_amount') }}" class="form-control" readonly>
+                          <span class="total_amount">Php 0.00</span>
+					      <input type="hidden" name="total_amount" value="{{ Input::old('total_amount') }}" class="form-control" readonly>
 					  </div>
 					</div>
 

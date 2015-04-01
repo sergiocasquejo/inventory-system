@@ -30,12 +30,15 @@
                                 @if (\Confide::user()->isAdmin())
 								<td>{{ \Branch::find($review['branch_id'])->address }}</td>
                                 @endif
-								<td data-branch="{{{ $review['branch_id'] }}}" data-expense_type="{{{ $review['expense_type'] }}}">{{{ $review['expense_type'] }}}</td>
+								<td data-branch="{{{ $review['branch_id'] }}}"
+                                    data-supplier="{{ $review['supplier']  }}"
+                                    data-is_payable="{{{ isset($review['is_payable']) ? $review['is_payable'] : 0  }}}"
+                                    data-expense_type="{{{ $review['expense_type'] }}}">{{{ $review['expense_type'] }}}</td>
 								<td data-name="{{{ $review['name'] }}}">
 									<strong>{{{ is_numeric($review['name']) ? \Product::find($review['name'])->name : $review['name']  }}}</strong>
 								</td>
-								<td data-quantity="{{{ $review['quantity'] }}}" data-uom="{{{ $review['uom'] }}}">{{ \Helper::nf($review['quantity']) .' '.$review['uom'] }}</td>
-								<td data-total_amount="{{{ $review['total_amount'] }}}">{{ $review['total_amount'] }}</td>
+								<td data-quantity="{{{ $review['quantity'] }}}" data-uom="{{{ isset($review['uom']) ? $review['uom'] : '' }}}">{{ $review['quantity'] .' '.(isset($review['uom']) ? $review['uom'] : '') }}</td>
+								<td data-total_amount="{{{ $review['total_amount'] }}}">{{ \Helper::nf($review['total_amount']) }}</td>
 								<td data-date_of_expense="{{{ $review['date_of_expense'] }}}">{{ $review['date_of_expense'] }}</td>
 								<td data-comments="{{{ $review['comments'] }}}"><a class="badge bg-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="{{{ $review['comments'] }}}">?</a></td>
 								<td>
@@ -71,12 +74,23 @@
 			              <span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
 			          </div>
 			      	</div>
+
+
 			      	<div class="form-group">
 			          <label class="col-sm-2 control-label">TYPE OF EXPENSE</label>
 			          <div class="col-sm-10">
 			              {{ Form::select('expense_type', ['STORE EXPENSES' => 'STORE EXPENSES', 'PRODUCT EXPENSES' => 'PRODUCT EXPENSES'], Input::old('expense_type'), ['class' => 'form-control m-bot15', 'data-selected' => Input::old('expense_type')]) }}
 			          </div>
 			      	</div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Supplier</label>
+                        <div class="col-sm-10">
+                            {{ Form::select('supplier', ['' => 'Select Supplier'], Input::old('supplier'), ['class' => 'form-control']) }}
+                        </div>
+                    </div>
+
+
 			       	<div class="form-group">
 			          <label class="col-sm-2 control-label">Expense Title</label>
 			          <div class="col-sm-10">
@@ -99,9 +113,17 @@
 					  </div>
 					</div>
 
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Is Payable</label>
+                        <div class="col-sm-10">
+                            <input type="checkbox"  name="is_payable" value="1" disabled>
+                        </div>
+                    </div>
+
 					<div class="form-group">
 					  <label class="col-sm-2 control-label">Total Amount</label>
 					  <div class="col-sm-10">
+                          <span class="total_amount">Php 0.00</span>
 					      <input type="number"  step="any" name="total_amount" class="form-control" value="{{ Input::old('total_amount') }}" />
 					  </div>
 					</div>

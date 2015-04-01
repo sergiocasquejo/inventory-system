@@ -12,9 +12,18 @@ class BranchesController extends \BaseController {
 		$input = \Input::all();
 
 
-		$branches = \Branch::withTrashed()->search($input)->orderBy('id', 'desc')->paginate(intval(array_get($input, 'records_per_page', 10)));
+        $totalRows = \Branch::withTrashed()->count();
+
+        $offset = intval(array_get($input, 'records_per_page', 10));
+        if ( $offset == -1 ) {
+            $offset = $totalRows;
+
+        }
+
+
+		$branches = \Branch::withTrashed()->search($input)->orderBy('id', 'desc')->paginate($offset);
 		
-		$totalRows = \Branch::withTrashed()->count();
+
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 

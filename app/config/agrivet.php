@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'default_currency' => 'Php',
 	// 1 sack is equivalent to 50 kilogram
 	'equivalent_measure' => ['sacks' => ['to' => 'kg', 'per' => 50]],
 	
@@ -19,7 +20,8 @@ return [
 		5 	=> 5,
 		10 => 10,
 		25 => 25,
-		50 => 100,
+		100 => 100,
+        '-1' => 'All'
 	],
 	// Unit of measures
 	'unit_of_measure' => [

@@ -25,14 +25,14 @@
                       {{ Form::select('branch', $branches, Input::get('branch', ''), ['class' => 'form-control', 'size' => '1']) }} 
                     </div>
                     <div class="form-group">
-                      {{ Form::select('category', $categories, Input::get('category', ''), ['class' => 'form-control', 'size' => '1']) }} 
+                      {{ Form::select('brand', $brands, Input::get('brand', ''), ['class' => 'form-control', 'size' => '1']) }}
                     </div>
                     <button type="submit" class="btn btn-info">Filter</button>
                   </div>
                 <table class="table table-striped table-advance table-hover">
                     <thead>
                       <tr>
-                          <th>BRANCH</th>
+                          <th>SUPPLIER NAME</th>
                           <th>PRODUCT NAME</th>
                           <th>SELLING PRICE PER KILO/BTL/PCK/PCS/SACKS</th>
                           <th>STATUS</th>
@@ -44,7 +44,7 @@
                       @if ($products)
                           @foreach ($products as $product)
                           <tr>
-                              <td>{{{ $product->address.' '.$product->city  }}}</td>
+                              <td>{{{ !$product->supplier?'':$product->supplier->supplier_name }}}</td>
                               <td>{{{ $product->name }}}</td>
                               <td><span class="label label-info label-mini mr-10px">{{ str_replace(',', '</span><span class="label label-info label-mini mr-10px">', $product->selling_price) }}</span></td>
                               <td>
@@ -73,7 +73,7 @@
                           @endforeach
                       @else
                           <tr>
-                            <td colspan="10">{{{ \Lang::get('agrivet.empty', 'Products') }}}</td>
+                            <td colspan="10">{{{ \Lang::get('agrivet.empty', ['name' => 'Products']) }}}</td>
                           </tr>
                       @endif
                     </tbody>

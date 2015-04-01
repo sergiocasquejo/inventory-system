@@ -46,6 +46,11 @@
       .symbol strong {
         color: #FFF;
       }
+
+      span.total_amount {
+          font-weight: bold;
+          font-size:18px;
+      }
     </style>
     <script type="text/javascript">
     //<![CDATA[
@@ -89,6 +94,7 @@
   <script type="text/javascript" src="{{ asset('/assets/backend/assets/bootstrap-datepicker/js/bootstrap-datepicker.js') }}"></script>
   <script type="text/javascript" src="{{ asset('/assets/backend/assets/bootstrap-daterangepicker/date.js') }}"></script>
    <script type="text/javascript" src="{{ asset('/assets/backend/assets/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
+  <script src="{{ asset('/assets/backend/js/typeahead.min.js') }}"></script>
   <!--common script for all pages-->
   <script src="{{ asset('/assets/backend/js/common-scripts.js') }}"></script>
 

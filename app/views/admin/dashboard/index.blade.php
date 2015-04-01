@@ -21,7 +21,7 @@
             </div>
             <div class="value">
                 <strong>{{{ \Helper::nf($total_sales) }}}</strong>
-                <p>Sales</p>
+                <p>Cash on Hand</p>
             </div>
         </section>
     </div>

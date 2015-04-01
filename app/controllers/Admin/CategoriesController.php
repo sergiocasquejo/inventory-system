@@ -12,10 +12,18 @@ class CategoriesController extends \BaseController {
 
 		$input = \Input::all();
 
+        $totalRows = \Category::All()->count();
 
-		$categories = \Category::search($input)->orderBy('category_id', 'desc')->paginate(intval(array_get($input, 'records_per_page', 10)));
+        $offset = intval(array_get($input, 'records_per_page', 10));
+        if ( $offset == -1 ) {
+            $offset = $totalRows;
+
+        }
+
+
+		$categories = \Category::search($input)->orderBy('category_id', 'desc')->paginate($offset);
 		
-		$totalRows = \Category::All()->count();
+
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 

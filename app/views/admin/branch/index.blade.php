@@ -72,7 +72,7 @@
                           @endforeach
                       @else
                           <tr>
-                            <td colspan="8">{{{ \Lang::get('agrivet.empty', 'Branch') }}}</td>
+                            <td colspan="8">{{{ \Lang::get('agrivet.empty', ['name' => 'Branch']) }}}</td>
                           </tr>
                       @endif
                     </tbody>

@@ -12,10 +12,17 @@ class UnitOfMeasuresController extends \BaseController {
 
 		$input = \Input::all();
 
+        $totalRows = \UnitOfMeasure::All()->count();
 
-		$uoms = \UnitOfMeasure::search($input)->orderBy('uom_id', 'desc')->paginate(intval(array_get($input, 'records_per_page', 10)));
+        $offset = intval(array_get($input, 'records_per_page', 10));
+        if ( $offset == -1 ) {
+            $offset = $totalRows;
+
+        }
+
+		$uoms = \UnitOfMeasure::search($input)->orderBy('uom_id', 'desc')->paginate($offset);
 		
-		$totalRows = \UnitOfMeasure::All()->count();
+
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
