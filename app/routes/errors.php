@@ -31,8 +31,6 @@ App::error(function(Exception $exception, $code)
             return \View::make('errors.'.$code, ['code' => $code]);
             break;
         case 405:
-            echo 'test';
-            die;
             return \View::make('errors.default');
             break;
         default:

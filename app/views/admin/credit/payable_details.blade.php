@@ -72,7 +72,7 @@
                     </tbody>
                     <tfoot>
                       <tr>
-                          <td></td>
+                          <td colspan="2"></td>
                           <td><strong>{{{ !$expenses ? 0 :$expenses->sum('quantity') }}}</strong></td>
                           <td><strong>{{{ \Helper::nf(!$expenses ? 0 : $expenses->sum('total_amount')) }}}</strong></td>
                           <td colspan="6"></td>
