@@ -126,7 +126,12 @@ class PayablesController extends \BaseController {
         return \Response::json(['data' => $credits]);
     }
 
+
+
+
+
     public function partialPayablePayment() {
+
         $input = \Input::all();
 
         try {
@@ -144,47 +149,10 @@ class PayablesController extends \BaseController {
             } else {
 
                 $supplierId = array_get($input, 'supplier');
-                $supplier = \Supplier::findOrFail($supplierId);
+                $supplier = \Supplier::find($supplierId);
 
-                $supplier->total_payables = $supplier->total_payables - array_get($input, 'amount');
-                if (! $supplier->save()) {
-                    return \Response::json(['errors' => $supplier->errors()]);
-                } else {
-                    return \Response::json(['success' => 'Successfully saved.']);
-                }
-            }
-
-        } catch(\Exception $e) {
-            return \Response::json(['error' =>  $e->getMessage()]);
-        }
-
-    }
-
-
-
-    public function partialPayment() {
-
-        $input = \Input::all();
-
-        try {
-
-            $rules = [
-                'amount' => 'required|numeric|min:1',
-                'customer' => 'required|exists:customers,customer_id'
-            ];
-
-
-            $validator = \Validator::make($input, $rules);
-
-            if ($validator->fails()) {
-                return \Response::json(['errors' => $validator->errors()]);
-            } else {
-
-                $cusId = array_get($input, 'customer');
-                $customer = \Customer::find($cusId);
-
-                $input['branch_id'] = $customer->branch_id;
-                $input['sale_type'] = 'SALE';
+                $input['branch_id'] = $supplier->branch_id;
+                $input['expense_type'] = 'STORE EXPENSES';
                 $input['product_id'] = 0;
                 $input['supplier_price'] = 0;
                 $input['selling_price'] = 0;
@@ -197,14 +165,17 @@ class PayablesController extends \BaseController {
 
                 $errors = [];
 
-                \DB::transaction(function() use (&$input, &$customer, &$errors) {
-                    $sale = new \Sale;
+                \DB::transaction(function() use (&$input, &$supplier, &$errors) {
+                    $expense = new \Expense;
 
-                    if (!$sale->doSave($sale, $input)) {
-                        $errors[] = $sale->errors();
+                    if (!$expense->doSave($expense, $input)) {
+                        $errors[] = $expense->errors();
                     } else {
-                        $customer->total_credits = $customer->total_credits - array_get($input, 'amount');
-                        $customer->save();
+
+                        $supplier->total_payables = $supplier->total_payables - array_get($input, 'amount');
+                        if (! $supplier->save()) {
+                            $errors[] = $supplier->errors();
+                        }
                     }
                 });
 

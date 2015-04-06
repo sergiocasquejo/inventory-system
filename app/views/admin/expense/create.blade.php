@@ -31,7 +31,7 @@
 								<td>{{ \Branch::find($review['branch_id'])->address }}</td>
                                 @endif
 								<td data-branch="{{{ $review['branch_id'] }}}"
-                                    data-supplier="{{ $review['supplier']  }}"
+                                    data-supplier="{{ isset($review['supplier']) ? $review['supplier']  : 0  }}"
                                     data-is_payable="{{{ isset($review['is_payable']) ? $review['is_payable'] : 0  }}}"
                                     data-expense_type="{{{ $review['expense_type'] }}}">{{{ $review['expense_type'] }}}</td>
 								<td data-name="{{{ $review['name'] }}}">

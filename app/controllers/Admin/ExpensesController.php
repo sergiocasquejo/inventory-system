@@ -150,10 +150,11 @@ class ExpensesController extends \BaseController {
 
                         $errors[] = $expense->errors();
                     } else {
-
-                        $supplier = \Supplier::findOrFail(array_get($input, 'supplier'));
-                        $supplier->total_payables = $supplier->total_payables + array_get($input, 'total_amount', 0);
-                        $supplier->save();
+                        if (array_get($input, 'expense_type') == 'PRODUCT EXPENSES') {
+                            $supplier = \Supplier::findOrFail(array_get($input, 'supplier'));
+                            $supplier->total_payables = $supplier->total_payables + array_get($input, 'total_amount', 0);
+                            $supplier->save();
+                        }
                     }
 
                 });
@@ -386,10 +387,14 @@ class ExpensesController extends \BaseController {
 
                         $errors[] = $expense->errors();
                     } else {
+                        if (array_get($input, 'expense_type') == 'PRODUCT EXPENSES') {
                             $supplier = \Supplier::findOrFail(array_get($input, 'supplier'));
                             $supplier->total_payables = $supplier->total_payables + array_get($input, 'total_amount', 0);
                             $supplier->save();
-                            \Session::forget("expensesReview.$key");
+
+                        }
+
+                        \Session::forget("expensesReview.$key");
                     }
 
                 });
