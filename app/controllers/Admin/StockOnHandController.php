@@ -13,7 +13,7 @@ class StockOnHandController extends \BaseController {
 
         $stockSQL = \StockOnHand::select('stocks_on_hand.stock_on_hand_id', 'stocks_on_hand.uom',
                 'stocks_on_hand.total_stocks',
-                'products.name as product_name',
+                'products.name as product_name', 'products.sack_to_kg',
                 'branches.name as branch_name', 'branches.address')
             ->join('products', 'stocks_on_hand.product_id', '=', 'products.id')
             ->join('branches', 'branches.id', '=', 'stocks_on_hand.branch_id');
@@ -52,7 +52,7 @@ class StockOnHandController extends \BaseController {
 
 			if ($stock->uom == 'kg') {
 				//1 Sack equivalent
-				$sackEqui = \Config::get('agrivet.equivalent_measure.sacks.per');
+				$sackEqui = $stock->sack_to_kg != 0 ? $stock->sack_to_kg : \Config::get('agrivet.equivalent_measure.sacks.per');
 
 				$sack = 0;
 				$quantity = (float)$stock->total_stocks / (float)$sackEqui;
@@ -173,9 +173,11 @@ class StockOnHandController extends \BaseController {
 				if (strpos($uomInput, 'sack') !== false) {
 
 					$equi_config = \Config::get('agrivet.equivalent_measure.sacks');
+                    $sackEqui = $stock->sack_to_kg != 0 ? $stock->sack_to_kg : $equi_config['per'];
+
 					$input['uom'] = $uom = $equi_config['to'];
 					
-					$total_stocks = array_get($input, 'total_stocks', 0) * $equi_config['per'];
+					$total_stocks = array_get($input, 'total_stocks', 0) * $sackEqui;
 
 					$stockObj = \StockOnHand::whereRaw("branch_id = {$branch_id} AND product_id = {$product_id}  AND uom = '{$uom}'")->first();
 
@@ -193,26 +195,24 @@ class StockOnHandController extends \BaseController {
                 \DB::transaction(function() use (&$stock, &$input, &$errors) {
                     if ($stock->doSave($stock, $input)) {
                         if (array_get($input, 'is_payable') == 1 ) {
-                            $expense = new \Expense;
-                            $input['expense_type'] = 'PRODUCT EXPENSES';
-                            $input['is_payable_paid'] = 0;
+
+                            $payable = new \Payable;
                             $input['name'] = array_get($input, 'product_id');
                             $input['brand'] = array_get($input, 'brand');
                             $input['supplier'] = array_get($input, 'supplier');
                             $input['quantity'] = array_get($input, 'quantity');
                             $input['encoded_by'] = \Confide::user()->id;
                             $input['stock_on_hand_id'] = $stock->stock_on_hand_id;
-                            $input['date_of_expense'] = date('Y-m-d');
                             $input['comments'] = array_get($input, 'comments');
 
-                            if ($expense->doSave($expense, $input)) {
+                            if ($payable->doSave($payable, $input)) {
 
                                 $supplier = \Supplier::findOrFail($input['supplier']);
                                 $supplier->total_payables = $supplier->total_payables + array_get($input, 'total_amount', 0);
                                 $supplier->save();
 
                             } else {
-                                $errors[] = $expense->errors();
+                                $errors[] = $payable->errors();
                             }
                         }
                     } else {
@@ -287,19 +287,13 @@ class StockOnHandController extends \BaseController {
 	public function update($stock_id = false)
 	{
 
-		$input = \Input::all();
+		$input = \Input::only('total_stocks');
 
 
 
 
-		$rules = \StockOnHand::$rules; 
+		$rules['total_stocks'] = 'required|numeric';
 
-		$uom = array_get($input, 'uom');
-
-		$product_id = array_get($input, 'product_id');
-
-		
-		$rules['branch_id'] = 'required|exists:branches,id|unique:stocks_on_hand,branch_id,'.$stock_id.',stock_on_hand_id,product_id,'.$product_id.',uom,'.$uom;
 
 
 		$validator = \Validator::make($input, $rules);
@@ -317,21 +311,11 @@ class StockOnHandController extends \BaseController {
 
 				$stock = \StockOnHand::findOrFail($stock_id);
 				
-				// Do conversion sacks to kilogram
-				$uomInput = array_get($input, 'uom');
-				if (strpos($uomInput, 'sack')  !== false) {
-
-
-					$equi_config = \Config::get('agrivet.equivalent_measure.sacks');
-					$input['uom'] = $uom = $equi_config['to'];
-					
-					$input['total_stocks'] = array_get($input, 'total_stocks', 0) * $equi_config['per'];
-
-				}
+                $stock->total_stocks = array_get($input, 'total_stocks', 0);
 
 
 
-				if ($stock->doSave($stock, $input)) {
+				if ($stock->save()) {
 					if (\Request::ajax()) {
 						return \Response::json(['success' => \Lang::get('agrivet.updated')]);
 					} else {
@@ -369,10 +353,8 @@ class StockOnHandController extends \BaseController {
 		$stock = \StockOnHand::find($stock_id)->delete();
 		if ($stock) {
 			return \Redirect::back()->with('success', \Lang::get('agrivet.deleted'));
-			// return \Response::json(['success' => \Lang::get('agrivet.deleted')]);
 		} 
 		return \Redirect::back()->withErrors($stock->errors());
-		// return \Response::json($stock->errors());
 	}
 
 

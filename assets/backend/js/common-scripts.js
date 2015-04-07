@@ -132,6 +132,14 @@ var Script = function () {
     $(function () {
 
 
+        $('input[type=checkbox][value="sack(s)"]').on('click', function() {
+           if ($(this).is(':checked')) {
+                $('.sack-to-kilo-box').removeClass('hidden');
+           }  else {
+               $('.sack-to-kilo-box').addClass('hidden');
+           }
+        });
+
 
         var payableList = $('form#payableList');
 

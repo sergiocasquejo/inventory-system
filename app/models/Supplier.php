@@ -14,7 +14,7 @@ class Supplier extends Eloquent {
 
 
     public function payables() {
-        return $this->hasMany('Expense');
+        return $this->hasMany('Payable');
     }
 
     public function products() {

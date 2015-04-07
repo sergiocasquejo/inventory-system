@@ -51,6 +51,10 @@ class Product extends Eloquent {
         return $this->hasMany('Expense');
     }
 
+    public function products() {
+        return $this->hasMany('Product');
+    }
+
     public function supplier() {
         return $this->belongsTo('Supplier', 'supplier_id');
     }
@@ -120,6 +124,7 @@ class Product extends Eloquent {
         $instance->brand_id = array_get($input, 'brand_id');
         $instance->category_id = array_get($input, 'category_id');
         $instance->uom = json_encode(array_get($input, 'uom'));
+        $instance->sack_to_kg =array_get($input, 'sack_to_kg', 0);
         
 		
 		$instance->save();

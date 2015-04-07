@@ -35,6 +35,9 @@ class Branch extends Eloquent {
 		return $this->hasMany('Expense');
 	}
 
+    public function payables() {
+        return $this->hasMany('Payable');
+    }
 
     public function credit() {
         return $this->hasMany('Credit');

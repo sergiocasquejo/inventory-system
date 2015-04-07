@@ -50,10 +50,10 @@ class PayablesController extends \BaseController {
 
         $appends = '';
         $totalRows = 0;
-        $expenses = array();
+        $payables = array();
 
         if ($input) {
-            $lists = \Expense::filter($input)->owned()->payable()->orderBy('expense_id', 'desc');
+            $lists = \Payable::filter($input)->owned()->orderBy('payable_id', 'desc');
 
 
             $totalRows = $lists->count();
@@ -64,7 +64,7 @@ class PayablesController extends \BaseController {
 
             }
 
-            $expenses = $lists->paginate($offset);
+            $payables = $lists->paginate($offset);
 
 
             $appends = ['records_per_page' => \Input::get('records_per_page', 10)];
@@ -77,7 +77,7 @@ class PayablesController extends \BaseController {
             ->with('branch', $branch->address)
             ->with('supplier', $supplier->supplier_name)
             ->with('suppliers', array_add(\Supplier::hasPayables()->lists('supplier_name', 'supplier_id'), '', 'Select Supplier'))
-            ->with('expenses', $expenses)
+            ->with('payables', $payables)
             ->with('appends', $appends)
             ->with('totalRows', $totalRows);
     }
@@ -108,6 +108,28 @@ class PayablesController extends \BaseController {
         }
         return \Redirect::back()->withError($supplier->errors());
     }
+
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function destroy($id)
+    {
+        $payable = \Payable::findOrFail($id);
+        $message = \Lang::get('agrivet.deleted');
+
+        if (!$payable->delete()) {
+            return \Redirect::back()->withErrors($payable->errors());
+        }
+
+
+        return \Redirect::back()->with('success', $message);
+
+    }
+
 
 
 
@@ -148,27 +170,28 @@ class PayablesController extends \BaseController {
                 return \Response::json(['errors' => $validator->errors()]);
             } else {
 
-                $supplierId = array_get($input, 'supplier');
-                $supplier = \Supplier::find($supplierId);
 
-                $input['branch_id'] = $supplier->branch_id;
-                $input['expense_type'] = 'STORE EXPENSES';
-                $input['product_id'] = 0;
-                $input['supplier_price'] = 0;
-                $input['selling_price'] = 0;
-                $input['quantity'] = 0;
-                $input['uom'] = '';
-                $input['total_amount'] = array_get($input, 'amount');
-                $input['comments'] = array_get($input, 'comments');
-                $input['date_of_sale'] = date('Y-m-d');
-                $input['encoded_by'] = \Confide::user()->id;
 
                 $errors = [];
 
                 \DB::transaction(function() use (&$input, &$supplier, &$errors) {
+
                     $expense = new \Expense;
 
-                    if (!$expense->doSave($expense, $input)) {
+                    $supplierId = array_get($input, 'supplier');
+                    $supplier = \Supplier::findOrFail($supplierId);
+
+                    $expense->is_payable = 1;
+                    $expense->branch_id = $supplier->location;
+                    $expense->name = 'PARTIAL PAYMENT';
+                    $expense->expense_type = 'STORE EXPENSES';
+                    $expense->total_amount = array_get($input, 'amount');
+                    $expense->comments = array_get($input, 'comments');
+                    $expense->date_of_expense = date('Y-m-d H:i:s');
+                    $expense->encoded_by = \Confide::user()->id;
+
+
+                    if (!$expense->save()) {
                         $errors[] = $expense->errors();
                     } else {
 

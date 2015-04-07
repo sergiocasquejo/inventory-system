@@ -56,7 +56,7 @@
 						  </div>
 						</div>
 						<div class="form-group">
-						  <label class="col-sm-2 control-label">Description</label>
+						  <label class="col-sm-2 control-label">Unit of Measures</label>
 						<div class="col-sm-10">
 						  		@if ($measures)
 						  			@foreach ($measures as $key => $value)
@@ -66,6 +66,12 @@
 						  		@endif
 						  </div>
 						</div>
+                        <div class="form-group sack-to-kilo-box {{ in_array( 'sack(s)', Input::old('uom[]', (array)json_decode($product->uom)) ) ? '' : 'hidden' }}">
+                            <label class="col-sm-2 control-label">1 Sack to Kilos</label>
+                            <div class="col-sm-10">
+                                <input type="number" step="any"  name="sack_to_kg" min="0" placeholder="1 Sack to Kilos" value="{{ Input::old('sack_to_kg', $product->sack_to_kg) }}" class="form-control">
+                            </div>
+                        </div>
 
 						<div class="form-group">
 						  <label class="col-sm-2 control-label">Comments</label>

@@ -68,6 +68,8 @@ Route::group(['before' => 'auth', 'prefix' => 'admin'], function() {
     Route::put('credits/payables/{id}/paid', ['uses' => 'Admin\PayablesController@paid', 'as' => 'admin_credits.payables_paid']);
     Route::put('credits/payables/{id}/update', ['uses' => 'Admin\PayablesController@update', 'as' => 'admin_credits.payables_update']);
     Route::get('credits/payables/{id}/edit', ['uses' => 'Admin\PayablesController@edit', 'as' => 'admin_credits.payables_edit']);
+    Route::delete('credits/payables/{id}/destroy', ['uses' => 'Admin\PayablesController@destroy', 'as' => 'admin_credits.payables_destroy']);
+
     Route::get('credits/payables/details', ['uses' => 'Admin\PayablesController@details', 'as' => 'admin_credits.payable_details']);
     Route::get('credits/payables', ['uses' => 'Admin\PayablesController@index', 'as' => 'admin_credits.payables']);
 	Route::post('credits/save-review', ['uses' => 'Admin\CreditsController@saveReview', 'as' => 'admin_credits.saveReview']);

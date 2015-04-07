@@ -35,7 +35,6 @@ class SalesController extends \BaseController {
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
-		$countries = \Config::get('agrivet.countries');
 
 
 		$yearly = \Sale::owned()->sale()->owned()->whereRaw('sale_type="SALE" AND YEAR(date_of_sale) = YEAR(CURDATE())')->sum('total_amount');
@@ -133,58 +132,66 @@ class SalesController extends \BaseController {
 
 				$errors = [];
 
-				\DB::transaction(function() use(&$input, &$errors) {
-					
-
-					// Get user branch
-					$branch_id = array_get($input, 'branch_id');
-					$uom = array_get($input, 'uom');
-					$product = array_get($input, 'product_id');
-					$quantity = array_get($input, 'quantity');
-
-					// Convert sack to kg
-					if (strpos($uom,'sack') !== false) {
-						$oldMeasure = $input['uom'];
-						$input['quantity'] = $quantity * \Config::get('agrivet.equivalent_measure.sacks.per');
-						$input['uom'] = $uom = 'kg';
-					}
+                \DB::transaction(function() use(&$input, &$errors) {
 
 
-					$stock = \StockOnHand::where('product_id', $product)
-									->where('branch_id', $branch_id)
-									->where('uom', $uom)
-									->first();
+                    // Get user branch
+                    $branch_id = array_get($input, 'branch_id');
+                    $uom = array_get($input, 'uom');
+                    $product = array_get($input, 'product_id');
+                    $quantity = array_get($input, 'quantity');
+                    $total_quantity  = $quantity;
 
-		
-					if ($stock && $stock->total_stocks > 0) {
+                    $p = \Product::find($product);
 
-						if ($stock->total_stocks >= array_get($input, 'quantity', 0)) {
-							$branch = \ProductPricing::whereRaw("branch_id = {$branch_id} AND product_id = {$product}  AND per_unit = '{$uom}'")->first();
+                    // Convert sack to kg
+                    if (strpos($uom,'sack') !== false) {
+                        $sack_to_kg = $p->sack_to_kg;
 
-							$input['supplier_price'] = 	$branch->supplier_price;
-							$input['selling_price'] = 	$branch->selling_price;
-							$input['total_amount'] = 	$branch->selling_price * $input['quantity'];
+                        $per_sack = $sack_to_kg ? $sack_to_kg : \Config::get('agrivet.equivalent_measure.sacks.per');
+                        //$oldMeasure = $input['uom'];
+                        $total_quantity = $quantity * $per_sack;
+                        $uom = 'kg';
+                    }
+
+                    $stock = \StockOnHand::where('product_id', $product)
+                        ->where('branch_id', $branch_id)
+                        ->where('uom', $uom)
+                        ->first();
 
 
-							$sale = new \Sale;
+                    if ($stock && $stock->total_stocks > 0) {
 
-							if (!$sale->doSave($sale, $input)) {			
-								$errors = $sale->errors();
-							} else {
-								$stock->total_stocks = $stock->total_stocks - array_get($input, 'quantity');
-								$stock->save();
-							}
-						} else {
-							if (strpos($oldMeasure, 'sack') !== false) $input['uom'] = $oldMeasure;
-							$errors = [\Lang::get('agrivet.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
-						}
+                        if ($stock->total_stocks >= $total_quantity) {
+                            $product_pricing = \ProductPricing::whereRaw("branch_id = {$branch_id} AND product_id = {$product}  AND per_unit = '". array_get($input, 'uom') ."'")->first();
+                            if (!$product_pricing) {
+                                $errors[] = 'No pricing setup for '.$p->name.' with '.$uom.' measure ('. \Branch::find($branch_id)->address .'). you must setup especially if your converting sack to kg.';
+                            } else {
+                                $input['supplier_price'] = $product_pricing->supplier_price;
+                                $input['selling_price'] = $product_pricing->selling_price;
+                                $input['total_amount'] = $product_pricing->selling_price * $input['quantity'];
 
-					} else {
-						if (strpos($oldMeasure,'sack') !== false) $input['uom'] = $oldMeasure;
-						$errors = [\Lang::get('agrivet.errors.out_of_stocks')];
 
-					}
-				});
+                                $sale = new \Sale;
+
+                                if (!$sale->doSave($sale, $input)) {
+                                    $errors[] = $sale->errors();
+                                } else {
+                                    $stock->total_stocks = $stock->total_stocks - $total_quantity;
+                                    $stock->save();
+                                }
+                            }
+                        } else {
+                            //if (strpos($oldMeasure, 'sack') !== false) $input['uom'] = $oldMeasure;
+                            $errors[] = [$p->name.' '.\Lang::get('agrivet.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
+                        }
+
+                    } else {
+                        //if (strpos($oldMeasure,'sack') !== false) $input['uom'] = $oldMeasure;
+                        $errors[] = [$p->name.' '.\Lang::get('agrivet.errors.out_of_stocks')];
+
+                    }
+                });
 				
 
 				if (count($errors) == 0) {
@@ -270,64 +277,6 @@ class SalesController extends \BaseController {
                     if (!$sale->doSave($sale, $input)) {
                         $errors = $sale->errors();
                     }
-
-
-                    /*
-					// Get user branch
-					$branch_id = array_get($input, 'branch_id');
-					$uom = array_get($input, 'uom');
-					$product = array_get($input, 'product_id');
-					$quantity = array_get($input, 'quantity', 0);
-
-					// Convert sack to kg
-					if (strpos($uom,'sack') !== false) {
-						$oldMeasure = $input['uom'];
-						$input['quantity'] = $quantity * \Config::get('agrivet.equivalent_measure.sacks.per');
-						$input['uom'] = $uom = 'kg';
-					}
-
-					$stock = \StockOnHand::where('product_id', $product)
-									->where('branch_id', $branch_id)
-									->where('uom', $uom)
-									->first();
-
-					$branch = \ProductPricing::whereRaw("branch_id = {$branch_id} AND product_id = {$product}  AND per_unit = '{$uom}'")->first();
-
-					$input['supplier_price'] = 	$branch->supplier_price;
-					$input['selling_price'] = 	$branch->selling_price;
-
-
-					$sale = \Sale::findOrFail($id);
-                    $input['encoded_by'] = $sale->encoded_by;
-
-					if ($sale->quantity > $quantity) {
-							$stock->total_stocks = $stock->total_stocks +  ($sale->quantity - array_get($input, 'quantity'));
-							$stock->save();
-					} else if ($sale->quantity < $quantity) {
-						
-						$total = $stock->total_stocks -  ($quantity - $sale->quantity);
-
-
-						// Check if stock is insufficient
-						if ($total < 0) {
-							$errors = [\Lang::get('agrivet.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
-							return;
-						}
-
-						$stock->total_stocks = $total;
-
-						$stock->save();
-
-					}
-
-					$input['total_amount'] = 	$branch->selling_price * $input['quantity'];
-					if (!$sale->doSave($sale, $input)) {			
-						$errors = $sale->errors();
-					} else {
-						$stock->total_stocks = $stock->total_stocks - $quantity;
-						$stock->save();
-					}*/
-
 				});
 				
 
@@ -376,7 +325,7 @@ class SalesController extends \BaseController {
 	 */
 	public function restore($id) {
 		$sale = \Sale::withTrashed()->where('sale_id', $id)->first();
-		if (!$sale->restore()) {
+		if (!$sale->restore($id)) {
 			return \Redirect::back()->withErrors($sale->errors());			
 		}
 
@@ -448,22 +397,25 @@ class SalesController extends \BaseController {
 				$errors = [];
 				$input['encoded_by'] = \Confide::user()->id;
 				\DB::transaction(function() use(&$input, &$errors) {
-					
+
 
 					// Get user branch
 					$branch_id = array_get($input, 'branch_id');
-					$uom = array_get($input, 'uom');
+                    $uom = array_get($input, 'uom');
 					$product = array_get($input, 'product_id');
 					$quantity = array_get($input, 'quantity');
-					$oldMeasure = '';
+					$total_quantity  = $quantity;
 
 					$p = \Product::find($product);
 
 					// Convert sack to kg
 					if (strpos($uom,'sack') !== false) {
-						$oldMeasure = $input['uom'];
-						$input['quantity'] = $quantity * \Config::get('agrivet.equivalent_measure.sacks.per');
-						$input['uom'] = $uom = 'kg';
+                        $sack_to_kg = $p->sack_to_kg;
+
+                        $per_sack = $sack_to_kg ? $sack_to_kg : \Config::get('agrivet.equivalent_measure.sacks.per');
+                        //$oldMeasure = $input['uom'];
+                        $total_quantity = $quantity * $per_sack;
+						$uom = 'kg';
 					}
 
 					$stock = \StockOnHand::where('product_id', $product)
@@ -474,29 +426,32 @@ class SalesController extends \BaseController {
 		
 					if ($stock && $stock->total_stocks > 0) {
 
-						if ($stock->total_stocks >= array_get($input, 'quantity', 0)) {
-							$branch = \ProductPricing::whereRaw("branch_id = {$branch_id} AND product_id = {$product}  AND per_unit = '{$uom}'")->first();
+						if ($stock->total_stocks >= $total_quantity) {
+							$product_pricing = \ProductPricing::whereRaw("branch_id = {$branch_id} AND product_id = {$product}  AND per_unit = '". array_get($input, 'uom') ."'")->first();
+                            if (!$product_pricing) {
+                                $errors[] = 'No pricing setup for '.$p->name.' with '.$uom.' measure ('. \Branch::find($branch_id)->address .'). you must setup especially if your converting sack to kg.';
+                            } else {
+                                $input['supplier_price'] = $product_pricing->supplier_price;
+                                $input['selling_price'] = $product_pricing->selling_price;
+                                $input['total_amount'] = $product_pricing->selling_price * $input['quantity'];
 
-							$input['supplier_price'] = 	$branch->supplier_price;
-							$input['selling_price'] = 	$branch->selling_price;
-							$input['total_amount'] = 	$branch->selling_price * $input['quantity'];
 
+                                $sale = new \Sale;
 
-							$sale = new \Sale;
-
-							if (!$sale->doSave($sale, $input)) {			
-								$errors[] = $sale->errors();
-							} else {
-								$stock->total_stocks = $stock->total_stocks - array_get($input, 'quantity');
-								$stock->save();
-							}
+                                if (!$sale->doSave($sale, $input)) {
+                                    $errors[] = $sale->errors();
+                                } else {
+                                    $stock->total_stocks = $stock->total_stocks - $total_quantity;
+                                    $stock->save();
+                                }
+                            }
 						} else {
-							if (strpos($oldMeasure, 'sack') !== false) $input['uom'] = $oldMeasure;
+							//if (strpos($oldMeasure, 'sack') !== false) $input['uom'] = $oldMeasure;
 							$errors[] = [$p->name.' '.\Lang::get('agrivet.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
 						}
 
 					} else {
-						if (strpos($oldMeasure,'sack') !== false) $input['uom'] = $oldMeasure;
+						//if (strpos($oldMeasure,'sack') !== false) $input['uom'] = $oldMeasure;
 						$errors[] = [$p->name.' '.\Lang::get('agrivet.errors.out_of_stocks')];
 
 					}

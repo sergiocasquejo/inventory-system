@@ -26,7 +26,6 @@ class UnitOfMeasuresController extends \BaseController {
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
-		$countries = \Config::get('agrivet.countries');
 		return \View::make('admin.uom.index')
 			->with('uoms', $uoms)
 			->with('appends', $appends)

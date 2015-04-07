@@ -16,13 +16,13 @@ class DashboardController extends \BaseController {
 		$data = [];
 
 
-		$data['weekly_expenses'] = \Expense::select(\DB::raw('DAY(date_of_expense) as day_of_expense, TRUNCATE(SUM(total_amount), 2) as weekly_expense'))->paidPayable()->groupBy('day_of_expense')->whereRaw('WEEK(date_of_expense) = WEEK(CURDATE())')->lists('weekly_expense');
+		$data['weekly_expenses'] = \Expense::select(\DB::raw('DAY(date_of_expense) as day_of_expense, TRUNCATE(SUM(total_amount), 2) as weekly_expense'))->groupBy('day_of_expense')->whereRaw('WEEK(date_of_expense) = WEEK(CURDATE())')->lists('weekly_expense');
 		$data['weekly_sales'] = \Sale::select(\DB::raw('DAY(date_of_sale) as day_of_sale, TRUNCATE(SUM(total_amount - (supplier_price * quantity)), 2) as weekly_sale'))->groupBy('day_of_sale')->whereRaw('WEEK(date_of_sale) = WEEK(CURDATE())')->lists('weekly_sale');
 
 		$data['total_users']  = \User::count();
 		$data['total_credits']  = \Customer::sum('total_credits');
-		$data['total_expense']  = \Expense::paidPayable()->whereRaw('YEAR(CURDATE()) = YEAR(date_of_expense)')->sum('total_amount');
-		$data['total_sales'] = \Sale::where('sale_type', 'SALE')->whereRaw('YEAR(CURDATE()) = YEAR(date_of_sale)')->sum('total_amount');
+		$data['total_expense']  = \Expense::whereRaw('YEAR(CURDATE()) = YEAR(date_of_expense)')->sum('total_amount');
+		$data['total_sales'] = \Sale::where('sale_type', 'SALE')->whereRaw('YEAR(CURDATE()) = YEAR(date_of_sale)')->sum('total_amount') - \Expense::payable()->sum('total_amount');
 
 		$data['earning'] = \Sale::select(\DB::raw('YEAR(date_of_sale) as the_year,
 TRUNCATE(SUM(total_amount - (supplier_price * quantity)), 2) as total_amount,

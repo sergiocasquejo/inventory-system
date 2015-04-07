@@ -15,7 +15,6 @@ class ExpensesController extends \BaseController {
         $totalRows = \Expense::withTrashed()
             ->filter($input)
              ->search($input)
-            ->paidPayable()
             ->owned()->count();
 
 
@@ -29,7 +28,6 @@ class ExpensesController extends \BaseController {
 		$expenses = \Expense::withTrashed()
             ->filter($input)
             ->search($input)
-                ->paidPayable()
             ->owned()
             ->orderBy('expense_id', 'desc')
             ->paginate($offset);
@@ -43,10 +41,10 @@ class ExpensesController extends \BaseController {
 		$countries = \Config::get('agrivet.countries');
 
 
-		$yearly = \Expense::whereRaw('YEAR(date_of_expense) = YEAR(CURDATE())')->paidPayable()->sum('total_amount');
-		$monthly = \Expense::whereRaw('MONTH(date_of_expense) = MONTH(CURDATE())')->paidPayable()->sum('total_amount');
-		$weekly = \Expense::whereRaw('WEEK(date_of_expense) = WEEK(CURDATE())')->paidPayable()->sum('total_amount');
-		$daily = \Expense::whereRaw('DAY(date_of_expense) = DAY(CURDATE())')->paidPayable()->sum('total_amount');
+		$yearly = \Expense::whereRaw('YEAR(date_of_expense) = YEAR(CURDATE())')->sum('total_amount');
+		$monthly = \Expense::whereRaw('MONTH(date_of_expense) = MONTH(CURDATE())')->sum('total_amount');
+		$weekly = \Expense::whereRaw('WEEK(date_of_expense) = WEEK(CURDATE())')->sum('total_amount');
+		$daily = \Expense::whereRaw('DAY(date_of_expense) = DAY(CURDATE())')->sum('total_amount');
 
 
 		$branches = \DB::table('expenses')->join('branches', 'expenses.branch_id', '=', 'branches.id')
@@ -135,7 +133,14 @@ class ExpensesController extends \BaseController {
 			return \Redirect::back()->withErrors($validator->errors())->withInput();
 		} else {
 			try {
-				$expense = new \Expense;
+
+                // If payable is checked store data to payable else on expense
+                if (array_get($input, 'is_payable') == 1) {
+                    $expense = new \Payable;
+                } else {
+                    $expense = new \Expense;
+                }
+
                 $errors = [];
 
 
@@ -144,7 +149,6 @@ class ExpensesController extends \BaseController {
                     if (array_get($input, 'expense_type') == 'PRODUCT EXPENSES' && $stock = $this->addToStock($input)) {
                         $input['stock_on_hand_id'] = $stock->stock_on_hand_id;
                     }
-
 
                     if (!$expense->doSave($expense, $input)) {
 
@@ -240,20 +244,8 @@ class ExpensesController extends \BaseController {
                 $errors = [];
 				$expense = \Expense::findOrFail($id);
 
-//                $input['encoded_by'] = $expense->encoded_by;
-//                $input['is_payable'] = $expense->is_payable;
-//                $input['product_id'] = $input['name'];
-
 
                 \DB::transaction(function() use(&$errors, &$expense, &$input){
-
-//                        if ($expense->stock_on_hand_id != 0) {
-//                            $stock = \StockOnHand::findOrFail($expense->stock_on_hand_id);
-//                        } else {
-//                            $stock = new \StockOnHand();
-//                        }
-//
-//                        $oldStock = $expense->quantity;
 
                         if (!$expense->doSave($expense, $input)) {
                             $errors[] = $expense->errors();
@@ -377,7 +369,13 @@ class ExpensesController extends \BaseController {
 				$input['encoded_by'] = \Confide::user()->id;
 
                 \DB::transaction(function() use(&$input, &$key) {
-                    $expense = new \Expense;
+                    // If payable is checked store data to payable else on expense
+                    if (array_get($input, 'is_payable') == 1) {
+                        $expense = new \Payable;
+                    } else {
+                        $expense = new \Expense;
+                    }
+
                     if (array_get($input, 'expense_type') == 'PRODUCT EXPENSES' && $stock = $this->addToStock($input)) {
 
                         $input['stock_on_hand_id'] = $stock->stock_on_hand_id;

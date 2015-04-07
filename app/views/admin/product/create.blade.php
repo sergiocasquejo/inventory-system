@@ -52,6 +52,13 @@
 					  		@endif
 					  </div>
 					</div>
+                    <div class="form-group sack-to-kilo-box {{ in_array( 'sack(s)', Input::old('uom[]', []) ) ? '' : 'hidden' }}">
+                        <label class="col-sm-2 control-label">1 Sack to Kilos</label>
+                        <div class="col-sm-10">
+                            <input type="number" step="any"  name="sack_to_kg" min="0" placeholder="1 Sack to Kilos" value="{{ Input::old('sack_to_kg', \Config::get('agrivet.equivalent_measure.sacks.per')) }}" class="form-control">
+                        </div>
+                    </div>
+
 					<div class="form-group">
 					  <label class="col-sm-2 control-label">Comments</label>
 					  <div class="col-sm-10">

@@ -32,32 +32,18 @@
                     </thead>
                     <tbody>
 
-                      @if ($expenses)
-                          @foreach ($expenses as $expense)
+                      @if ($payables)
+                          @foreach ($payables as $payable)
                           <tr>
                               <td>
-                                @if ($expense->expense_type=='PRODUCT EXPENSES')
-                                  {{{ $expense->product->name }}}
-                                @else
-                                  {{{ $expense->name }}}
-                                @endif
+                                  {{{ $payable->product->name }}}
                               </td>
-                              <td>{{{ $expense->uom }}}</td>
-                              <td>{{{ $expense->quantity }}}</td>
-                              <td>{{{ \Helper::nf($expense->total_amount) }}}</td>
+                              <td>{{{ $payable->uom }}}</td>
+                              <td>{{{ $payable->quantity }}}</td>
+                              <td>{{{ \Helper::nf($payable->total_amount) }}}</td>
                                <td>
 
-                                   @if ($expense->deleted_at != null)
-                                    <a href="{{{ route('admin_expenses.restore', $expense->expense_id) }}}" data-method="RESTORE" class="btn btn-primary btn-xs" title="Restore"><i class="icon-rotate-left"></i></a>
-                                   @else
-                                       <a href="{{{ route('admin_expenses.edit', $expense->expense_id) }}}" class="btn btn-primary btn-xs" title="Edit"><i class="icon-pencil"></i></a>
-                                  @endif
-                                   @if ($expense->deleted_at == null)
-                                  <a href="{{{ route('admin_expenses.destroy', $expense->expense_id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Trash" class="btn btn-danger btn-xs">
-                                    <i class="icon-trash"></i>
-                                  </a>
-                                  @endif
-                                  <a href="{{{ route('admin_expenses.destroy', ['id' => $expense->expense_id, 'remove' => 1]) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
+                                  <a href="{{{ route('admin_credits.payables_destroy',  $payable->payable_id) }}}" data-confirm="Are you sure?" data-method="DELETE" title="Delete" class="btn btn-danger btn-xs">
                                     <i class="icon-remove"></i>
                                   </a>
 
@@ -73,8 +59,8 @@
                     <tfoot>
                       <tr>
                           <td colspan="2"></td>
-                          <td><strong>{{{ !$expenses ? 0 :$expenses->sum('quantity') }}}</strong></td>
-                          <td><strong>{{{ \Helper::nf(!$expenses ? 0 : $expenses->sum('total_amount')) }}}</strong></td>
+                          <td><strong>{{{ !$payables ? 0 :$payables->sum('quantity') }}}</strong></td>
+                          <td><strong>{{{ \Helper::nf(!$payables ? 0 : $payables->sum('total_amount')) }}}</strong></td>
                           <td colspan="6"></td>
                       </tr>
                   </tfoot>
@@ -86,8 +72,8 @@
                   </div>
                   <div class="col-sm-6">
                     <div class="dataTables_filter pagination-sm">
-                        @if ($expenses)
-                      <label>{{ $expenses->appends($appends)->links() }}</label>
+                        @if ($payables)
+                      <label>{{ $payables->appends($appends)->links() }}</label>
                             @endif
                     </div>
                   </div>

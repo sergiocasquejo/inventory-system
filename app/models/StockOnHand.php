@@ -27,6 +27,10 @@ class StockOnHand extends Eloquent {
         return $this->belongsTo('Expense', 'stock_on_hand_id');
     }
 
+    public function payable() {
+        return $this->belongsTo('Payable', 'stock_on_hand_id');
+    }
+
 
     public function scopeFilter($query, $input) {
 
