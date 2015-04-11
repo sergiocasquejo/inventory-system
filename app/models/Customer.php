@@ -27,6 +27,10 @@ class Customer extends Eloquent {
         return $this->hasMany('Credit');
     }
 
+    public function scopeCashOut($query) {
+        return $query->where('is_cash_out', 1);
+    }
+
     public function scopeHasCredits($query) {
         return $query->where('total_credits', '>', 0);
     }
@@ -35,6 +39,17 @@ class Customer extends Eloquent {
 
         if (!\Confide::user()->isAdmin()) {
             $query->where('branch_id', '=', \Confide::user()->branch_id);
+        }
+
+        return $query;
+    }
+
+
+    public function scopeSearch($query, $input) {
+
+        if (isset($input['s'])) {
+            $query->whereRaw('customer_name LIKE "%'. array_get($input, 's', '') .'%"
+    			OR address LIKE "%'. array_get($input, 's', '') .'%"');
         }
 
         return $query;

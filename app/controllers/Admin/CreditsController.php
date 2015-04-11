@@ -16,9 +16,8 @@ class CreditsController extends \BaseController {
             $input = \Input::all();
 
             $lists =  \Credit::withTrashed()
-                ->join('sales', 'credits.sale_id', '=', 'sales.sale_id')
-                ->join('customers', 'customers.customer_id', '=', 'credits.customer_id')
-                //->unPaid()
+                ->leftJoin('sales', 'credits.sale_id', '=', 'sales.sale_id')
+                ->leftJoin('customers', 'customers.customer_id', '=', 'credits.customer_id')
                 ->owned()
                 ->filter($input)->orderBy('credit_id', 'desc');
 
@@ -97,6 +96,9 @@ class CreditsController extends \BaseController {
         $input = \Input::all();
 
         $rules = \Customer::$rules;
+        if (!\Confide::user()->isAdmin()) {
+            $input['branch_id'] = \Confide::user()->branch_id;
+        }
 
         if (array_get($input, 'customer_id') == 0) {
             $rules['customer_name']	= 'required|unique:customers,customer_name,NULL,customer_id,address,'.array_get($input, 'address', '');
@@ -121,12 +123,12 @@ class CreditsController extends \BaseController {
 
 		$input['encoded_by'] = \Confide::user()->id;
 
-		if (!\Confide::user()->isAdmin()) {
-			$input['branch_id'] = \Confide::user()->branch_id;
-		}
-		$input['is_paid'] = 0;
+        $rules = \Sale::$rules;
+        if (array_get($input, 'is_cash_out') == 1) {
+            $rules = array_except($rules, ['product_id', 'quantity', 'uom']);
+        }
 
-		$rules = \Credit::$rules;
+
 
 		$validator = \Validator::make($input, $rules);
 
@@ -135,95 +137,8 @@ class CreditsController extends \BaseController {
 		} else {
 			try {
 
-				$errors = [];
-
-				\DB::transaction(function() use(&$input, &$errors) {
-					
-
-					// Get user branch
-					$branch_id = array_get($input, 'branch_id');
-                    $oldMeasure = $uom = array_get($input, 'uom');
-					$product = array_get($input, 'product_id');
-					$quantity = array_get($input, 'quantity');
-                    $p = \Product::find($product);
-					// Convert sack to kg
-					if (strpos($uom,'sack') !== false) {
-                        $sack_to_kg = $p->sack_to_kg;
-
-                        $per_sack = $sack_to_kg ? $sack_to_kg : \Config::get('agrivet.equivalent_measure.sacks.per');
-                        //$oldMeasure = $input['uom'];
-                        $total_quantity = $quantity * $per_sack;
-						$uom = 'kg';
-					}
-
-
-					$stock = \StockOnHand::where('product_id', $product)
-									->where('branch_id', $branch_id)
-									->where('uom', $uom)
-									->first();
-
-
-                    if (array_get($input, 'customer_id') == 0) {
-                        $customer = new \Customer;
-                    } else {
-                        $customer = \Customer::findOrFail(array_get($input, 'customer_id'));
-                    }
-                    $input['total_credits'] = $customer->total_credits + array_get($input, 'total_amount');
-                    $customer->doSave($customer, $input);
-                    $input['customer_id'] = $customer->customer_id;
-
-					if ($stock && $stock->total_stocks > 0) {
-
-                        if ($stock->total_stocks >= $total_quantity) {
-                            $product_pricing = \ProductPricing::whereRaw("branch_id = {$branch_id} AND product_id = {$product}  AND per_unit = '". array_get($input, 'uom') ."'")->first();
-                            if (!$product_pricing) {
-                                $errors[] = 'No pricing setup for '.$p->name.' with '.$uom.' measure ('. \Branch::find($branch_id)->address .'). you must setup especially if your converting sack to kg.';
-                            } else {
-
-                                $input['sale_type'] = "CREDIT";
-                                $input['supplier_price'] = $product_pricing->supplier_price;
-                                $input['selling_price'] = $product_pricing->selling_price;
-                                $input['total_amount'] = $product_pricing->selling_price * array_get($input, 'quantity');
-
-
-                                $sale = new \Sale;
-
-                                if (!$sale->doSave($sale, $input)) {
-                                    $errors = $sale->errors();
-                                } else {
-                                    $stock->total_stocks = $stock->total_stocks - $total_quantity;
-                                    $stock->save();
-
-                                    if (array_get($input, 'customer_id') == 0) {
-                                        $customer = new \Customer;
-                                    } else {
-                                        $customer = \Customer::findOrFail(array_get($input, 'customer_id'));
-                                    }
-
-                                    $input['total_credits'] = $customer->total_credits + array_get($input, 'total_amount');
-
-                                    $customer->doSave($customer, $input);
-                                    $input['customer_id'] = $customer->customer_id;
-
-
-                                    $credit = new \Credit;
-                                    $input['sale_id'] = $sale->sale_id;
-                                    $credit->doSave($credit, $input);
-
-                                }
-                            }
-						} else {
-							//if (strpos($oldMeasure, 'sack') !== false) $input['uom'] = $oldMeasure;
-							$errors = [\Lang::get('agrivet.errors.insufficient_stocks', ['stocks' => $stock->total_stocks .' '.$uom])];
-						}
-
-					} else {
-						if (strpos($oldMeasure,'sack') !== false) $input['uom'] = $oldMeasure;
-						$errors = [\Lang::get('agrivet.errors.out_of_stocks')];
-
-					}
-				});
-				
+                $errors = [];
+				$errors = $this->doSave($input, $errors);
 
 				if (count($errors) == 0) {
 					return \Redirect::route('admin_credits.index')->with('success', \Lang::get('agrivet.created'));
@@ -240,6 +155,116 @@ class CreditsController extends \BaseController {
 			}
 		}
 	}
+
+
+    public function doSave($input, $errors) {
+        \DB::transaction(function() use(&$input, &$errors) {
+
+
+            // Get user branch
+            $branch_id = array_get($input, 'branch_id');
+
+
+
+
+            if (array_get($input, 'is_cash_out') == 0) {
+
+                $oldMeasure = $uom = array_get($input, 'uom');
+                $product = array_get($input, 'product_id');
+                $total_quantity = $quantity = array_get($input, 'quantity');
+                $p = \Product::find($product);
+                // Convert sack to kg
+                if (strpos($uom,'sack') !== false) {
+                    $sack_to_kg = $p->sack_to_kg;
+
+                    $per_sack = $sack_to_kg ? $sack_to_kg : \Config::get('agrivet.equivalent_measure.sacks.per');
+                    //$oldMeasure = $input['uom'];
+                    $total_quantity = $quantity * $per_sack;
+                    $uom = 'kg';
+                }
+
+
+                $stock = \StockOnHand::where('product_id', $product)
+                    ->where('branch_id', $branch_id)
+                    ->where('uom', $uom)
+                    ->first();
+
+
+
+                if ($stock && $stock->total_stocks > 0) {
+
+                    if ($stock->total_stocks >= $total_quantity) {
+
+                        $product_pricing = \ProductPricing::whereRaw("branch_id = {$branch_id} AND product_id = {$product}  AND per_unit = '" . array_get($input, 'uom') . "'")->first();
+                        if (!$product_pricing) {
+                            $errors[] = 'No pricing setup for ' . $p->name . ' with ' . $uom . ' measure (' . \Branch::find($branch_id)->address . '). you must setup especially if your converting sack to kg.';
+                        } else {
+                            $input['supplier_price'] = $product_pricing->supplier_price;
+                            $input['selling_price'] = $product_pricing->selling_price;
+                            $input['total_amount'] = $product_pricing->selling_price * array_get($input, 'quantity');
+
+                            $stock->total_stocks = $stock->total_stocks - $total_quantity;
+                            if (!$stock->save()) {
+                                $errors[] = $stock->errors();
+                            }
+
+
+                        }
+                    } else {
+                        //if (strpos($oldMeasure, 'sack') !== false) $input['uom'] = $oldMeasure;
+                        $errors[] = [\Lang::get('agrivet.errors.insufficient_stocks', ['stocks' => $stock->total_stocks . ' ' . $uom])];
+                    }
+
+                } else {
+                    if (strpos($oldMeasure, 'sack') !== false) $input['uom'] = $oldMeasure;
+                    $errors[] = [\Lang::get('agrivet.errors.out_of_stocks')];
+
+                }
+
+            }
+
+            if (count($errors) != 0) return;
+
+            $sale = new \Sale;
+
+            $input['sale_type'] = "CREDIT";
+            if (!$sale->doSave($sale, $input)) {
+                $errors[] = $sale->errors();
+            } else {
+
+
+                $customer = \Customer::find(array_get($input, 'customer_id'));
+
+                if (!$customer) {
+                    $customer = new \Customer;
+                }
+                // Save customer information except total credits, save total credits once all transaction is success
+                $customer->doSave($customer, array_except($input, array('total_credits')));
+
+                $input['customer_id'] = $customer->customer_id;
+                $input['total_credits'] = $customer->total_credits + array_get($input, 'total_amount');
+
+                $credit = new \Credit;
+                $input['sale_id'] = $sale->sale_id;
+                if (!$credit->doSave($credit, $input)) {
+                    $errors[] = $credit->errors();
+                }
+
+
+                if (count($errors) == 0) {
+                    $customer->total_credits = array_get($input, 'total_credits');
+                    if (!$customer->save()) {
+                        $errors[] = $customer->errors();
+                    }
+                }
+
+            }
+
+
+        });
+
+        return $errors;
+    }
 
 
 
@@ -310,13 +335,6 @@ class CreditsController extends \BaseController {
                         $errors = $sale->errors();
                     }
                 });
-//                 $input['sale_type'] = "CREDIT";
-
-
-
-
-
-
 
                 if (count($errors) == 0) {
 					return \Redirect::route('admin_credits.index')->with('success', \Lang::get('agrivet.updated'));
@@ -391,6 +409,10 @@ class CreditsController extends \BaseController {
         $input = \Input::all();
 
         $rules = \Customer::$rules;
+        if (!\Confide::user()->isAdmin()) {
+            $input['branch_id'] = \Confide::user()->branch_id;
+        }
+
 
         if (array_get($input, 'customer_id') == 0) {
             $rules['customer_name']	= 'required|unique:customers,customer_name,NULL,customer_id,address,'.array_get($input, 'address', '');
@@ -405,11 +427,12 @@ class CreditsController extends \BaseController {
 
 
 		$rules = \Sale::$rules;
+        if (array_get($input, 'is_cash_out') == 1) {
+            $rules = array_except($rules, ['product_id', 'quantity', 'uom']);
+        }
 
-		if (!\Confide::user()->isAdmin()) {
-			$input['branch_id'] = \Confide::user()->branch_id;
-		}
-		$input['status'] = 0;
+
+        $input['status'] = 0;
 		$input['encoded_by'] = \Confide::user()->id;
 
 		$validator = \Validator::make($input, $rules);
@@ -428,12 +451,6 @@ class CreditsController extends \BaseController {
 				if (!$reviewId) {
 					$reviewId = time();
 				}
-
-
-
-
-
-
 				$review[$reviewId] = array_add($input, 'branch_id', $input['branch_id']);
 
 
@@ -461,10 +478,10 @@ class CreditsController extends \BaseController {
 
 			foreach ($reviews as $key => $input) {
 				$input['encoded_by'] = \Confide::user()->id;
-				$input['is_paid'] = 0;
 
-				$errors = [];
-
+                $errors = [];
+                $errors = $this->doSave($input, $errors);
+                /*
                 \DB::transaction(function() use(&$input, &$errors) {
 
 
@@ -472,7 +489,7 @@ class CreditsController extends \BaseController {
                     $branch_id = array_get($input, 'branch_id');
                     $oldMeasure = $uom = array_get($input, 'uom');
                     $product = array_get($input, 'product_id');
-                    $quantity = array_get($input, 'quantity');
+                    $total_quantity = $quantity = array_get($input, 'quantity');
                     $p = \Product::find($product);
                     // Convert sack to kg
                     if (strpos($uom,'sack') !== false) {
@@ -489,16 +506,6 @@ class CreditsController extends \BaseController {
                         ->where('branch_id', $branch_id)
                         ->where('uom', $uom)
                         ->first();
-
-
-                    if (array_get($input, 'customer_id') == 0) {
-                        $customer = new \Customer;
-                    } else {
-                        $customer = \Customer::findOrFail(array_get($input, 'customer_id'));
-                    }
-                    $input['total_credits'] = $customer->total_credits + array_get($input, 'total_amount');
-                    $customer->doSave($customer, $input);
-                    $input['customer_id'] = $customer->customer_id;
 
                     if ($stock && $stock->total_stocks > 0) {
 
@@ -517,26 +524,37 @@ class CreditsController extends \BaseController {
                                 $sale = new \Sale;
 
                                 if (!$sale->doSave($sale, $input)) {
-                                    $errors = $sale->errors();
+                                    $errors[] = $sale->errors();
                                 } else {
                                     $stock->total_stocks = $stock->total_stocks - $total_quantity;
-                                    $stock->save();
-
-                                    if (array_get($input, 'customer_id') == 0) {
-                                        $customer = new \Customer;
-                                    } else {
-                                        $customer = \Customer::findOrFail(array_get($input, 'customer_id'));
+                                    if (!$stock->save()) {
+                                        $errors[] = $stock->errors();
                                     }
 
-                                    $input['total_credits'] = $customer->total_credits + array_get($input, 'total_amount');
+                                    $customer = \Customer::find(array_get($input, 'customer_id'));
 
-                                    $customer->doSave($customer, $input);
+                                    if (!$customer) {
+                                        $customer = new \Customer;
+                                    }
+                                    // Save customer information except total credits, save total credits once all transaction is success
+                                    $customer->doSave($customer, array_except($input, array('total_credits')));
+
                                     $input['customer_id'] = $customer->customer_id;
-
+                                    $input['total_credits'] = $customer->total_credits + array_get($input, 'total_amount');
 
                                     $credit = new \Credit;
                                     $input['sale_id'] = $sale->sale_id;
-                                    $credit->doSave($credit, $input);
+                                    if (!$credit->doSave($credit, $input)) {
+                                        $errors[] = $credit->errors();
+                                    }
+
+
+                                    if (count($errors) == 0) {
+                                        $customer->total_credits = array_get($input, 'total_credits');
+                                        if (!$customer->save()) {
+                                            $errors[] = $customer->errors();
+                                        }
+                                    }
 
                                 }
                             }
@@ -547,10 +565,10 @@ class CreditsController extends \BaseController {
 
                     } else {
                         if (strpos($oldMeasure,'sack') !== false) $input['uom'] = $oldMeasure;
-                        $errors = [\Lang::get('agrivet.errors.out_of_stocks')];
+                        $errors = [$p->name .' is '.\Lang::get('agrivet.errors.out_of_stocks')];
 
                     }
-                });
+                });*/
 				
 
 

@@ -31,16 +31,28 @@
 								data-address="{{ $review['address'] }}" 
 								data-contact_number="{{ $review['contact_number'] }}"
                                         data-customer_id="{{ $review['customer_id']  }}">
-									<a class="badge bg-primary" data-html="true" data-container="body" data-toggle="popover" data-placement="top" 
+									<a class="badge bg-primary" data-html="true"
+                                       data-container="body" data-toggle="popover" data-placement="top"
 										data-content="{{ 'Name: '. $review['customer_name'] .'<br />'. 
 										'Address: '. $review['address'] .'<br />'.
 										'Contact #: '.$review['contact_number'] }}">?</a>
 								</td>
-								<td data-branch="{{{ $review['branch_id'] }}}" data-product="{{{ $review['product_id'] }}}"><strong>{{{ \Product::find($review['product_id'])->name }}}</strong></td>
+								<td data-branch="{{{ $review['branch_id'] }}}"
+                                    data-product="{{{ isset($review['product_id']) ? $review['product_id'] : 0 }}}"
+                                    data-iscashout="{{{ isset($review['is_cash_out']) ? $review['is_cash_out'] : 0 }}}">
+                                    @if (isset($review['product_id']))
+                                    <strong>{{{ \Product::find($review['product_id'])->name }}}</strong>
+                                    @endif
+                                </td>
                                 @if (\Confide::user()->isAdmin())
 								<td>{{ \Branch::find($review['branch_id'])->address }}</td>
                                 @endif
-								<td data-quantity="{{{ $review['quantity'] }}}" data-uom="{{{ $review['uom'] }}}">{{$review['quantity'] .' '.$review['uom'] }}</td>
+								<td data-quantity="{{{ isset($review['quantity']) ? $review['product_id'] : 0 }}}"
+                                    data-uom="{{{ isset($review['uom']) ? $review['product_id'] : 0 }}}">
+                                    @if (isset($review['quantity']))
+                                        {{$review['quantity'] .' '.$review['uom'] }}
+                                    @endif
+                                </td>
 								<td data-total_amount="{{{ $review['total_amount'] }}}">{{ \Helper::nf($review['total_amount']) }}</td>
 								<td data-date_of_sale="{{{ $review['date_of_sale'] }}}">{{ $review['date_of_sale'] }}</td>
 								<td data-comments="{{{ $review['comments'] }}}"><a class="badge bg-primary" data-container="body" data-toggle="popover" data-placement="top" data-content="{{{ $review['comments'] }}}">?</a></td>
@@ -101,11 +113,17 @@
 			              <span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
 			          </div>
 			      	</div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Is Cash Out</label>
+                        <div class="col-sm-10">
+                            {{ Form::checkbox('is_cash_out', 1, Input::old('is_cash_out', 0) == 1)  }}
+                        </div>
+                    </div>
 
 			      	<div class="form-group">
 						<label class="col-sm-2 control-label">Product</label>
 						<div class="col-sm-10">
-							{{ Form::select('product_id', $products, Input::old('product_id', 0), ['class' => 'form-control m-bot15']) }}
+							{{ Form::select('product_id', $products, Input::old('product_id', 0), ['class' => 'form-control m-bot15', \Helper::is_disabled(Input::old('is_cash_out', 0), 1)]) }}
 							<span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
 						</div>
 			      	</div>
@@ -113,7 +131,7 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label">Unit of measure</label>
                         <div class="col-sm-10">
-                            {{ Form::select('uom', $measures, Input::old('uom'), ['class' => 'form-control m-bot15', 'data-selected' => Input::old('uom')]) }}
+                            {{ Form::select('uom', $measures, Input::old('uom'), ['class' => 'form-control m-bot15', 'data-selected' => Input::old('uom'), \Helper::is_disabled(Input::old('is_cash_out', 0), 1)]) }}
                         </div>
                     </div>
 
@@ -121,7 +139,7 @@
 			      	<div class="form-group">
 					  <label class="col-sm-2 control-label">Quantity</label>
 					  <div class="col-sm-10">
-					      <input type="number"  step="any" name="quantity"  data-selected="{{ Input::old('quantity') }}" value="{{ Input::old('quantity') }}" class="form-control">
+					      <input type="number"  step="any" name="quantity"  data-selected="{{ Input::old('quantity') }}" value="{{ Input::old('quantity') }}" class="form-control" {{{ \Helper::is_disabled(Input::old('is_cash_out', 0), 1)  }}}>
 					  </div>
 					</div>
 
@@ -130,8 +148,12 @@
 					<div class="form-group">
 					  <label class="col-sm-2 control-label">Total Amount</label>
 					  <div class="col-sm-10">
+                          @if (Input::old('is_cash_out', 0) == 1)
+                          <input type="text" name="total_amount" value="{{ Input::old('total_amount') }}" data-selected="{{ Input::old('total_amount') }}" class="form-control">
+                          @else
                             <span class="total_amount">Php 0.00</span>
-					      <input type="hidden" name="total_amount" value="{{ Input::old('total_amount') }}" data-selected="{{ Input::old('total_amount') }}" class="form-control" readonly>
+					        <input type="hidden" name="total_amount" value="{{ Input::old('total_amount') }}" data-selected="{{ Input::old('total_amount') }}" class="form-control" readonly>
+                          @endif
 					  </div>
 					</div>
 
@@ -150,12 +172,7 @@
 					  </div>
 					</div>
 					
-					<!--<div class="form-group">
-					  <label class="col-sm-2 control-label">Is Paid</label>
-					  <div class="col-sm-10">
-					      {{ Form::select('is_paid', \Config::get('agrivet.credit_statuses'), Input::old('is_paid', 0), ['class' => 'form-control m-bot15', 'disabled' => 'disabled']) }}
-					  </div>
-					</div>-->
+
 
 
 					<button type="submit" name="action" value="review" class="btn btn-shadow btn-info">Add to Review</button>

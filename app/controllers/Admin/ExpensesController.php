@@ -38,7 +38,7 @@ class ExpensesController extends \BaseController {
 
 		$appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
-		$countries = \Config::get('agrivet.countries');
+
 
 
 		$yearly = \Expense::whereRaw('YEAR(date_of_expense) = YEAR(CURDATE())')->sum('total_amount');
@@ -368,7 +368,7 @@ class ExpensesController extends \BaseController {
 
 				$input['encoded_by'] = \Confide::user()->id;
 
-                \DB::transaction(function() use(&$input, &$key) {
+                \DB::transaction(function() use(&$input, &$key, &$errors) {
                     // If payable is checked store data to payable else on expense
                     if (array_get($input, 'is_payable') == 1) {
                         $expense = new \Payable;
@@ -388,11 +388,14 @@ class ExpensesController extends \BaseController {
                         if (array_get($input, 'expense_type') == 'PRODUCT EXPENSES') {
                             $supplier = \Supplier::findOrFail(array_get($input, 'supplier'));
                             $supplier->total_payables = $supplier->total_payables + array_get($input, 'total_amount', 0);
-                            $supplier->save();
+                            if (!$supplier->save()) {
+                                $errors[] = $supplier->errors();
+                            }
 
                         }
-
-                        \Session::forget("expensesReview.$key");
+                        if (count($errors) == 0) {
+                            \Session::forget("expensesReview.$key");
+                        }
                     }
 
                 });
@@ -417,7 +420,7 @@ class ExpensesController extends \BaseController {
 
     public function addToStock($input) {
 
-        $stock = new \StockOnHand;
+
 
 
         if (\Confide::user()->isAdmin()) {
@@ -433,37 +436,37 @@ class ExpensesController extends \BaseController {
 
         $stockObj = \StockOnHand::whereRaw("branch_id = {$branch_id} AND product_id = {$product_id}  AND uom = '{$uom}'")->first();
 
-        if ($stockObj) {
-            $stock = $stockObj;
-            $input['total_stocks'] = $stock->total_stocks + array_get($input, 'quantity', 0);
-
-
-
-            // Do conversion sacks to kilogram
-            $uomInput = array_get($input, 'uom');
-            if (strpos($uomInput, 'sack') !== false) {
-
-                $equi_config = \Config::get('agrivet.equivalent_measure.sacks');
-                $input['uom'] = $uom = $equi_config['to'];
-
-                $total_stocks = array_get($input, 'quantity', 0) * $equi_config['per'];
-
-                $stockObj = \StockOnHand::whereRaw("branch_id = {$branch_id} AND product_id = {$product_id}  AND uom = '{$uom}'")->first();
-
-                if ($stockObj) {
-                    $stock = $stockObj;
-                    $total_stocks = $stock->total_stocks + $total_stocks;
-                }
-
-                $input['total_stocks'] = $total_stocks;
-
-            }
-
-            $input['product_id'] = $product_id;
-            return $stock->doSave($stock, $input);
+        if (!$stockObj) {
+            $stockObj = new \StockOnHand();
         }
 
-        return;
+        $stock = $stockObj;
+        $input['total_stocks'] = $stock->total_stocks + array_get($input, 'quantity', 0);
+
+
+
+        // Do conversion sacks to kilogram
+        $uomInput = array_get($input, 'uom');
+        if (strpos($uomInput, 'sack') !== false) {
+
+            $equi_config = \Config::get('agrivet.equivalent_measure.sacks');
+            $input['uom'] = $uom = $equi_config['to'];
+
+            $total_stocks = array_get($input, 'quantity', 0) * $equi_config['per'];
+
+            $stockObj = \StockOnHand::whereRaw("branch_id = {$branch_id} AND product_id = {$product_id}  AND uom = '{$uom}'")->first();
+
+            if ($stockObj) {
+                $stock = $stockObj;
+                $total_stocks = $stock->total_stocks + $total_stocks;
+            }
+
+            $input['total_stocks'] = $total_stocks;
+
+        }
+
+        $input['product_id'] = $product_id;
+        return $stock->doSave($stock, $input);
 
     }
 

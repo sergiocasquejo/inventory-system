@@ -45,6 +45,8 @@
                         <input type="number" step="any" name="total_credits" class="form-control" value="{{ Input::old('total_credits', $customer->total_credits) }}" />
                     </div>
                 </div>
+
+
                 <button type="submit" class="btn btn-shadow btn-primary">Update</button>
             </form>
         </div>

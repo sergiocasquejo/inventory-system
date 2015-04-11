@@ -64,6 +64,27 @@ class Sale extends Eloquent {
         $query->where('sale_type', '=', 'SALE');
         return $query;
     }
+
+    public  function scopeIsSale($query) {
+        $query->where('sale_type', '=', 'SALE');
+        return $query;
+    }
+
+    public function scopeIsCredit($query) {
+        $query->where('sale_type', '=', 'CREDIT');
+    }
+
+    public function scopeIsCashOut($query) {
+        $query->where('is_cash_out', '=', 1);
+    }
+
+    public function scopeByYear($query, $year = null) {
+        if ($year == null) {
+            return $query->whereRaw('YEAR(CURDATE()) = YEAR(date_of_sale)');
+        } else {
+            return $query->whereRaw($year.' = YEAR(date_of_sale)');
+        }
+    }
     
 
 	public function scopeFilter($query, $input) {
@@ -153,6 +174,13 @@ class Sale extends Eloquent {
 
             $instance->sale_type = array_get($input, 'sale_type', 'SALE');
         }
+
+        if (array_get($input, 'is_cash_out') != '') {
+
+            $instance->is_cash_out = array_get($input, 'is_cash_out', 0);
+        }
+
+
 
 
 		$instance->comments = array_get($input, 'comments');

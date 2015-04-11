@@ -42,6 +42,13 @@
 		          </div>
 		      	</div>
 
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">Is Cash Out</label>
+                    <div class="col-sm-10">
+                        {{ Form::checkbox('is_cash_out', 1, Input::old('is_cash_out', $credit->sale->is_cash_out) == 1, ['disabled'])  }}
+                    </div>
+                </div>
+
 		      	<div class="form-group">
 					<label class="col-sm-2 control-label">Product</label>
 					<div class="col-sm-10">
@@ -89,13 +96,7 @@
 				      <input type="text" name="date_of_sale" value="{{ Input::old('date_of_sale', $credit->sale->date_of_sale) }}" class="form-control datepicker">
 				  </div>
 				</div>
-				
-				<!--<div class="form-group">
-				  <label class="col-sm-2 control-label">Is Paid</label>
-				  <div class="col-sm-10">
-				      {{ Form::select('is_paid', \Config::get('agrivet.credit_statuses'), Input::old('is_paid' , $credit->is_paid), ['class' => 'form-control m-bot15']) }}
-				  </div>
-				</div>-->
+
 
 
 

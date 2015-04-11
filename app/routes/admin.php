@@ -34,7 +34,7 @@ Route::group(['before' => 'auth', 'prefix' => 'admin'], function() {
 			Route::resource('prices', 'Admin\PricesController', ['names' => $prefixResourceNamespace('admin_product_prices'), 'except' => ['show']] );
 		});
 		// Products routes
-        Route::post('products/suppliers-product/', ['uses' => 'Admin\ProductsController@getBySupplier', 'as' => 'admin_products.by_supplier']);
+
 		Route::post('products/{id}/restore', ['uses' => 'Admin\ProductsController@restore', 'as' => 'admin_products.restore']);
 		Route::resource('products', 'Admin\ProductsController', ['names' => $prefixResourceNamespace('admin_products'), 'except' => ['show']]);
 		// Brands routes
@@ -46,10 +46,15 @@ Route::group(['before' => 'auth', 'prefix' => 'admin'], function() {
 		Route::resource('uoms', 'Admin\UnitOfMeasuresController', ['names' => $prefixResourceNamespace('admin_uoms'), 'except' => ['show']]);
 
         //Supplier Routes
-        Route::post('suppliers/list-by-branch', ['uses' => 'Admin\SuppliersController@getByBranch', 'as' => 'admin_suppliers.by_branch']);
+
         Route::resource('suppliers', 'Admin\SuppliersController', ['names' => $prefixResourceNamespace('admin_suppliers')]);
 
 	});
+    Route::post('products/suppliers-product/', ['uses' => 'Admin\ProductsController@getBySupplier', 'as' => 'admin_products.by_supplier']);
+
+    Route::post('suppliers/list-by-branch', ['uses' => 'Admin\SuppliersController@getByBranch', 'as' => 'admin_suppliers.by_branch']);
+
+
     // Customers routeslist
     Route::get('customers/lists', ['uses' => 'Admin\CustomersController@lists', 'as' => 'admin_customers.list']);
     Route::resource('customers', 'Admin\CustomersController', ['names' => $prefixResourceNamespace('admin_customers')]);

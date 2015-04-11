@@ -142,4 +142,18 @@ class Helper {
 	{
 	    return is_numeric( $val ) && floor( $val ) != $val;
 	}
+
+
+    public static function is_disabled($str1, $str2, $echo = false, $attr = 'disabled') {
+        if ($str1 != $str2) {
+            $attr = '';
+        }
+
+        if (!$echo) {
+            return $attr;
+        }
+        echo $attr;
+
+
+    }
 }

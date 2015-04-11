@@ -339,9 +339,9 @@ class SalesController extends \BaseController {
 
 		$rules = \Sale::$rules;
 
-		if (!\Confide::user()->isAdmin()) {
-			$input['branch_id'] = \Confide::user()->branch_id;
-		}
+        if (!\Confide::user()->isAdmin()) {
+            $input['branch_id'] = \Confide::user()->branch_id;
+        }
 
 		$input['encoded_by'] = \Confide::user()->id;
 
@@ -399,7 +399,8 @@ class SalesController extends \BaseController {
 				\DB::transaction(function() use(&$input, &$errors) {
 
 
-					// Get user branch
+
+                    // Get user branch
 					$branch_id = array_get($input, 'branch_id');
                     $uom = array_get($input, 'uom');
 					$product = array_get($input, 'product_id');
@@ -423,7 +424,7 @@ class SalesController extends \BaseController {
 									->where('uom', $uom)
 									->first();
 
-		
+
 					if ($stock && $stock->total_stocks > 0) {
 
 						if ($stock->total_stocks >= $total_quantity) {
@@ -451,6 +452,7 @@ class SalesController extends \BaseController {
 						}
 
 					} else {
+
 						//if (strpos($oldMeasure,'sack') !== false) $input['uom'] = $oldMeasure;
 						$errors[] = [$p->name.' '.\Lang::get('agrivet.errors.out_of_stocks')];
 

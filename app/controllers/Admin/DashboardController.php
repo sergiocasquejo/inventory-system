@@ -22,7 +22,7 @@ class DashboardController extends \BaseController {
 		$data['total_users']  = \User::count();
 		$data['total_credits']  = \Customer::sum('total_credits');
 		$data['total_expense']  = \Expense::whereRaw('YEAR(CURDATE()) = YEAR(date_of_expense)')->sum('total_amount');
-		$data['total_sales'] = \Sale::where('sale_type', 'SALE')->whereRaw('YEAR(CURDATE()) = YEAR(date_of_sale)')->sum('total_amount') - \Expense::payable()->sum('total_amount');
+		$data['total_sales'] = \Sale::isSale()->byYear()->sum('total_amount') - \Expense::payable()->sum('total_amount') - \Sale::isCredit()->byYear()->sum('total_amount');
 
 		$data['earning'] = \Sale::select(\DB::raw('YEAR(date_of_sale) as the_year,
 TRUNCATE(SUM(total_amount - (supplier_price * quantity)), 2) as total_amount,

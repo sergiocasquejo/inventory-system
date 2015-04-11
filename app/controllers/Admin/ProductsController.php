@@ -38,9 +38,8 @@ class ProductsController extends \BaseController {
 
 
 
-                $appends = ['records_per_page' => \Input::get('records_per_page', 10)];
+            $appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 
-                $countries = \Config::get('agrivet.countries');
 
             return \View::make('admin.product.index')
                 ->with('products', $products)
@@ -63,7 +62,7 @@ class ProductsController extends \BaseController {
 	public function create()
 	{
 		return \View::make('admin.product.create')
-            ->with('suppliers', array_add(\Supplier::lists('supplier_name', 'supplier_id'), '', 'Select Branch'))
+            ->with('suppliers', array_add(\Supplier::lists('supplier_name', 'supplier_id'), '', 'Select Supplier'))
 		->with('brands', array_add(\Brand::all()->lists('name', 'brand_id'), 0, 'Select Brand'))
 		->with('categories', array_add(\Category::all()->lists('name', 'category_id'), 0, 'Select Category'))
 		->with('measures', \UnitOfMeasure::all()->lists('label', 'name'));
@@ -124,7 +123,7 @@ class ProductsController extends \BaseController {
 
 		return \View::make('admin.product.edit')
 		->with('product', $product)
-            ->with('suppliers', array_add(\Supplier::lists('supplier_name', 'supplier_id'), '', 'Select Branch'))
+            ->with('suppliers', array_add(\Supplier::lists('supplier_name', 'supplier_id'), '', 'Select Supplier'))
 		->with('branches', array_add(\Branch::dropdown()->lists('name', 'id'), '', 'Select Branch'))
 		->with('brands', array_add(\Brand::all()->lists('name', 'brand_id'), 0, 'Select Brand'))
 		->with('categories', array_add(\Category::all()->lists('name', 'category_id'), 0, 'Select Category'))

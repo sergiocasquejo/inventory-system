@@ -22,9 +22,7 @@ class CustomersController extends \BaseController {
             $offset = $totalRows;
 
         }
-        $customers = \Customer::orderBy('customer_id', 'desc')->belongToBranch()->paginate($offset);
-
-
+        $customers = \Customer::orderBy('customer_id', 'desc')->search($input)->belongToBranch()->paginate($offset);
 
         $appends = ['records_per_page' => \Input::get('records_per_page', 10)];
 

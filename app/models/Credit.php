@@ -115,7 +115,7 @@ class Credit extends Eloquent {
     public function doSave(Credit $instance, $input) {
         $instance->sale_id = array_get($input, 'sale_id');
         $instance->customer_id = array_get($input, 'customer_id');
-        $instance->is_paid =  array_get($input, 'is_paid', 0);
+
         
         $instance->save();
         return $instance;

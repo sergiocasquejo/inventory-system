@@ -65,7 +65,7 @@ class StockOnHandController extends \BaseController {
 				}
 
 				
-				$kg = ($quantity - $sack) * $sackEqui;
+				$kg = round(($quantity - $sack) * $sackEqui);
 
 
 				if ($kg != 0) {

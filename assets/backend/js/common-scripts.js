@@ -527,26 +527,41 @@ var Script = function () {
                 if (response.length) {
                     $.each(response, function(index, data) {
                         var option = $('<option>').text(data.supplier_name).val(data.supplier_id);
+                        if (data.supplier_id == $supField.data('selected')) {
+                            option.attr('selected', 'selected');
+                        }
                         $supField.append(option);
+
                     });
+
+
                 }
 
                 removeImageLoader($supField, false);
+                expenseForm.find('select[name=supplier]').trigger('change');
+                expenseForm.find('select[name=expense_type]').trigger('change');
             });
         }).trigger('change');
 
         supplierField.on('change', function() {
             var self = $(this);
-            var productField = expenseForm.find('select[name=name]');
+            var productField = $('select[name=name]');
             loadImgLoader(productField);
 
             $.post(AJAX.baseUrl+'/admin/products/suppliers-product', { supplier: self.val() }).done(function(response) {
 
-
+                productField = $('select[name=name]');
                 productField.html('');
                 if (response.length) {
+
+
                     $.each(response, function(index, data){
+
                         var option = $('<option>').val(data.id).text(data.name);
+                        if (data.id == productField.data('selected')) {
+                            option.attr('selected', 'selected');
+                        }
+
                         productField.append(option);
                     });
 
@@ -579,31 +594,6 @@ var Script = function () {
                 var opt = $('<option>').val('').text("Select Product").attr('selected', 'selected');
 
                 productInput.append(opt);
-
-                //$.get(AJAX.baseUrl+'/admin/products/dropdown', function(response) {
-                //
-                //    if (response.length) {
-                //        $.each(response, function(index, product){
-                //            if (product.name != '') {
-                //                var opt = $('<option>').val(product.id).text(product.name);
-                //                if (product.id == productInput.data('selected')) {
-                //                    opt.attr('selected', 'selected');
-                //                    ddUOM(product.id);
-                //                }
-                //                productInput.append(opt);
-                //            }
-                //            removeImageLoader(expenseForm.find(':input[name=name]'));
-                //        });
-                //
-                //    }
-                //
-                //});
-
-
-
-
-
-
             } else if (val == 'STORE EXPENSES') {
                 supplierField.attr('disabled', true);
                 expenseForm.find(':input[name=is_payable]').attr('checked', false).attr('disabled','disabled');
@@ -643,7 +633,7 @@ var Script = function () {
         expenseForm.find(':input[name=uom]').on('change', function() {
             expenseForm.find(":input[name=total_amount]").val('');
             totalAmountHolder.text(formatNumberStr(parseFloat(totalAmountHolder.data('selected'))));
-            expenseForm.find(':input[name=quantity]').trigger('keyup');
+            $(':input[name=quantity]').trigger('keyup');
         });
 
         $('body').on('change', ':input[name=name]', function() {
@@ -717,11 +707,30 @@ var Script = function () {
             uomField = creditForm.find(':input[name=uom]'),
             branchField = creditForm.find(':input[name=branch_id]'),
             totalAmntField = creditForm.find(':input[name=total_amount]'),
-            totalAmountHolder = $('span.total_amount');
+            totalAmountHolder = $('span.total_amount'),
+            isCashOutField = creditForm.find(':input[name=is_cash_out]');
+
+        isCashOutField.on('click', function() {
+           var self = $(this);
+
+            if (self.is(':checked')) {
+                productField.attr('disabled', true);
+                uomField.attr('disabled', true);
+                qtyField.attr('disabled', true);
+                totalAmountHolder.hide();
+                $(':input[name=total_amount]').replaceWith($('<input type="text" name="total_amount" class="form-control">'));
+            } else {
+                productField.removeAttr('disabled');
+                uomField.removeAttr('disabled');
+                qtyField.removeAttr('disabled');
+                totalAmountHolder.show();
+                $(':input[name=total_amount]').replaceWith($('<input type="hidden" name="total_amount" class="form-control">'));
+            }
+        });
 
 
         qtyField.on('keyup', function() {
-
+            if (isCashOutField.is(':checked')) return;
             var slctdProduct = creditForm.find(':input[name=product_id]').val();
             var slctdBranch = creditForm.find(':input[name=branch_id]').val();
             var slctdUOM = creditForm.find(':input[name=uom]').val();
@@ -741,6 +750,7 @@ var Script = function () {
 
 
         productField.on('change', function() {
+            if (isCashOutField.is(':checked')) return;
             var self = $(this);
             var slctdProduct = self.val();
             var slctdBranch = creditForm.find(':input[name=branch_id]').val();
@@ -796,11 +806,11 @@ var Script = function () {
                 trEl = _self.closest('tr'),
                 branch = trEl.find('td[data-branch]').data('branch'),
                 product = trEl.find('td[data-product]').data('product'),
-                uom = trEl.find('td[data-uom]').data('uom')
-            quantity = trEl.find('td[data-quantity]').data('quantity')
-            total_amount = trEl.find('td[data-total_amount]').data('total_amount')
-            comments = trEl.find('td[data-comments]').data('comments')
-            date_of_sale = trEl.find('td[data-date_of_sale]').data('date_of_sale'),
+                uom = trEl.find('td[data-uom]').data('uom'),
+                quantity = trEl.find('td[data-quantity]').data('quantity'),
+                total_amount = trEl.find('td[data-total_amount]').data('total_amount'),
+                comments = trEl.find('td[data-comments]').data('comments'),
+                date_of_sale = trEl.find('td[data-date_of_sale]').data('date_of_sale'),
                 hiddenInput = $('<input type="hidden" name="review_id">');
             $(':input[name=review_id]').remove();
             $(':input[name=branch_id]').val(branch).attr('data-selected', branch);
@@ -827,30 +837,42 @@ var Script = function () {
                 trEl = _self.closest('tr'),
                 branch = trEl.find('td[data-branch]').data('branch'),
                 product = trEl.find('td[data-product]').data('product'),
-                uom = trEl.find('td[data-uom]').data('uom')
-            quantity = trEl.find('td[data-quantity]').data('quantity')
-            total_amount = trEl.find('td[data-total_amount]').data('total_amount')
-            comments = trEl.find('td[data-comments]').data('comments')
-            date_of_sale = trEl.find('td[data-date_of_sale]').data('date_of_sale'),
+                uom = trEl.find('td[data-uom]').data('uom'),
+                quantity = trEl.find('td[data-quantity]').data('quantity'),
+                total_amount = trEl.find('td[data-total_amount]').data('total_amount'),
+                comments = trEl.find('td[data-comments]').data('comments'),
+                date_of_sale = trEl.find('td[data-date_of_sale]').data('date_of_sale'),
                 address = trEl.find('td[data-address]').data('address'),
                 customer_name = trEl.find('td[data-customer_name]').data('customer_name'),
                 contact_number = trEl.find('td[data-contact_number]').data('contact_number'),
                 customer_id = trEl.find('td[data-contact_number]').data('customer_id'),
-                hiddenInput = $('<input type="hidden" name="review_id">');
+                hiddenInput = $('<input type="hidden" name="review_id">'),
+                isCashOut = trEl.find('td[data-iscashout]').data('iscashout');
+
             $(':input[name=review_id]').remove();
             $(':input[name=branch_id]').val(branch).attr('data-selected', branch);
             $(':input[name=customer_name]').val(customer_name);
             $(':input[name=customer_id]').val(customer_id);
             $(':input[name=address]').val(address);
             $(':input[name=contact_number]').val(contact_number);
-            $(':input[name=product_id]').val(product).attr('data-selected', product).trigger('change');
-            $(':input[name=uom]').val(uom).attr('data-selected', uom);
-            $(':input[name=quantity]').val(quantity);
-            $(':input[name=total_amount]').val(total_amount);
             $(':input[name=comments]').val(comments);
             $(':input[name=date_of_sale]').val(date_of_sale);
             $(':input[name=action][value=review]').text('Update Review');
             $('.total_amount').text(formatNumberStr(total_amount));
+
+            if (isCashOut == 1) {
+                $('input[name=is_cash_out]').attr('checked', true);
+                $(':input[name=product_id]').attr('disabled', true);
+                $(':input[name=uom]').attr('disabled', true);
+                $(':input[name=quantity]').attr('disabled', true);
+                $('.total_amount').hide();
+                $(':input[name=total_amount]').replaceWith($('<input type="text" name="total_amount" value="'+ total_amount +'" class="form-control">'));
+            } else {
+                $(':input[name=product_id]').val(product).attr('data-selected', product).trigger('change');
+                $(':input[name=uom]').val(uom).attr('data-selected', uom);
+                $(':input[name=quantity]').val(quantity);
+                $(':input[name=total_amount]').val(total_amount);
+            }
 
             var input = hiddenInput.val(_self.data('review-id'));
 
@@ -866,28 +888,28 @@ var Script = function () {
                 trEl = _self.closest('tr'),
                 branch = trEl.find('td[data-branch]').data('branch'),
                 name = trEl.find('td[data-name]').data('name'),
-                expense_type = trEl.find('td[data-expense_type]').data('expense_type');
-            uom = trEl.find('td[data-uom]').data('uom')
-            quantity = trEl.find('td[data-quantity]').data('quantity')
-            total_amount = trEl.find('td[data-total_amount]').data('total_amount')
-            comments = trEl.find('td[data-comments]').data('comments')
-            date_of_sale = trEl.find('td[data-date_of_sale]').data('date_of_sale'),
-                hiddenInput = $('<input type="hidden" name="review_id">')
-            isPayable = trEl.find('td[data-is_payable]').data('is_payable'),
+                expense_type = trEl.find('td[data-expense_type]').data('expense_type'),
+                uom = trEl.find('td[data-uom]').data('uom'),
+                quantity = trEl.find('td[data-quantity]').data('quantity'),
+                total_amount = trEl.find('td[data-total_amount]').data('total_amount'),
+                comments = trEl.find('td[data-comments]').data('comments'),
+                date_of_sale = trEl.find('td[data-date_of_sale]').data('date_of_sale'),
+                hiddenInput = $('<input type="hidden" name="review_id">'),
+                isPayable = trEl.find('td[data-is_payable]').data('is_payable'),
                 supplier = trEl.find('td[data-supplier]').data('supplier');
 
             $(':input[name=review_id]').remove();
-            $(':input[name=branch_id]').val(branch).attr('data-selected', branch);
+            $(':input[name=supplier]').attr('data-selected', supplier);//.trigger('change');
+            $(':input[name=branch_id]').val(branch).attr('data-selected', branch).trigger('change');
             $(':input[name=expense_type]').val(expense_type).attr('data-selected', expense_type).trigger('change');
-            $(':input[name=supplier] option[value='+ supplier +']').attr('selected', true).attr('data-selected', expense_type).trigger('change');
             $(':input[name=name]').val(name).attr('data-selected', name);//.trigger('change');
             $(':input[name=uom]').val(uom).attr('data-selected', uom);
-            $(':input[name=quantity]').val(quantity);
+            $(':input[name=quantity]').val(quantity).attr('data-selected', quantity);
             $(':input[name=total_amount]').val(total_amount);
             $(':input[name=comments]').val(comments);
             $(':input[name=date_of_sale]').val(date_of_sale);
             $(':input[name=action][value=review]').text('Update Review');
-            $('.total_amount').text(formatNumberStr(total_amount));
+            $('.total_amount').text(formatNumberStr(total_amount)).attr('data-selected', total_amount);
 
             if (isPayable == 1) {
                 $('input[name=is_payable]').attr('checked', true);
